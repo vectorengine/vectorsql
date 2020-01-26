@@ -1,0 +1,418 @@
+/*
+Copyright 2019 The Vitess Authors.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+// This file contains all the types necessary to make
+// RPC calls to Vttablet.
+
+syntax = "proto3";
+package query;
+
+import "vtrpc.proto";
+
+// Target describes what the client expects the tablet is.
+// If the tablet does not match, an error is returned.
+message Target {
+  string keyspace = 1;
+  string shard = 2;
+  // cell is used for routing queries between vtgate and vttablets. It
+  // is not used when Target is part of the Session sent by the client.
+  string cell = 3;
+}
+
+// VTGateCallerID is sent by VTGate to VTTablet to describe the
+// caller. If possible, this information is secure. For instance,
+// if using unique certificates that guarantee that VTGate->VTTablet
+// traffic cannot be spoofed, then VTTablet can trust this information,
+// and VTTablet will use it for tablet ACLs, for instance.
+// Because of this security guarantee, this is different than the CallerID
+// structure, which is not secure at all, because it is provided
+// by the Vitess client.
+message VTGateCallerID {
+  string username = 1;
+  repeated string groups = 2;
+}
+
+// EventToken is a structure that describes a point in time in a
+// replication stream on one shard. The most recent known replication
+// position can be retrieved from vttablet when executing a query. It
+// is also sent with the replication streams from the binlog service.
+message EventToken {
+  // timestamp is the MySQL timestamp of the statements. Seconds since Epoch.
+  int64 timestamp = 1;
+
+  // The shard name that applied the statements. Note this is not set when
+  // streaming from a vttablet. It is only used on the client -> vtgate link.
+  string shard = 2;
+
+  // The position on the replication stream after this statement was applied.
+  // It is not the transaction ID / GTID, but the position / GTIDSet.
+  string position = 3;
+}
+
+// Flags sent from the MySQL C API
+enum MySqlFlag {
+  EMPTY = 0;
+  NOT_NULL_FLAG = 1;
+  PRI_KEY_FLAG = 2;
+  UNIQUE_KEY_FLAG = 4;
+  MULTIPLE_KEY_FLAG = 8;
+  BLOB_FLAG = 16;
+  UNSIGNED_FLAG = 32;
+  ZEROFILL_FLAG = 64;
+  BINARY_FLAG = 128;
+  ENUM_FLAG = 256;
+  AUTO_INCREMENT_FLAG = 512;
+  TIMESTAMP_FLAG = 1024;
+  SET_FLAG = 2048;
+  NO_DEFAULT_VALUE_FLAG = 4096;
+  ON_UPDATE_NOW_FLAG = 8192;
+  NUM_FLAG = 32768;
+  PART_KEY_FLAG = 16384;
+  GROUP_FLAG = 32768;
+  UNIQUE_FLAG = 65536;
+  BINCMP_FLAG = 131072;
+
+  option allow_alias = true;
+}
+
+// Flag allows us to qualify types by their common properties.
+enum Flag {
+  NONE = 0;
+  ISINTEGRAL = 256;
+  ISUNSIGNED = 512;
+  ISFLOAT = 1024;
+  ISQUOTED = 2048;
+  ISTEXT = 4096;
+  ISBINARY = 8192;
+}
+
+// Type defines the various supported data types in bind vars
+// and query results.
+enum Type {
+  // NULL_TYPE specifies a NULL type.
+  NULL_TYPE = 0;
+  // INT8 specifies a TINYINT type.
+  // Properties: 1, IsNumber.
+  INT8 = 257;
+  // UINT8 specifies a TINYINT UNSIGNED type.
+  // Properties: 2, IsNumber, IsUnsigned.
+  UINT8 = 770;
+  // INT16 specifies a SMALLINT type.
+  // Properties: 3, IsNumber.
+  INT16 = 259;
+  // UINT16 specifies a SMALLINT UNSIGNED type.
+  // Properties: 4, IsNumber, IsUnsigned.
+  UINT16 = 772;
+  // INT24 specifies a MEDIUMINT type.
+  // Properties: 5, IsNumber.
+  INT24 = 261;
+  // UINT24 specifies a MEDIUMINT UNSIGNED type.
+  // Properties: 6, IsNumber, IsUnsigned.
+  UINT24 = 774;
+  // INT32 specifies a INTEGER type.
+  // Properties: 7, IsNumber.
+  INT32 = 263;
+  // UINT32 specifies a INTEGER UNSIGNED type.
+  // Properties: 8, IsNumber, IsUnsigned.
+  UINT32 = 776;
+  // INT64 specifies a BIGINT type.
+  // Properties: 9, IsNumber.
+  INT64 = 265;
+  // UINT64 specifies a BIGINT UNSIGNED type.
+  // Properties: 10, IsNumber, IsUnsigned.
+  UINT64 = 778;
+  // FLOAT32 specifies a FLOAT type.
+  // Properties: 11, IsFloat.
+  FLOAT32 = 1035;
+  // FLOAT64 specifies a DOUBLE or REAL type.
+  // Properties: 12, IsFloat.
+  FLOAT64 = 1036;
+  // TIMESTAMP specifies a TIMESTAMP type.
+  // Properties: 13, IsQuoted.
+  TIMESTAMP = 2061;
+  // DATE specifies a DATE type.
+  // Properties: 14, IsQuoted.
+  DATE = 2062;
+  // TIME specifies a TIME type.
+  // Properties: 15, IsQuoted.
+  TIME = 2063;
+  // DATETIME specifies a DATETIME type.
+  // Properties: 16, IsQuoted.
+  DATETIME = 2064;
+  // YEAR specifies a YEAR type.
+  // Properties: 17, IsNumber, IsUnsigned.
+  YEAR = 785;
+  // DECIMAL specifies a DECIMAL or NUMERIC type.
+  // Properties: 18, None.
+  DECIMAL = 18;
+  // TEXT specifies a TEXT type.
+  // Properties: 19, IsQuoted, IsText.
+  TEXT = 6163;
+  // BLOB specifies a BLOB type.
+  // Properties: 20, IsQuoted, IsBinary.
+  BLOB = 10260;
+  // VARCHAR specifies a VARCHAR type.
+  // Properties: 21, IsQuoted, IsText.
+  VARCHAR = 6165;
+  // VARBINARY specifies a VARBINARY type.
+  // Properties: 22, IsQuoted, IsBinary.
+  VARBINARY = 10262;
+  // CHAR specifies a CHAR type.
+  // Properties: 23, IsQuoted, IsText.
+  CHAR = 6167;
+  // BINARY specifies a BINARY type.
+  // Properties: 24, IsQuoted, IsBinary.
+  BINARY = 10264;
+  // BIT specifies a BIT type.
+  // Properties: 25, IsQuoted.
+  BIT = 2073;
+  // ENUM specifies an ENUM type.
+  // Properties: 26, IsQuoted.
+  ENUM = 2074;
+  // SET specifies a SET type.
+  // Properties: 27, IsQuoted.
+  SET = 2075;
+  // TUPLE specifies a tuple. This cannot
+  // be returned in a QueryResult, but it can
+  // be sent as a bind var.
+  // Properties: 28, None.
+  TUPLE = 28;
+  // GEOMETRY specifies a GEOMETRY type.
+  // Properties: 29, IsQuoted.
+  GEOMETRY = 2077;
+  // JSON specifies a JSON type.
+  // Properties: 30, IsQuoted.
+  JSON = 2078;
+  // EXPRESSION specifies a SQL expression.
+  // This type is for internal use only.
+  // Properties: 31, None.
+  EXPRESSION = 31;
+}
+
+// Value represents a typed value.
+message Value {
+  Type type = 1;
+  bytes value = 2;
+}
+
+// BindVariable represents a single bind variable in a Query.
+message BindVariable {
+  Type type = 1;
+  bytes value = 2;
+  // values are set if type is TUPLE.
+  repeated Value values = 3;
+}
+
+// BoundQuery is a query with its bind variables
+message BoundQuery {
+  // sql is the SQL query to execute
+  string sql = 1;
+
+  // bind_variables is a map of all bind variables to expand in the query.
+  // nil values are not allowed. Use NULL_TYPE to express a NULL value.
+  map<string, BindVariable> bind_variables = 2;
+}
+
+// ExecuteOptions is passed around for all Execute calls.
+message ExecuteOptions {
+  // This used to be exclude_field_names, which was replaced by
+  // IncludedFields enum below
+  reserved 1;
+
+  // If set, we will try to include an EventToken with the responses.
+  bool include_event_token = 2;
+
+  // If set, the fresher field may be set as a result comparison to this token.
+  // This is a shortcut so the application doesn't need to care about
+  // comparing EventTokens.
+  EventToken compare_event_token = 3;
+
+  enum IncludedFields {
+    TYPE_AND_NAME = 0;
+    TYPE_ONLY = 1;
+    ALL = 2;
+  }
+
+  // Controls what fields are returned in Field message responses from mysql, i.e.
+  // field name, table name, etc. This is an optimization for high-QPS queries where
+  // the client knows what it's getting
+  IncludedFields included_fields = 4;
+
+  // client_rows_found specifies if rows_affected should return
+  // rows found instead of rows affected. Behavior is defined
+  // by MySQL's CLIENT_FOUND_ROWS flag.
+  bool client_found_rows = 5;
+
+  enum Workload {
+    UNSPECIFIED = 0;
+    OLTP = 1;
+    OLAP = 2;
+    DBA = 3;
+  }
+
+  // workload specifies the type of workload:
+  // OLTP: DMLs allowed, results have row count limit, and
+  // query timeouts are shorter.
+  // OLAP: DMLS not allowed, no limit on row count, timeouts
+  // can be as high as desired.
+  // DBA: no limit on rowcount or timeout, all queries allowed 
+  // but intended for long DMLs and DDLs.
+  Workload workload = 6;
+
+  // sql_select_limit sets an implicit limit on all select statements. Since
+  // vitess also sets a rowcount limit on queries, the smallest value wins.
+  int64 sql_select_limit = 8;
+
+  enum TransactionIsolation {
+    DEFAULT = 0;
+    REPEATABLE_READ = 1;
+    READ_COMMITTED = 2;
+    READ_UNCOMMITTED = 3;
+    SERIALIZABLE = 4;
+
+    // This is not an "official" transaction level but it will do a
+    // START TRANSACTION WITH CONSISTENT SNAPSHOT, READ ONLY
+    CONSISTENT_SNAPSHOT_READ_ONLY = 5;
+
+    // This not an "official" transaction level, it will send queries to mysql
+    // without wrapping them in a transaction
+    AUTOCOMMIT = 6;
+  }
+
+  TransactionIsolation transaction_isolation = 9;
+
+  // skip_query_plan_cache specifies if the query plan should be cached by vitess.
+  // By default all query plans are cached.
+  bool skip_query_plan_cache = 10;
+}
+
+// Field describes a single column returned by a query
+message Field {
+  // name of the field as returned by mysql C API
+  string name = 1;
+
+  // vitess-defined type. Conversion function is in sqltypes package.
+  Type type = 2;
+
+  // Remaining fields from mysql C API.
+  // These fields are only populated when ExecuteOptions.included_fields
+  // is set to IncludedFields.ALL.
+  string table = 3;
+  string org_table = 4;
+  string database = 5;
+  string org_name = 6;
+
+  // column_length is really a uint32. All 32 bits can be used.
+  uint32 column_length = 7;
+
+  // charset is actually a uint16. Only the lower 16 bits are used.
+  uint32 charset = 8;
+
+  // decimals is actually a uint8. Only the lower 8 bits are used.
+  uint32 decimals = 9;
+
+  // flags is actually a uint16. Only the lower 16 bits are used.
+  uint32 flags = 10;
+}
+
+// Row is a database row.
+message Row {
+  // lengths contains the length of each value in values.
+  // A length of -1 means that the field is NULL. While
+  // reading values, you have to accummulate the length
+  // to know the offset where the next value begins in values.
+  repeated sint64 lengths = 1;
+  // values contains a concatenation of all values in the row.
+  bytes values = 2;
+}
+
+// ResultExtras contains optional out-of-band information. Usually the
+// extras are requested by adding ExecuteOptions flags.
+message ResultExtras {
+  // event_token is populated if the include_event_token flag is set
+  // in ExecuteOptions.
+  EventToken event_token = 1;
+
+  // If set, it means the data returned with this result is fresher
+  // than the compare_token passed in the ExecuteOptions.
+  bool fresher = 2;
+}
+
+// QueryResult is returned by Execute and ExecuteStream.
+//
+// As returned by Execute, len(fields) is always equal to len(row)
+// (for each row in rows).
+//
+// As returned by StreamExecute, the first QueryResult has the fields
+// set, and subsequent QueryResult have rows set. And as Execute,
+// len(QueryResult[0].fields) is always equal to len(row) (for each
+// row in rows for each QueryResult in QueryResult[1:]).
+message QueryResult {
+  repeated Field fields = 1;
+  uint64 rows_affected = 2;
+  uint64 insert_id = 3;
+  repeated Row rows = 4;
+  ResultExtras extras = 5;
+}
+
+// QueryWarning is used to convey out of band query execution warnings
+// by storing in the vtgate.Session
+message QueryWarning {
+  uint32 code = 1;
+  string message = 2;
+}
+
+// StreamEvent describes a set of transformations that happened as a
+// single transactional unit on a server. It is streamed back by the
+// Update Stream calls.
+message StreamEvent {
+  // One individual Statement in a transaction.
+  message Statement {
+    // The category of one statement.
+    enum Category {
+      Error = 0;
+      DML = 1;
+      DDL = 2;
+    }
+    Category category = 1;
+
+    // table_name, primary_key_fields and primary_key_values are set for DML.
+    string table_name = 2;
+    repeated Field primary_key_fields = 3;
+    repeated Row primary_key_values = 4;
+
+    // sql is set for all queries.
+    // FIXME(alainjobart) we may not need it for DMLs.
+    bytes sql = 5;
+  }
+
+  // The statements in this transaction.
+  repeated Statement statements = 1;
+
+  // The Event Token for this event.
+  EventToken event_token = 2;
+}
+
+// ResultWithError represents a query response
+// in the form of result or error but not both.
+// TODO: To be used in ExecuteBatchResponse and BeginExecuteBatchResponse.
+message ResultWithError {
+  // error contains an query level error, only set if result is unset.
+  RPCError error = 1;
+
+  // result contains the query result, only set if error is unset.
+  query.QueryResult result = 2;
+}

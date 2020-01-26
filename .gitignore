@@ -1,0 +1,20 @@
+bin/*
+pkg/*
+tags
+coverage*
+y.output
+
+# data
+default/*
+data9000/*
+
+# packages
+src/gopkg.in/*
+src/golang.org/*
+src/github.com/*
+
+# IntelliJ project files
+.idea/*
+
+# visual studio code files
+.vscode

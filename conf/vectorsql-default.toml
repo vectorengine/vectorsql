@@ -1,0 +1,8 @@
+[server]
+tcp_port = 9000
+http_port = 8123
+default_database = "default"
+calculate_text_stack_trace = true
+
+[logger]
+level = "debug"
