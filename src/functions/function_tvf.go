@@ -31,14 +31,3 @@ var FuncTableValuedFunctionRange = &Function{
 		),
 	),
 }
-
-var FuncTableValuedFunctionArrayJoin = &Function{
-	Name: "ARRAYJOIN",
-	Args: [][]string{},
-	Logic: func(args ...datatypes.Value) (datatypes.Value, error) {
-		var values []datatypes.Value
-		values = append(values, args...)
-		return datatypes.MakeTuple(values), nil
-	},
-	Validator: All(),
-}

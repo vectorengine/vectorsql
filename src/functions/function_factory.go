@@ -26,8 +26,7 @@ var (
 		FuncLogicOr.Name:  FuncLogicOr,
 
 		// Table valued function.
-		FuncTableValuedFunctionRange.Name:     FuncTableValuedFunctionRange,
-		FuncTableValuedFunctionArrayJoin.Name: FuncTableValuedFunctionArrayJoin,
+		FuncTableValuedFunctionRange.Name: FuncTableValuedFunctionRange,
 	}
 )
 

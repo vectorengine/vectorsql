@@ -6,7 +6,6 @@ package functions
 
 import (
 	"fmt"
-	"strings"
 
 	"datatypes"
 
@@ -76,71 +75,6 @@ func (v *oneOf) Validate(args ...datatypes.Value) error {
 	return errors.Errorf("none of the conditions have been met: %+v", errs)
 }
 
-type singleOneOf struct {
-	validators []ISingleArgumentValidator
-}
-
-func SingleOneOf(validators ...ISingleArgumentValidator) *singleOneOf {
-	return &singleOneOf{validators: validators}
-}
-
-func (v *singleOneOf) Validate(arg datatypes.Value) error {
-	errs := make([]error, len(v.validators))
-	for i, validator := range v.validators {
-		errs[i] = validator.Validate(arg)
-		if errs[i] == nil {
-			return nil
-		}
-	}
-	return errors.Errorf("none of the conditions have been met: %+v", errs)
-}
-
-type ifArgPresent struct {
-	i         int
-	validator IValidator
-}
-
-func IfArgPresent(i int, validator IValidator) *ifArgPresent {
-	return &ifArgPresent{i: i, validator: validator}
-}
-
-func (v *ifArgPresent) Validate(args ...datatypes.Value) error {
-	if len(args) < v.i+1 {
-		return nil
-	}
-	return v.validator.Validate(args...)
-}
-
-type atLeastNArgs struct {
-	n int
-}
-
-func AtLeastNArgs(n int) *atLeastNArgs {
-	return &atLeastNArgs{n: n}
-}
-
-func (v *atLeastNArgs) Validate(args ...datatypes.Value) error {
-	if len(args) < v.n {
-		return errors.Errorf("expected at least %s, but got %v", argumentCount(v.n), len(args))
-	}
-	return nil
-}
-
-type atMostNArgs struct {
-	n int
-}
-
-func AtMostNArgs(n int) *atMostNArgs {
-	return &atMostNArgs{n: n}
-}
-
-func (v *atMostNArgs) Validate(args ...datatypes.Value) error {
-	if len(args) > v.n {
-		return errors.Errorf("expected at most %s, but got %v", argumentCount(v.n), len(args))
-	}
-	return nil
-}
-
 type exactlyNArgs struct {
 	n int
 }
@@ -167,48 +101,6 @@ func TypeOf(wantedType datatypes.Value) *typeOf {
 func (v *typeOf) Validate(arg datatypes.Value) error {
 	if v.wantedType.GetType() != arg.GetType() {
 		return errors.Errorf("expected type %v but got %v", v.wantedType.GetType(), arg.GetType())
-	}
-	return nil
-}
-
-type valueOf struct {
-	values []datatypes.Value
-}
-
-func ValueOf(values ...datatypes.Value) *valueOf {
-	return &valueOf{values: values}
-}
-
-func (v *valueOf) Validate(arg datatypes.Value) error {
-	for i := range v.values {
-		if datatypes.AreEqual(v.values[i], arg) {
-			return nil
-		}
-	}
-
-	values := make([]string, len(v.values))
-	for i := range v.values {
-		values[i] = v.values[i].String()
-	}
-	return errors.Errorf(
-		"argument must be one of: [%s], got %v",
-		strings.Join(values, ", "),
-		arg,
-	)
-}
-
-type arg struct {
-	i         int
-	validator ISingleArgumentValidator
-}
-
-func Arg(i int, validator ISingleArgumentValidator) *arg {
-	return &arg{i: i, validator: validator}
-}
-
-func (v *arg) Validate(args ...datatypes.Value) error {
-	if err := v.validator.Validate(args[v.i]); err != nil {
-		return errors.Errorf("bad argument at index %v: %v", v.i, err)
 	}
 	return nil
 }
