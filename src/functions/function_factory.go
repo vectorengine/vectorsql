@@ -13,11 +13,13 @@ import (
 var (
 	table = map[string]*Function{
 		// Compare.
-		FuncCompareEqual.Name:       FuncCompareEqual,
-		FuncCompareNotEqual.Name:    FuncCompareNotEqual,
-		FuncCompareLessThan.Name:    FuncCompareLessThan,
-		FuncCompareGreaterThan.Name: FuncCompareGreaterThan,
-		FuncCompareLike.Name:        FuncCompareLike,
+		FuncCompareEqual.Name:        FuncCompareEqual,
+		FuncCompareNotEqual.Name:     FuncCompareNotEqual,
+		FuncCompareLessThan.Name:     FuncCompareLessThan,
+		FuncCompareLessEqual.Name:    FuncCompareLessEqual,
+		FuncCompareGreaterThan.Name:  FuncCompareGreaterThan,
+		FuncCompareGreaterEqual.Name: FuncCompareGreaterEqual,
+		FuncCompareLike.Name:         FuncCompareLike,
 
 		// Logic.
 		FuncLogicAnd.Name: FuncLogicAnd,

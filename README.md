@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.org/vectorengine/vectorsql.png)](https://travis-ci.org/vectorengine/vectorsql)
+[![codecov.io](https://codecov.io/gh/vectorengine/vectorsql/graphs/badge.svg)](https://codecov.io/gh/vectorengine/vectorsql/branch/master)
+
 # VectorSQL
 
 VectorSQL is a free analytics DBMS for IoT & Big Data, compatible with ClickHouse.

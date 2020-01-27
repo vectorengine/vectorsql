@@ -65,6 +65,25 @@ var FuncCompareGreaterThan = &Function{
 	),
 }
 
+var FuncCompareGreaterEqual = &Function{
+	Name: ">=",
+	Args: [][]string{
+		{"left", "right"},
+	},
+	Logic: func(args ...datatypes.Value) (datatypes.Value, error) {
+		v1 := args[0]
+		v2 := args[1]
+		cmp, err := datatypes.Compare(v1, v2)
+		if err != nil || (cmp < 0) {
+			return datatypes.MakeBool(false), err
+		}
+		return datatypes.MakeBool(true), nil
+	},
+	Validator: All(
+		ExactlyNArgs(2),
+	),
+}
+
 var FuncCompareLessThan = &Function{
 	Name: "<",
 	Args: [][]string{
@@ -75,6 +94,25 @@ var FuncCompareLessThan = &Function{
 		v2 := args[1]
 		cmp, err := datatypes.Compare(v1, v2)
 		if err != nil || (cmp >= 0) {
+			return datatypes.MakeBool(false), err
+		}
+		return datatypes.MakeBool(true), nil
+	},
+	Validator: All(
+		ExactlyNArgs(2),
+	),
+}
+
+var FuncCompareLessEqual = &Function{
+	Name: "<=",
+	Args: [][]string{
+		{"left", "right"},
+	},
+	Logic: func(args ...datatypes.Value) (datatypes.Value, error) {
+		v1 := args[0]
+		v2 := args[1]
+		cmp, err := datatypes.Compare(v1, v2)
+		if err != nil || (cmp > 0) {
 			return datatypes.MakeBool(false), err
 		}
 		return datatypes.MakeBool(true), nil

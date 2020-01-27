@@ -67,10 +67,37 @@ func TestCompareFunctions(t *testing.T) {
 			expect: datatypes.MakeBool(true),
 		},
 		{
-			name: "greaterthan-ok",
+			name: "greaterthan-not-ok",
 			fn:   FuncCompareGreaterThan,
 			args: []datatypes.Value{
 				datatypes.MakeInt(2),
+				datatypes.MakeInt(2),
+			},
+			expect: datatypes.MakeBool(false),
+		},
+		{
+			name: "greaterequal-ok",
+			fn:   FuncCompareGreaterEqual,
+			args: []datatypes.Value{
+				datatypes.MakeInt(2),
+				datatypes.MakeInt(2),
+			},
+			expect: datatypes.MakeBool(true),
+		},
+		{
+			name: "greaterequal-ok",
+			fn:   FuncCompareGreaterEqual,
+			args: []datatypes.Value{
+				datatypes.MakeInt(2),
+				datatypes.MakeInt(1),
+			},
+			expect: datatypes.MakeBool(true),
+		},
+		{
+			name: "greaterequal-not-ok",
+			fn:   FuncCompareGreaterEqual,
+			args: []datatypes.Value{
+				datatypes.MakeInt(1),
 				datatypes.MakeInt(2),
 			},
 			expect: datatypes.MakeBool(false),
@@ -85,11 +112,38 @@ func TestCompareFunctions(t *testing.T) {
 			expect: datatypes.MakeBool(true),
 		},
 		{
-			name: "lessthan-ok",
+			name: "lessthan-not-ok",
 			fn:   FuncCompareLessThan,
 			args: []datatypes.Value{
 				datatypes.MakeInt(2),
 				datatypes.MakeInt(2),
+			},
+			expect: datatypes.MakeBool(false),
+		},
+		{
+			name: "lessequal-ok",
+			fn:   FuncCompareLessEqual,
+			args: []datatypes.Value{
+				datatypes.MakeInt(2),
+				datatypes.MakeInt(2),
+			},
+			expect: datatypes.MakeBool(true),
+		},
+		{
+			name: "lessequal-ok",
+			fn:   FuncCompareLessEqual,
+			args: []datatypes.Value{
+				datatypes.MakeInt(1),
+				datatypes.MakeInt(2),
+			},
+			expect: datatypes.MakeBool(true),
+		},
+		{
+			name: "lessequal-not-ok",
+			fn:   FuncCompareLessEqual,
+			args: []datatypes.Value{
+				datatypes.MakeInt(2),
+				datatypes.MakeInt(1),
 			},
 			expect: datatypes.MakeBool(false),
 		},

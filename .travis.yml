@@ -8,7 +8,6 @@ before_install:
 script:
   - make build
   - make test
-  - make check
   - make coverage
 
 after_success:
