@@ -13,6 +13,7 @@ import (
 type Server struct {
 	TCPPort                 int
 	HTTPPort                int
+	DebugPort               int
 	Path                    string
 	TmpPath                 string
 	ListenHost              string
@@ -25,6 +26,7 @@ func DefaultServerConfig() Server {
 	return Server{
 		TCPPort:         9000,
 		HTTPPort:        8123,
+		DebugPort:       8080,
 		Path:            "./data9000",
 		DefaultDatabase: "default",
 		DisplayName:     "VectorSQL",
