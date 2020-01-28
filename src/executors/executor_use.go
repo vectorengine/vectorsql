@@ -42,6 +42,5 @@ func (executor *UseExecutor) Execute() (processors.IProcessor, error) {
 }
 
 func (executor *UseExecutor) String() string {
-	res := executor.Name()
-	return res
+	return executor.Name()
 }

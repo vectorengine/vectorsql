@@ -14,7 +14,7 @@ import (
 )
 
 func TestShowDatabasesPlan(t *testing.T) {
-	query := "show tables"
+	query := "show databases"
 	statement, err := parsers.Parse(query)
 	assert.Nil(t, err)
 
@@ -28,7 +28,7 @@ func TestShowDatabasesPlan(t *testing.T) {
 	})
 	assert.Nil(t, err)
 
-	expect := "ShowDatabasesNode(AST: show tables\n)"
+	expect := "ShowDatabasesNode(AST: show databases\n)"
 	actual := plan.String()
 	assert.Equal(t, expect, actual)
 }
