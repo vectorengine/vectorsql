@@ -45,5 +45,5 @@ func (executor *CreateDatabaseExecutor) Execute() (processors.IProcessor, error)
 }
 
 func (executor *CreateDatabaseExecutor) String() string {
-	return "CreateDatabaseExecutor"
+	return executor.Name()
 }

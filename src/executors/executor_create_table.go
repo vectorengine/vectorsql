@@ -49,5 +49,5 @@ func (executor *CreateTableExecutor) Execute() (processors.IProcessor, error) {
 }
 
 func (executor *CreateTableExecutor) String() string {
-	return "CreateTableExecutor"
+	return executor.Name()
 }

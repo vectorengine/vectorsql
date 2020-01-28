@@ -22,6 +22,10 @@ func NewDropTableExecutor(ctx *ExecutorContext, plan planners.IPlan) IExecutor {
 	}
 }
 
+func (executor *DropTableExecutor) Name() string {
+	return "DropTableExecutor"
+}
+
 func (executor *DropTableExecutor) Execute() (processors.IProcessor, error) {
 	ectx := executor.ctx
 	log := executor.ctx.log
@@ -29,15 +33,15 @@ func (executor *DropTableExecutor) Execute() (processors.IProcessor, error) {
 
 	log.Debug("Executor->Enter->LogicalPlan:%s", executor.plan)
 	schema := ectx.session.GetDatabase()
-	if !ast.Table.Qualifier.IsEmpty() {
-		schema = ast.Table.Qualifier.String()
+	if !ast.FromTables[0].Qualifier.IsEmpty() {
+		schema = ast.FromTables[0].Qualifier.String()
 	}
 	database, err := databases.GetDatabase(schema)
 	if err != nil {
 		return nil, err
 	}
 
-	table := ast.Table.Name.String()
+	table := ast.FromTables[0].Name.String()
 	if err := database.Executor().DropTable(table); err != nil {
 		return nil, err
 	}
@@ -45,10 +49,6 @@ func (executor *DropTableExecutor) Execute() (processors.IProcessor, error) {
 	return nil, nil
 }
 
-func (executor *DropTableExecutor) Name() string {
-	return "DropTableExecutor"
-}
-
 func (executor *DropTableExecutor) String() string {
-	return "DropTableExecutor"
+	return executor.Name()
 }

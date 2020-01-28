@@ -65,6 +65,9 @@ func Load(log *xlog.Log, conf *config.Config) error {
 
 		// Ordinary.
 		registerOrdinaryDatabase(factory)
+
+		// Memory.
+		registerMemoryDatabase(factory)
 	}
 
 	databases = NewDatabases(log, conf)

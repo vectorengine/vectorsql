@@ -27,10 +27,16 @@ func NewTableValuedFunctionExecutor(ctx *ExecutorContext, plan *planners.TableVa
 	}
 }
 
-func (executor *TableValuedFunctionExecutor) Execute() (processors.IProcessor, error) {
-	plan := executor.plan
-	var args []datatypes.Value
+func (executor *TableValuedFunctionExecutor) Name() string {
+	return "TableValuedFunctionExecutor"
+}
 
+func (executor *TableValuedFunctionExecutor) Execute() (processors.IProcessor, error) {
+	var args []datatypes.Value
+	plan := executor.plan
+	log := executor.ctx.log
+
+	log.Debug("Executor->Enter->LogicalPlan:%s", executor.plan)
 	err := plan.Walk(func(plan planners.IPlan) (bool, error) {
 		switch plan := plan.(type) {
 		case *planners.ConstantPlan:
@@ -66,7 +72,6 @@ func (executor *TableValuedFunctionExecutor) Execute() (processors.IProcessor, e
 				return nil, err
 			}
 		}
-	case "arrayjoin":
 	}
 	// Stream.
 	stream := datastreams.NewNativeBlockInputStream()
@@ -75,13 +80,16 @@ func (executor *TableValuedFunctionExecutor) Execute() (processors.IProcessor, e
 	}
 
 	transformCtx := transforms.NewTransformContext(executor.ctx.log, executor.ctx.conf)
-	return transforms.NewDataSourceTransform(transformCtx, stream), nil
-}
-
-func (executor *TableValuedFunctionExecutor) Name() string {
-	return "TableValuedFunctionExecutor"
+	transform := transforms.NewDataSourceTransform(transformCtx, stream)
+	log.Debug("Executor->Return->Pipeline:%s", transform.Name())
+	return transform, nil
 }
 
 func (executor *TableValuedFunctionExecutor) String() string {
-	return "TableValuedFunctionExecutor"
+	res := "\n"
+	res += "->"
+	res += executor.Name()
+	res += "\t--> "
+	res += executor.plan.String()
+	return res
 }
