@@ -14,13 +14,12 @@ var FuncTableValuedFunctionRange = &Function{
 		{"left", "right"},
 	},
 	Logic: func(args ...datatypes.Value) (datatypes.Value, error) {
-		var values []datatypes.Value
+		v1 := args[0].AsInt()
+		v2 := args[1].AsInt()
+		values := make([]datatypes.Value, v2-v1)
 
-		v1 := args[0]
-		v2 := args[1]
-
-		for i := v1.AsInt(); i < v2.AsInt(); i++ {
-			values = append(values, datatypes.MakeInt(i))
+		for j, i := 0, v1; i < v2; j, i = j+1, i+1 {
+			values[j] = datatypes.MakeInt(i)
 		}
 		return datatypes.MakeTuple(values), nil
 	},

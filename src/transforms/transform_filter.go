@@ -69,7 +69,7 @@ func (t *FilterTransform) filter(x *datablocks.DataBlock) (*datablocks.DataBlock
 func (t *FilterTransform) check(x *datablocks.DataBlock, plan planners.IPlan) ([]datatypes.Value, error) {
 	switch plan := plan.(type) {
 	case *planners.BooleanExpressionPlan:
-		var checks []datatypes.Value
+		checks := make([]datatypes.Value, x.NumRows())
 
 		right := datatypes.ToValue(plan.Args[1].(*planners.ConstantPlan).Value)
 
@@ -83,7 +83,7 @@ func (t *FilterTransform) check(x *datablocks.DataBlock, plan planners.IPlan) ([
 		if err != nil {
 			return nil, err
 		}
-		for _, v := range column.Values() {
+		for i, v := range column.Values() {
 			left := v
 			if err := function.Validator.Validate(left, right); err != nil {
 				return nil, err
@@ -92,7 +92,7 @@ func (t *FilterTransform) check(x *datablocks.DataBlock, plan planners.IPlan) ([
 			if err != nil {
 				return nil, err
 			}
-			checks = append(checks, result)
+			checks[i] = result
 		}
 		return checks, nil
 	case *planners.AndPlan:

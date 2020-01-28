@@ -16,7 +16,7 @@ type ColumnValue struct {
 func NewColumnValue(col Column) *ColumnValue {
 	return &ColumnValue{
 		column: col,
-		values: make([]datatypes.Value, 0, 4),
+		values: make([]datatypes.Value, 0, 1024),
 	}
 }
 
