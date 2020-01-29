@@ -105,6 +105,21 @@ func (v *typeOf) Validate(arg datatypes.Value) error {
 	return nil
 }
 
+type atLeastNArgs struct {
+	n int
+}
+
+func AtLeastNArgs(n int) *atLeastNArgs {
+	return &atLeastNArgs{n: n}
+}
+
+func (v *atLeastNArgs) Validate(args ...datatypes.Value) error {
+	if len(args) < v.n {
+		return errors.Errorf("expected at least %s, but got %v", argumentCount(v.n), len(args))
+	}
+	return nil
+}
+
 type allArgs struct {
 	validator ISingleArgumentValidator
 }

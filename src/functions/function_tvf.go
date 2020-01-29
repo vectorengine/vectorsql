@@ -21,12 +21,39 @@ var FuncTableValuedFunctionRange = &Function{
 		for j, i := 0, v1; i < v2; j, i = j+1, i+1 {
 			values[j] = datatypes.MakeInt(i)
 		}
-		return datatypes.MakeTuple(values), nil
+		return datatypes.MakeTuple(values...), nil
 	},
 	Validator: All(
 		ExactlyNArgs(2),
 		OneOf(
 			AllArgs(TypeOf(datatypes.ZeroInt())),
+		),
+	),
+}
+
+var FuncTableValuedFunctionZip = &Function{
+	Name: "ZIP",
+	Args: [][]string{
+		{""},
+	},
+	Logic: func(args ...datatypes.Value) (datatypes.Value, error) {
+		argsize := len(args)
+		tuplesize := len(args[0].AsSlice())
+		values := make([]datatypes.Value, tuplesize)
+
+		for i := 0; i < tuplesize; i++ {
+			var v []datatypes.Value
+			for j := 0; j < argsize; j++ {
+				v = append(v, args[j].AsSlice()[i])
+			}
+			values[i] = datatypes.MakeTuple(v...)
+		}
+		return datatypes.MakeTuple(values...), nil
+	},
+	Validator: All(
+		AtLeastNArgs(2),
+		OneOf(
+			AllArgs(TypeOf(datatypes.ZeroTuple())),
 		),
 	),
 }

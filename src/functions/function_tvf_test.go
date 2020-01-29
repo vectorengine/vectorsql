@@ -29,10 +29,8 @@ func TestTableValuedFunctions(t *testing.T) {
 				datatypes.MakeInt(3),
 			},
 			expect: datatypes.MakeTuple(
-				[]datatypes.Value{
-					datatypes.ToValue(1),
-					datatypes.ToValue(2),
-				},
+				datatypes.ToValue(1),
+				datatypes.ToValue(2),
 			),
 		},
 		{
@@ -41,6 +39,45 @@ func TestTableValuedFunctions(t *testing.T) {
 			args: []datatypes.Value{
 				datatypes.MakeInt(1),
 				datatypes.MakeString("x"),
+			},
+			err: errors.New("type.error"),
+		},
+		{
+			name: "tvf-zip-ok",
+			fn:   FuncTableValuedFunctionZip,
+			args: []datatypes.Value{
+				datatypes.MakeTuple(
+					datatypes.ToValue(1),
+					datatypes.ToValue(2),
+				),
+				datatypes.MakeTuple(
+					datatypes.ToValue("a"),
+					datatypes.ToValue("b"),
+				),
+				datatypes.MakeTuple(
+					datatypes.ToValue(11),
+					datatypes.ToValue(22),
+				),
+			},
+			expect: datatypes.MakeTuple(
+				datatypes.MakeTuple(
+					datatypes.ToValue(1),
+					datatypes.ToValue("a"),
+					datatypes.ToValue(11),
+				),
+				datatypes.MakeTuple(
+					datatypes.ToValue(2),
+					datatypes.ToValue("b"),
+					datatypes.ToValue(22),
+				),
+			),
+		},
+		{
+			name: "tvf-zip-type-error",
+			fn:   FuncTableValuedFunctionZip,
+			args: []datatypes.Value{
+				datatypes.ToValue(1),
+				datatypes.ToValue(2),
 			},
 			err: errors.New("type.error"),
 		},

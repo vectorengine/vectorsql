@@ -81,7 +81,7 @@ func ZeroDuration() Value {
 	return Value{Value: &Value_Duration{Duration: &duration.Duration{}}}
 }
 
-func MakeTuple(v []Value) Value {
+func MakeTuple(v ...Value) Value {
 	tuple := &Tuple{
 		Fields: make([]*Value, len(v)),
 	}
@@ -149,7 +149,7 @@ func ToValue(value interface{}) Value {
 		for i := range value {
 			out[i] = ToValue(value[i])
 		}
-		return MakeTuple(out)
+		return MakeTuple(out...)
 	case map[string]interface{}:
 		out := make(map[string]Value)
 		for k, v := range value {
