@@ -27,6 +27,11 @@ func TestSelectPlan(t *testing.T) {
 			expect: "\n->ScanNode\t--> (table=[, t1]), \n->ProjectNode\t--> (), \n->SinkNode\t-->",
 		},
 		{
+			name:   "orderby",
+			query:  "select * from t1 order by c1 desc, c2 asc, c3 desc",
+			expect: "\n->ScanNode\t--> (table=[, t1]), \n->ProjectNode\t--> (), OrderByNode[(field:VariableNode=[$c1], direction:desc)(field:VariableNode=[$c2], direction:asc)(field:VariableNode=[$c3], direction:desc)], \n->SinkNode\t-->",
+		},
+		{
 			name:   "simple",
 			query:  "select name, sum(id), (id+1) from system.tables where (name='db1' or name='db2') and (id+1)>3",
 			expect: "\n->ScanNode\t--> (table=[system, tables]), \n->ProjectNode\t--> (VariableNode=[$name], FuncExpressionNode=(Func=[SUM], Args=[[VariableNode=[$id]]]), FuncExpressionNode=(Func=[+], Args=[[VariableNode=[$id] ConstantNode=<1>]])), \n->FilterNode\t--> (AndNode=(Func=[AND], Left=[OrNode=(Func=[OR], Left=[BooleanExpressionNode=(Func=[=], Args=[[VariableNode=[$name] ConstantNode=<db1>]])], Right=[BooleanExpressionNode=(Func=[=], Args=[[VariableNode=[$name] ConstantNode=<db2>]])])], Right=[BooleanExpressionNode=(Func=[>], Args=[[FuncExpressionNode=(Func=[+], Args=[[VariableNode=[$id] ConstantNode=<1>]]) ConstantNode=<3>]])])), \n->SinkNode\t-->",

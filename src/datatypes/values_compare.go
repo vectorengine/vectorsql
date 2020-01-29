@@ -6,10 +6,6 @@
 package datatypes
 
 import (
-	"fmt"
-	"regexp"
-	"strings"
-
 	"base/errors"
 
 	"github.com/golang/protobuf/proto"
@@ -43,7 +39,6 @@ func Compare(x, y Value) (Comparison, error) {
 		} else if x < y {
 			return -1, nil
 		}
-
 		return 1, nil
 	case TypeFloat:
 		if y.GetType() != TypeFloat {
@@ -57,7 +52,6 @@ func Compare(x, y Value) (Comparison, error) {
 		} else if x < y {
 			return -1, nil
 		}
-
 		return 1, nil
 	case TypeString:
 		if y.GetType() != TypeString {
@@ -72,7 +66,6 @@ func Compare(x, y Value) (Comparison, error) {
 		} else if x < y {
 			return -1, nil
 		}
-
 		return 1, nil
 	case TypeTime:
 		if y.GetType() != TypeTime {
@@ -87,7 +80,6 @@ func Compare(x, y Value) (Comparison, error) {
 		} else if x.Before(y) {
 			return -1, nil
 		}
-
 		return 1, nil
 	case TypeBool:
 		if y.GetType() != TypeBool {
@@ -102,42 +94,10 @@ func Compare(x, y Value) (Comparison, error) {
 		} else if !x && y {
 			return -1, nil
 		}
-
 		return 1, nil
 
 	case TypeNull, TypePhantom, TypeDuration, TypeTuple, TypeObject:
 		return 0, errors.Errorf("unsupported type in sorting")
 	}
-
 	panic("unreachable")
-}
-
-var (
-	re = regexp.MustCompile(`([^\\]?|[\\]{2})[%_]`)
-)
-
-func replacer(s string) string {
-	if strings.HasPrefix(s, `\\`) {
-		return s[2:]
-	}
-
-	result := strings.Replace(s, "%", ".*", -1)
-	result = strings.Replace(result, "_", ".", -1)
-	return result
-}
-
-func LikeToRegexp(likeExpr string) *regexp.Regexp {
-	if likeExpr == "" {
-		return regexp.MustCompile("^.*$") // Can never fail
-	}
-
-	keyPattern := regexp.QuoteMeta(likeExpr)
-	keyPattern = re.ReplaceAllStringFunc(keyPattern, replacer)
-	keyPattern = fmt.Sprintf("^%s$", keyPattern)
-	return regexp.MustCompile(keyPattern) // Can never fail
-}
-
-func Like(likeExpr string, x Value) bool {
-	re := LikeToRegexp(likeExpr)
-	return re.Match([]byte(x.ToRawValue().(string)))
 }

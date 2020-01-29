@@ -52,6 +52,17 @@ func (plan *SelectPlan) Build() error {
 		filterPlan := NewFilterPlan(logic)
 		tree.Add(filterPlan)
 	}
+
+	// OrderBy.
+	if ast.OrderBy != nil {
+		expressions, directions, err := parseOrderByExpressions(ast.OrderBy)
+		if err != nil {
+			return err
+		}
+		orderByPlan := NewOrderByPlan(expressions, directions)
+		tree.Add(orderByPlan)
+	}
+
 	// Sink.
 	tree.Add(NewSinkPlan())
 	return tree.Build()
