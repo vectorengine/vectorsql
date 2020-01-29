@@ -32,7 +32,7 @@ func (s *TCPHandler) processQuery(session *TCPSession) error {
 	if err != nil {
 		return err
 	}
-	log.Debug("Receive client query:%+v", query.Query)
+	log.Debug("TCPHandler-Query->Enter:%+v", query.Query)
 
 	// Logical plans.
 	plan, err := planners.PlanFactory(query.Query)
@@ -66,18 +66,21 @@ func (s *TCPHandler) processOrdinaryQuery(session *TCPSession, sink processors.I
 	conf := s.conf
 	log := s.log
 
+	log.Debug("TCPHandler->OrdinaryQuery->Enter")
 	if sink != nil {
 		for x := range sink.In().Recv() {
 			switch x := x.(type) {
 			case error:
+				log.Error("%+v", x)
 				return session.sendException(x, conf.Server.CalculateTextStackTrace)
 			case *datablocks.DataBlock:
-				log.Debug("Response:%+v", x)
+				log.Debug("TCPHandler->OrdinaryQuery->DataBlock: rows:%+v", x.NumRows())
 				if err := session.sendData(x); err != nil {
 					return err
 				}
 			}
 		}
 	}
+	log.Debug("TCPHandler->OrdinaryQuery->Return")
 	return nil
 }

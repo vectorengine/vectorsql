@@ -59,11 +59,20 @@ func (t *FilterTransform) filter(x *datablocks.DataBlock) (*datablocks.DataBlock
 	if err != nil {
 		return nil, err
 	}
-	newx, err := x.Filter(checks)
-	if err != nil {
-		return nil, err
+
+	// In place filter.
+	for _, v := range x.Values() {
+		n := 0
+		values := v.Values
+		for i, check := range checks {
+			if check.AsBool() {
+				values[n] = values[i]
+				n++
+			}
+		}
+		v.Values = values[:n]
 	}
-	return newx, nil
+	return x, nil
 }
 
 func (t *FilterTransform) check(x *datablocks.DataBlock, plan planners.IPlan) ([]datatypes.Value, error) {
@@ -83,7 +92,7 @@ func (t *FilterTransform) check(x *datablocks.DataBlock, plan planners.IPlan) ([
 		if err != nil {
 			return nil, err
 		}
-		for i, v := range column.Values() {
+		for i, v := range column.Values {
 			left := v
 			if err := function.Validator.Validate(left, right); err != nil {
 				return nil, err

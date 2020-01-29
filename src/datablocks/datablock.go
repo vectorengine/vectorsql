@@ -42,7 +42,7 @@ func (block *DataBlock) NumColumns() int {
 func (block *DataBlock) Columns() []columns.Column {
 	var cols []columns.Column
 	for _, cv := range block.values {
-		cols = append(cols, cv.Column())
+		cols = append(cols, cv.Column)
 	}
 	return cols
 }
@@ -54,7 +54,7 @@ func (block *DataBlock) ColumnValues() []*columns.ColumnValue {
 
 func (block *DataBlock) Column(name string) (*columns.ColumnValue, error) {
 	for _, cv := range block.values {
-		if cv.Column().Name == name {
+		if cv.Column.Name == name {
 			return cv, nil
 		}
 	}

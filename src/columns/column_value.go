@@ -9,30 +9,22 @@ import (
 )
 
 type ColumnValue struct {
-	column Column
-	values []datatypes.Value
+	Column Column
+	Values []datatypes.Value
 }
 
 func NewColumnValue(col Column) *ColumnValue {
 	return &ColumnValue{
-		column: col,
-		values: make([]datatypes.Value, 0, 1024),
+		Column: col,
+		Values: make([]datatypes.Value, 0, 1024),
 	}
 }
 
-func (cv *ColumnValue) Column() Column {
-	return cv.column
-}
-
 func (cv *ColumnValue) NumRows() int {
-	return len(cv.values)
-}
-
-func (cv *ColumnValue) Values() []datatypes.Value {
-	return cv.values
+	return len(cv.Values)
 }
 
 func (cv *ColumnValue) Insert(v datatypes.Value) error {
-	cv.values = append(cv.values, v)
+	cv.Values = append(cv.Values, v)
 	return nil
 }
