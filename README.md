@@ -1,5 +1,5 @@
-[![Build Status](https://travis-ci.org/vectorengine/vectorsql.png)](https://travis-ci.org/vectorengine/vectorsql)
-[![codecov.io](https://codecov.io/gh/vectorengine/vectorsql/graphs/badge.svg)](https://codecov.io/gh/vectorengine/vectorsql/branch/master)
+[![Build Status](https://api.travis-ci.org/vectorengine/vectorsql.svg?branch=master)](https://travis-ci.org/vectorengine/vectorsql)
+[![codecov.io](https://codecov.io/gh/vectorengine/vectorsql/branch/master/graph/badge.svg)](https://codecov.io/gh/vectorengine/vectorsql/branch/master)
 
 # VectorSQL
 
