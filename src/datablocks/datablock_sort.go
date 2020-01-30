@@ -34,13 +34,13 @@ func (block *DataBlock) Sort(sorters ...Sorter) error {
 
 	// Seqs column.
 	max := block.NumRows()
-	seqs := make([]datatypes.Value, max)
+	seqs := make([]*datatypes.Value, max)
 	for i := 0; i < max; i++ {
 		seqs[i] = datatypes.ToValue(i)
 	}
 
 	// Sort columns.
-	var tuples []datatypes.Value
+	var tuples []*datatypes.Value
 	for _, sorter := range sorters {
 		cv, ok := block.valuesmap[sorter.column]
 		if !ok {
@@ -88,7 +88,7 @@ func (block *DataBlock) Sort(sorters ...Sorter) error {
 	})
 
 	// Final.
-	finalSeqs := make([]datatypes.Value, max)
+	finalSeqs := make([]*datatypes.Value, max)
 	for i, tuple := range matrix {
 		finalSeqs[i] = tuple.AsSlice()[len(sorters)]
 	}

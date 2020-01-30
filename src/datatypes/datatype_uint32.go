@@ -31,7 +31,7 @@ func (datatype *UInt32DataType) Name() string {
 	return DataTypeUInt32Name
 }
 
-func (datatype *UInt32DataType) Serialize(writer *binary.Writer, v Value) error {
+func (datatype *UInt32DataType) Serialize(writer *binary.Writer, v *Value) error {
 	if err := writer.UInt32(uint32(v.ToRawValue().(uint32))); err != nil {
 		return errors.Wrap(err)
 	}

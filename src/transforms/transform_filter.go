@@ -54,10 +54,10 @@ func (t *FilterTransform) filter(x *datablocks.DataBlock) error {
 	return x.Filter(checks)
 }
 
-func (t *FilterTransform) check(x *datablocks.DataBlock, plan planners.IPlan) ([]datatypes.Value, error) {
+func (t *FilterTransform) check(x *datablocks.DataBlock, plan planners.IPlan) ([]*datatypes.Value, error) {
 	switch plan := plan.(type) {
 	case *planners.BooleanExpressionPlan:
-		checks := make([]datatypes.Value, x.NumRows())
+		checks := make([]*datatypes.Value, x.NumRows())
 
 		right := datatypes.ToValue(plan.Args[1].(*planners.ConstantPlan).Value)
 

@@ -13,11 +13,11 @@ import (
 )
 
 type IValidator interface {
-	Validate(args ...datatypes.Value) error
+	Validate(args ...*datatypes.Value) error
 }
 
 type ISingleArgumentValidator interface {
-	Validate(arg datatypes.Value) error
+	Validate(arg *datatypes.Value) error
 }
 
 type all struct {
@@ -28,7 +28,7 @@ func All(validators ...IValidator) *all {
 	return &all{validators: validators}
 }
 
-func (v *all) Validate(args ...datatypes.Value) error {
+func (v *all) Validate(args ...*datatypes.Value) error {
 	for _, validator := range v.validators {
 		err := validator.Validate(args...)
 		if err != nil {
@@ -46,7 +46,7 @@ func SingleAll(validators ...ISingleArgumentValidator) *singleAll {
 	return &singleAll{validators: validators}
 }
 
-func (v *singleAll) Validate(args datatypes.Value) error {
+func (v *singleAll) Validate(args *datatypes.Value) error {
 	for _, validator := range v.validators {
 		err := validator.Validate(args)
 		if err != nil {
@@ -64,7 +64,7 @@ func OneOf(validators ...IValidator) *oneOf {
 	return &oneOf{validators: validators}
 }
 
-func (v *oneOf) Validate(args ...datatypes.Value) error {
+func (v *oneOf) Validate(args ...*datatypes.Value) error {
 	errs := make([]error, len(v.validators))
 	for i, validator := range v.validators {
 		errs[i] = validator.Validate(args...)
@@ -83,7 +83,7 @@ func ExactlyNArgs(n int) *exactlyNArgs {
 	return &exactlyNArgs{n: n}
 }
 
-func (v *exactlyNArgs) Validate(args ...datatypes.Value) error {
+func (v *exactlyNArgs) Validate(args ...*datatypes.Value) error {
 	if len(args) != v.n {
 		return errors.Errorf("expected exactly %s, but got %v", argumentCount(v.n), len(args))
 	}
@@ -91,14 +91,14 @@ func (v *exactlyNArgs) Validate(args ...datatypes.Value) error {
 }
 
 type typeOf struct {
-	wantedType datatypes.Value
+	wantedType *datatypes.Value
 }
 
-func TypeOf(wantedType datatypes.Value) *typeOf {
+func TypeOf(wantedType *datatypes.Value) *typeOf {
 	return &typeOf{wantedType: wantedType}
 }
 
-func (v *typeOf) Validate(arg datatypes.Value) error {
+func (v *typeOf) Validate(arg *datatypes.Value) error {
 	if v.wantedType.GetType() != arg.GetType() {
 		return errors.Errorf("expected type %v but got %v", v.wantedType.GetType(), arg.GetType())
 	}
@@ -113,7 +113,7 @@ func AtLeastNArgs(n int) *atLeastNArgs {
 	return &atLeastNArgs{n: n}
 }
 
-func (v *atLeastNArgs) Validate(args ...datatypes.Value) error {
+func (v *atLeastNArgs) Validate(args ...*datatypes.Value) error {
 	if len(args) < v.n {
 		return errors.Errorf("expected at least %s, but got %v", argumentCount(v.n), len(args))
 	}
@@ -128,7 +128,7 @@ func AllArgs(validator ISingleArgumentValidator) *allArgs {
 	return &allArgs{validator: validator}
 }
 
-func (v *allArgs) Validate(args ...datatypes.Value) error {
+func (v *allArgs) Validate(args ...*datatypes.Value) error {
 	for i := range args {
 		if err := v.validator.Validate(args[i]); err != nil {
 			return errors.Errorf("bad argument at index %v: %v", i, err)

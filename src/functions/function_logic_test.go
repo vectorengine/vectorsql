@@ -16,14 +16,14 @@ func TestLogicFunctions(t *testing.T) {
 	tests := []struct {
 		name   string
 		fn     *Function
-		args   []datatypes.Value
-		expect datatypes.Value
+		args   []*datatypes.Value
+		expect *datatypes.Value
 		err    error
 	}{
 		{
 			name: "and-ok",
 			fn:   FuncLogicAnd,
-			args: []datatypes.Value{
+			args: []*datatypes.Value{
 				datatypes.MakeBool(true),
 				datatypes.MakeBool(true),
 			},
@@ -32,7 +32,7 @@ func TestLogicFunctions(t *testing.T) {
 		{
 			name: "and-not-ok",
 			fn:   FuncLogicAnd,
-			args: []datatypes.Value{
+			args: []*datatypes.Value{
 				datatypes.MakeBool(true),
 				datatypes.MakeBool(false),
 			},
@@ -41,7 +41,7 @@ func TestLogicFunctions(t *testing.T) {
 		{
 			name: "or-ok",
 			fn:   FuncLogicOr,
-			args: []datatypes.Value{
+			args: []*datatypes.Value{
 				datatypes.MakeBool(true),
 				datatypes.MakeBool(false),
 			},
@@ -50,7 +50,7 @@ func TestLogicFunctions(t *testing.T) {
 		{
 			name: "and-not-ok",
 			fn:   FuncLogicOr,
-			args: []datatypes.Value{
+			args: []*datatypes.Value{
 				datatypes.MakeBool(false),
 				datatypes.MakeBool(false),
 			},

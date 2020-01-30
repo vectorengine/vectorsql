@@ -13,5 +13,5 @@ import (
 type IDataType interface {
 	Name() string
 	Type() reflect.Type
-	Serialize(*binary.Writer, Value) error
+	Serialize(*binary.Writer, *Value) error
 }

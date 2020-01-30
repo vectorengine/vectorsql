@@ -13,10 +13,10 @@ var FuncTableValuedFunctionRange = &Function{
 	Args: [][]string{
 		{"left", "right"},
 	},
-	Logic: func(args ...datatypes.Value) (datatypes.Value, error) {
+	Logic: func(args ...*datatypes.Value) (*datatypes.Value, error) {
 		v1 := args[0].AsInt()
 		v2 := args[1].AsInt()
-		values := make([]datatypes.Value, v2-v1)
+		values := make([]*datatypes.Value, v2-v1)
 
 		for j, i := 0, v1; i < v2; j, i = j+1, i+1 {
 			values[j] = datatypes.MakeInt(i)
@@ -36,15 +36,15 @@ var FuncTableValuedFunctionZip = &Function{
 	Args: [][]string{
 		{""},
 	},
-	Logic: func(args ...datatypes.Value) (datatypes.Value, error) {
+	Logic: func(args ...*datatypes.Value) (*datatypes.Value, error) {
 		argsize := len(args)
 		tuplesize := len(args[0].AsSlice())
-		values := make([]datatypes.Value, tuplesize)
+		values := make([]*datatypes.Value, tuplesize)
 
 		for i := 0; i < tuplesize; i++ {
-			var v []datatypes.Value
+			v := make([]*datatypes.Value, argsize)
 			for j := 0; j < argsize; j++ {
-				v = append(v, args[j].AsSlice()[i])
+				v[j] = args[j].AsSlice()[i]
 			}
 			values[i] = datatypes.MakeTuple(v...)
 		}

@@ -13,7 +13,7 @@ var FuncLogicAnd = &Function{
 	Args: [][]string{
 		{"left", "right"},
 	},
-	Logic: func(args ...datatypes.Value) (datatypes.Value, error) {
+	Logic: func(args ...*datatypes.Value) (*datatypes.Value, error) {
 		v1 := args[0]
 		v2 := args[1]
 
@@ -32,7 +32,7 @@ var FuncLogicOr = &Function{
 	Args: [][]string{
 		{"left", "right"},
 	},
-	Logic: func(args ...datatypes.Value) (datatypes.Value, error) {
+	Logic: func(args ...*datatypes.Value) (*datatypes.Value, error) {
 		v1 := args[0]
 		v2 := args[1]
 

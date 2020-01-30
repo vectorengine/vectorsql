@@ -5,8 +5,6 @@
 package datablocks
 
 import (
-	"sync"
-
 	"columns"
 	"datatypes"
 
@@ -14,9 +12,8 @@ import (
 )
 
 type DataBlock struct {
-	mu        sync.RWMutex
 	info      *DataBlockInfo
-	seqs      []datatypes.Value
+	seqs      []*datatypes.Value
 	values    []*ColumnValue
 	immutable bool
 	valuesmap map[string]*ColumnValue
@@ -43,9 +40,6 @@ func (block *DataBlock) Info() *DataBlockInfo {
 }
 
 func (block *DataBlock) NumRows() int {
-	block.mu.RLock()
-	defer block.mu.RUnlock()
-
 	if block.seqs != nil {
 		return len(block.seqs)
 	} else {
@@ -59,8 +53,6 @@ func (block *DataBlock) NumColumns() int {
 
 func (block *DataBlock) Columns() []columns.Column {
 	var cols []columns.Column
-	block.mu.RLock()
-	defer block.mu.RUnlock()
 
 	for _, cv := range block.values {
 		cols = append(cols, cv.column)
@@ -69,9 +61,6 @@ func (block *DataBlock) Columns() []columns.Column {
 }
 
 func (block *DataBlock) Iterator(name string) (*DataBlockIterator, error) {
-	block.mu.RLock()
-	defer block.mu.RUnlock()
-
 	cv, ok := block.valuesmap[name]
 	if !ok {
 		return nil, errors.Errorf("Can't find column:%v", name)
@@ -81,8 +70,6 @@ func (block *DataBlock) Iterator(name string) (*DataBlockIterator, error) {
 
 func (block *DataBlock) Iterators() []*DataBlockIterator {
 	var iterators []*DataBlockIterator
-	block.mu.RLock()
-	defer block.mu.RUnlock()
 
 	for _, cv := range block.values {
 		iter := newDataBlockIterator(block.seqs, cv)
@@ -92,9 +79,6 @@ func (block *DataBlock) Iterators() []*DataBlockIterator {
 }
 
 func (block *DataBlock) Write(batcher *BatchWriter) error {
-	block.mu.Lock()
-	defer block.mu.Unlock()
-
 	if block.immutable {
 		return errors.New("Can't write, block is immutable")
 	}
@@ -113,7 +97,7 @@ func (block *DataBlock) Write(batcher *BatchWriter) error {
 	return nil
 }
 
-func (block *DataBlock) setSeqs(seqs []datatypes.Value) {
+func (block *DataBlock) setSeqs(seqs []*datatypes.Value) {
 	block.seqs = seqs
 	block.immutable = true
 }

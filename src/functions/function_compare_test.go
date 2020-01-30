@@ -17,14 +17,14 @@ func TestCompareFunctions(t *testing.T) {
 	tests := []struct {
 		name   string
 		fn     *Function
-		args   []datatypes.Value
-		expect datatypes.Value
+		args   []*datatypes.Value
+		expect *datatypes.Value
 		err    error
 	}{
 		{
 			name: "equal-ok",
 			fn:   FuncCompareEqual,
-			args: []datatypes.Value{
+			args: []*datatypes.Value{
 				datatypes.MakeInt(1),
 				datatypes.MakeInt(1),
 			},
@@ -33,7 +33,7 @@ func TestCompareFunctions(t *testing.T) {
 		{
 			name: "equal-not-ok",
 			fn:   FuncCompareEqual,
-			args: []datatypes.Value{
+			args: []*datatypes.Value{
 				datatypes.MakeInt(1),
 				datatypes.MakeInt(2),
 			},
@@ -42,7 +42,7 @@ func TestCompareFunctions(t *testing.T) {
 		{
 			name: "notequal-ok",
 			fn:   FuncCompareNotEqual,
-			args: []datatypes.Value{
+			args: []*datatypes.Value{
 				datatypes.MakeInt(2),
 				datatypes.MakeInt(1),
 			},
@@ -51,7 +51,7 @@ func TestCompareFunctions(t *testing.T) {
 		{
 			name: "notequal-not-ok",
 			fn:   FuncCompareNotEqual,
-			args: []datatypes.Value{
+			args: []*datatypes.Value{
 				datatypes.MakeInt(2),
 				datatypes.MakeInt(2),
 			},
@@ -60,7 +60,7 @@ func TestCompareFunctions(t *testing.T) {
 		{
 			name: "greaterthan-ok",
 			fn:   FuncCompareGreaterThan,
-			args: []datatypes.Value{
+			args: []*datatypes.Value{
 				datatypes.MakeInt(2),
 				datatypes.MakeInt(1),
 			},
@@ -69,7 +69,7 @@ func TestCompareFunctions(t *testing.T) {
 		{
 			name: "greaterthan-not-ok",
 			fn:   FuncCompareGreaterThan,
-			args: []datatypes.Value{
+			args: []*datatypes.Value{
 				datatypes.MakeInt(2),
 				datatypes.MakeInt(2),
 			},
@@ -78,7 +78,7 @@ func TestCompareFunctions(t *testing.T) {
 		{
 			name: "greaterequal-ok",
 			fn:   FuncCompareGreaterEqual,
-			args: []datatypes.Value{
+			args: []*datatypes.Value{
 				datatypes.MakeInt(2),
 				datatypes.MakeInt(2),
 			},
@@ -87,7 +87,7 @@ func TestCompareFunctions(t *testing.T) {
 		{
 			name: "greaterequal-ok",
 			fn:   FuncCompareGreaterEqual,
-			args: []datatypes.Value{
+			args: []*datatypes.Value{
 				datatypes.MakeInt(2),
 				datatypes.MakeInt(1),
 			},
@@ -96,7 +96,7 @@ func TestCompareFunctions(t *testing.T) {
 		{
 			name: "greaterequal-not-ok",
 			fn:   FuncCompareGreaterEqual,
-			args: []datatypes.Value{
+			args: []*datatypes.Value{
 				datatypes.MakeInt(1),
 				datatypes.MakeInt(2),
 			},
@@ -105,7 +105,7 @@ func TestCompareFunctions(t *testing.T) {
 		{
 			name: "lessthan-ok",
 			fn:   FuncCompareLessThan,
-			args: []datatypes.Value{
+			args: []*datatypes.Value{
 				datatypes.MakeInt(1),
 				datatypes.MakeInt(2),
 			},
@@ -114,7 +114,7 @@ func TestCompareFunctions(t *testing.T) {
 		{
 			name: "lessthan-not-ok",
 			fn:   FuncCompareLessThan,
-			args: []datatypes.Value{
+			args: []*datatypes.Value{
 				datatypes.MakeInt(2),
 				datatypes.MakeInt(2),
 			},
@@ -123,7 +123,7 @@ func TestCompareFunctions(t *testing.T) {
 		{
 			name: "lessequal-ok",
 			fn:   FuncCompareLessEqual,
-			args: []datatypes.Value{
+			args: []*datatypes.Value{
 				datatypes.MakeInt(2),
 				datatypes.MakeInt(2),
 			},
@@ -132,7 +132,7 @@ func TestCompareFunctions(t *testing.T) {
 		{
 			name: "lessequal-ok",
 			fn:   FuncCompareLessEqual,
-			args: []datatypes.Value{
+			args: []*datatypes.Value{
 				datatypes.MakeInt(1),
 				datatypes.MakeInt(2),
 			},
@@ -141,7 +141,7 @@ func TestCompareFunctions(t *testing.T) {
 		{
 			name: "lessequal-not-ok",
 			fn:   FuncCompareLessEqual,
-			args: []datatypes.Value{
+			args: []*datatypes.Value{
 				datatypes.MakeInt(2),
 				datatypes.MakeInt(1),
 			},
@@ -150,7 +150,7 @@ func TestCompareFunctions(t *testing.T) {
 		{
 			name: "like-ok",
 			fn:   FuncCompareLike,
-			args: []datatypes.Value{
+			args: []*datatypes.Value{
 				datatypes.MakeString("xxx"),
 				datatypes.MakeString(`x%`),
 			},
@@ -159,7 +159,7 @@ func TestCompareFunctions(t *testing.T) {
 		{
 			name: "like-not-ok",
 			fn:   FuncCompareLike,
-			args: []datatypes.Value{
+			args: []*datatypes.Value{
 				datatypes.MakeString("xxx"),
 				datatypes.MakeString(`%y`),
 			},
@@ -168,7 +168,7 @@ func TestCompareFunctions(t *testing.T) {
 		{
 			name: "like-type-error",
 			fn:   FuncCompareLike,
-			args: []datatypes.Value{
+			args: []*datatypes.Value{
 				datatypes.MakeInt(1),
 				datatypes.MakeString(`%y`),
 			},

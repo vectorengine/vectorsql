@@ -12,8 +12,8 @@ import (
 )
 
 // octosql.AreEqual checks the equality of the given values, returning false if the types don't match.
-func AreEqual(left, right Value) bool {
-	return proto.Equal(&left, &right)
+func AreEqual(left, right *Value) bool {
+	return proto.Equal(left, right)
 }
 
 type Comparison int
@@ -24,7 +24,7 @@ const (
 	GreaterThan Comparison = 1
 )
 
-func Compare(x, y Value) (Comparison, error) {
+func Compare(x, y *Value) (Comparison, error) {
 	switch x.GetType() {
 	case TypeInt:
 		if y.GetType() != TypeInt {

@@ -25,7 +25,7 @@ func NewBatchWriter(cols []columns.Column) *BatchWriter {
 	}
 }
 
-func (bw *BatchWriter) WriteRow(row ...datatypes.Value) error {
+func (bw *BatchWriter) WriteRow(row ...*datatypes.Value) error {
 	for i, val := range bw.values {
 		val.values = append(val.values, row[i])
 	}

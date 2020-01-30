@@ -11,13 +11,13 @@ import (
 
 type ColumnValue struct {
 	column columns.Column
-	values []datatypes.Value
+	values []*datatypes.Value
 }
 
 func NewColumnValue(col columns.Column) *ColumnValue {
 	return &ColumnValue{
 		column: col,
-		values: make([]datatypes.Value, 0, 1024),
+		values: make([]*datatypes.Value, 0, 1024),
 	}
 }
 

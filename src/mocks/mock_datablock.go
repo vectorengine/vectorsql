@@ -17,7 +17,7 @@ func NewBlockFromSlice(cols []columns.Column, datas ...[]interface{}) *datablock
 	batcher := datablocks.NewBatchWriter(block.Columns())
 	for _, data := range datas {
 		if len(data) > 0 {
-			var row []datatypes.Value
+			var row []*datatypes.Value
 			for i := range cols {
 				row = append(row, datatypes.ToValue(data[i]))
 			}

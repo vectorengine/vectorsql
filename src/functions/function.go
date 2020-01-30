@@ -11,6 +11,6 @@ import (
 type Function struct {
 	Name      string
 	Args      [][]string
-	Logic     func(...datatypes.Value) (datatypes.Value, error)
+	Logic     func(...*datatypes.Value) (*datatypes.Value, error)
 	Validator IValidator
 }

@@ -8,10 +8,7 @@ import (
 	"datatypes"
 )
 
-func (block *DataBlock) Filter(checks []datatypes.Value) error {
-	block.mu.Lock()
-	defer block.mu.Unlock()
-
+func (block *DataBlock) Filter(checks []*datatypes.Value) error {
 	// In place filter.
 	for _, cv := range block.values {
 		n := 0

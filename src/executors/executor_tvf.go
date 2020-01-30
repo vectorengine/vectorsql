@@ -32,7 +32,7 @@ func (executor *TableValuedFunctionExecutor) Name() string {
 }
 
 func (executor *TableValuedFunctionExecutor) Execute() (processors.IProcessor, error) {
-	var args []datatypes.Value
+	var args []*datatypes.Value
 	plan := executor.plan
 	log := executor.ctx.log
 
