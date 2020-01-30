@@ -5,23 +5,14 @@
 package databases
 
 import (
-	"sort"
-
 	"datablocks"
 	"datatypes"
 )
 
 // Handlers.
 func fillDatabasesFunc(block *datablocks.DataBlock) error {
-	var dbs []IDatabase
-
-	for _, database := range databases.databases {
-		dbs = append(dbs, database)
-	}
-	sort.Slice(dbs, func(i, j int) bool { return dbs[i].Name() < dbs[j].Name() })
-
 	batcher := datablocks.NewBatchWriter(block.Columns())
-	for _, database := range dbs {
+	for _, database := range databases.databases {
 		if err := batcher.WriteRow(
 			datatypes.MakeString(database.Meta().GetDBName()),
 			datatypes.MakeString(database.Meta().GetEngineName()),

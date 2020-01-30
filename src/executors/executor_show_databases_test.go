@@ -67,7 +67,7 @@ func TestShowDatabasesExecutor(t *testing.T) {
 				for x := range transform.In().Recv() {
 					expect := test.expect
 					actual := x.(*datablocks.DataBlock)
-					assert.Equal(t, expect, actual)
+					assert.True(t, mocks.DataBlockEqual(expect, actual))
 				}
 			}
 		}

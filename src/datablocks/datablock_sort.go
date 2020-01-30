@@ -82,6 +82,8 @@ func (block *DataBlock) Sort(sorters ...Sorter) error {
 				return cmp == datatypes.LessThan
 			case "DESC":
 				return cmp == datatypes.GreaterThan
+			default:
+				return cmp == datatypes.LessThan
 			}
 		}
 		return false

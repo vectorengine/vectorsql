@@ -32,8 +32,8 @@ func TestShowTablessExecutor(t *testing.T) {
 					{Name: "name", DataType: datatypes.NewStringDataType()},
 					{Name: "engine", DataType: datatypes.NewStringDataType()},
 				},
-				[]interface{}{"tables", "SYSTEM_TABLES"},
 				[]interface{}{"databases", "SYSTEM_DATABASES"},
+				[]interface{}{"tables", "SYSTEM_TABLES"},
 			),
 		},
 	}
@@ -58,7 +58,7 @@ func TestShowTablessExecutor(t *testing.T) {
 				for x := range transform.In().Recv() {
 					expect := test.expect
 					actual := x.(*datablocks.DataBlock)
-					assert.Equal(t, expect, actual)
+					assert.True(t, mocks.DataBlockEqual(expect, actual))
 				}
 			}
 		}
