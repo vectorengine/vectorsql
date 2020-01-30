@@ -72,11 +72,6 @@ func (block *DataBlock) Sort(sorters ...Sorter) error {
 			if cmp == datatypes.Equal {
 				continue
 			}
-
-			cmp, err = datatypes.Compare(irows[x], jrows[x])
-			if err != nil {
-				return false
-			}
 			switch strings.ToUpper(sorters[x].direction) {
 			case "ASC":
 				return cmp == datatypes.LessThan
