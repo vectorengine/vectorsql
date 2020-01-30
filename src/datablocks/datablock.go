@@ -12,18 +12,24 @@ import (
 )
 
 type DataBlock struct {
-	info   *DataBlockInfo
-	values []*columns.ColumnValue
+	info      *DataBlockInfo
+	values    []*ColumnValue
+	valuesmap map[string]*ColumnValue
 }
 
 func NewDataBlock(cols []columns.Column) *DataBlock {
-	var values []*columns.ColumnValue
+	var values []*ColumnValue
+	valuesmap := make(map[string]*ColumnValue)
+
 	for _, col := range cols {
-		values = append(values, columns.NewColumnValue(col))
+		cv := NewColumnValue(col)
+		valuesmap[col.Name] = cv
+		values = append(values, cv)
 	}
 	return &DataBlock{
-		info:   &DataBlockInfo{},
-		values: values,
+		info:      &DataBlockInfo{},
+		values:    values,
+		valuesmap: valuesmap,
 	}
 }
 
@@ -42,32 +48,37 @@ func (block *DataBlock) NumColumns() int {
 func (block *DataBlock) Columns() []columns.Column {
 	var cols []columns.Column
 	for _, cv := range block.values {
-		cols = append(cols, cv.Column)
+		cols = append(cols, cv.column)
 	}
 	return cols
 }
 
-func (block *DataBlock) ColumnValues() []*columns.ColumnValue {
-	var vals []*columns.ColumnValue
+func (block *DataBlock) ColumnValues() []*ColumnValue {
+	var vals []*ColumnValue
 	return append(vals, block.values...)
 }
 
-func (block *DataBlock) Column(name string) (*columns.ColumnValue, error) {
-	for _, cv := range block.values {
-		if cv.Column.Name == name {
-			return cv, nil
-		}
+func (block *DataBlock) Iterator(name string) (*DataBlockIterator, error) {
+	cv, ok := block.valuesmap[name]
+	if !ok {
+		return nil, errors.Errorf("Can't find column:%v", name)
 	}
-	return nil, errors.Errorf("Can't find column:%v", name)
+	return NewDataBlockIterator(cv), nil
 }
 
-func (block *DataBlock) Values() []*columns.ColumnValue {
-	return block.values
+func (block *DataBlock) Iterators() []*DataBlockIterator {
+	var iterators []*DataBlockIterator
+
+	for _, cv := range block.values {
+		iter := NewDataBlockIterator(cv)
+		iterators = append(iterators, iter)
+	}
+	return iterators
 }
 
 func (block *DataBlock) Insert(col string, v datatypes.Value) error {
-	cv, err := block.Column(col)
-	if err != nil {
+	cv, ok := block.valuesmap[col]
+	if !ok {
 		return errors.Errorf("Can't find column:%v", col)
 	}
 	return cv.Insert(v)

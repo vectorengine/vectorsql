@@ -2,29 +2,30 @@
 //
 // Code is licensed under Apache License, Version 2.0.
 
-package columns
+package datablocks
 
 import (
+	"columns"
 	"datatypes"
 )
 
 type ColumnValue struct {
-	Column Column
-	Values []datatypes.Value
+	column columns.Column
+	values []datatypes.Value
 }
 
-func NewColumnValue(col Column) *ColumnValue {
+func NewColumnValue(col columns.Column) *ColumnValue {
 	return &ColumnValue{
-		Column: col,
-		Values: make([]datatypes.Value, 0, 1024),
+		column: col,
+		values: make([]datatypes.Value, 0, 1024),
 	}
 }
 
 func (cv *ColumnValue) NumRows() int {
-	return len(cv.Values)
+	return len(cv.values)
 }
 
 func (cv *ColumnValue) Insert(v datatypes.Value) error {
-	cv.Values = append(cv.Values, v)
+	cv.values = append(cv.values, v)
 	return nil
 }

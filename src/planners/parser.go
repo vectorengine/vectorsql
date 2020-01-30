@@ -210,17 +210,16 @@ func parseFunctionArgument(expr *sqlparser.AliasedExpr) (IPlan, error) {
 	return subExpr, nil
 }
 
-func parseOrderByExpressions(orderBy sqlparser.OrderBy) ([]IPlan, []string, error) {
-	expressions := make([]IPlan, len(orderBy))
-	directions := make([]string, len(orderBy))
+func parseOrderByExpressions(orderBy sqlparser.OrderBy) ([]Order, error) {
+	orders := make([]Order, len(orderBy))
 
 	for i, field := range orderBy {
 		expr, err := parseExpression(field.Expr)
 		if err != nil {
-			return nil, nil, errors.Errorf("couldn't parse order by expression with index %v", i)
+			return nil, errors.Errorf("couldn't parse order by expression with index %v", i)
 		}
-		expressions[i] = expr
-		directions[i] = field.Direction
+		orders[i].Expression = expr
+		orders[i].Direction = field.Direction
 	}
-	return expressions, directions, nil
+	return orders, nil
 }

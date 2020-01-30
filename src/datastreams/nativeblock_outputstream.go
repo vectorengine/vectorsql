@@ -47,11 +47,12 @@ func (stream *NativeBlockOutputStream) Write(block *datablocks.DataBlock) error 
 	}
 
 	// Values.
-	for _, v := range block.Values() {
-		datatype := v.Column.DataType
+	for _, it := range block.Iterators() {
+		column := it.Column()
+		datatype := column.DataType
 
 		// Column name.
-		if err := writer.String(v.Column.Name); err != nil {
+		if err := writer.String(column.Name); err != nil {
 			return errors.Wrap(err)
 		}
 
@@ -60,9 +61,9 @@ func (stream *NativeBlockOutputStream) Write(block *datablocks.DataBlock) error 
 			return errors.Wrap(err)
 		}
 
-		// Data serialize.
-		for _, val := range v.Values {
-			if err := datatype.Serialize(writer, val); err != nil {
+		for it.Next() {
+			// Data serialize.
+			if err := datatype.Serialize(writer, it.Value()); err != nil {
 				return err
 			}
 		}

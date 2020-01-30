@@ -33,46 +33,25 @@ func (t *FilterTransform) Execute() {
 
 	defer out.Close()
 	onNext := func(x interface{}) {
-		var r interface{}
-
-		switch x := x.(type) {
+		switch y := x.(type) {
 		case *datablocks.DataBlock:
-			y, err := t.filter(x)
-			if err != nil {
-				r = err
-			} else {
-				r = y
+			if err := t.filter(y); err != nil {
+				x = err
 			}
-		case error:
-			r = x
 		}
-
-		out.Send(r)
+		out.Send(x)
 	}
 	t.Subscribe(onNext)
 }
 
-func (t *FilterTransform) filter(x *datablocks.DataBlock) (*datablocks.DataBlock, error) {
+func (t *FilterTransform) filter(x *datablocks.DataBlock) error {
 	plan := t.plan.SubPlan
 
 	checks, err := t.check(x, plan)
 	if err != nil {
-		return nil, err
+		return err
 	}
-
-	// In place filter.
-	for _, v := range x.Values() {
-		n := 0
-		values := v.Values
-		for i, check := range checks {
-			if check.AsBool() {
-				values[n] = values[i]
-				n++
-			}
-		}
-		v.Values = values[:n]
-	}
-	return x, nil
+	return x.Filter(checks)
 }
 
 func (t *FilterTransform) check(x *datablocks.DataBlock, plan planners.IPlan) ([]datatypes.Value, error) {
@@ -83,7 +62,7 @@ func (t *FilterTransform) check(x *datablocks.DataBlock, plan planners.IPlan) ([
 		right := datatypes.ToValue(plan.Args[1].(*planners.ConstantPlan).Value)
 
 		colName := plan.Args[0].(*planners.VariablePlan).Value
-		column, err := x.Column(colName)
+		iter, err := x.Iterator(colName)
 		if err != nil {
 			return nil, err
 		}
@@ -92,8 +71,10 @@ func (t *FilterTransform) check(x *datablocks.DataBlock, plan planners.IPlan) ([
 		if err != nil {
 			return nil, err
 		}
-		for i, v := range column.Values {
-			left := v
+
+		i := 0
+		for iter.Next() {
+			left := iter.Value()
 			if err := function.Validator.Validate(left, right); err != nil {
 				return nil, err
 			}
@@ -102,6 +83,7 @@ func (t *FilterTransform) check(x *datablocks.DataBlock, plan planners.IPlan) ([
 				return nil, err
 			}
 			checks[i] = result
+			i++
 		}
 		return checks, nil
 	case *planners.AndPlan:

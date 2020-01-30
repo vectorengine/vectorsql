@@ -19,18 +19,20 @@ func TestOrderByPlan(t *testing.T) {
 		{
 			name: "simple",
 			plan: NewOrderByPlan(
-				[]IPlan{
-					NewVariablePlan("c1"),
-					NewVariablePlan("c2"),
-					NewVariablePlan("c2"),
+				Order{
+					Expression: NewVariablePlan("c1"),
+					Direction:  "desc",
 				},
-				[]string{
-					"asc",
-					"desc",
-					"asc",
+				Order{
+					Expression: NewVariablePlan("c2"),
+					Direction:  "asc",
+				},
+				Order{
+					Expression: NewVariablePlan("c3"),
+					Direction:  "desc",
 				},
 			),
-			expect: "OrderByNode[(field:VariableNode=[$c1], direction:asc)(field:VariableNode=[$c2], direction:desc)(field:VariableNode=[$c2], direction:asc)]",
+			expect: "\n->OrderByNode\t--> [(field:VariableNode=[$c1], direction:desc)(field:VariableNode=[$c2], direction:asc)(field:VariableNode=[$c3], direction:desc)]",
 		},
 	}
 

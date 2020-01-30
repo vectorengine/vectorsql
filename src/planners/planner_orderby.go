@@ -9,14 +9,16 @@ import (
 )
 
 type OrderByPlan struct {
-	Expression []IPlan
-	Directions []string
+	Orders []Order
+}
+type Order struct {
+	Expression IPlan
+	Direction  string
 }
 
-func NewOrderByPlan(exprs []IPlan, directions []string) *OrderByPlan {
+func NewOrderByPlan(orders ...Order) *OrderByPlan {
 	return &OrderByPlan{
-		Expression: exprs,
-		Directions: directions,
+		Orders: orders,
 	}
 }
 
@@ -33,10 +35,13 @@ func (plan *OrderByPlan) Walk(visit Visit) error {
 }
 
 func (plan *OrderByPlan) String() string {
-	res := plan.Name()
+	res := "\n"
+	res += "->"
+	res += plan.Name()
+	res += "\t--> "
 	res += "["
-	for i, expr := range plan.Expression {
-		res += fmt.Sprintf("(field:%s, direction:%v)", expr, plan.Directions[i])
+	for _, expr := range plan.Orders {
+		res += fmt.Sprintf("(field:%s, direction:%v)", expr.Expression, expr.Direction)
 	}
 	res += "]"
 	return res

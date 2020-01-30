@@ -29,7 +29,7 @@ func TestSelectPlan(t *testing.T) {
 		{
 			name:   "orderby",
 			query:  "select * from t1 order by c1 desc, c2 asc, c3 desc",
-			expect: "\n->ScanNode\t--> (table=[, t1]), \n->ProjectNode\t--> (), OrderByNode[(field:VariableNode=[$c1], direction:desc)(field:VariableNode=[$c2], direction:asc)(field:VariableNode=[$c3], direction:desc)], \n->SinkNode\t-->",
+			expect: "\n->ScanNode\t--> (table=[, t1]), \n->ProjectNode\t--> (), \n->OrderByNode\t--> [(field:VariableNode=[$c1], direction:desc)(field:VariableNode=[$c2], direction:asc)(field:VariableNode=[$c3], direction:desc)], \n->SinkNode\t-->",
 		},
 		{
 			name:   "simple",

@@ -55,11 +55,11 @@ func (plan *SelectPlan) Build() error {
 
 	// OrderBy.
 	if ast.OrderBy != nil {
-		expressions, directions, err := parseOrderByExpressions(ast.OrderBy)
+		orders, err := parseOrderByExpressions(ast.OrderBy)
 		if err != nil {
 			return err
 		}
-		orderByPlan := NewOrderByPlan(expressions, directions)
+		orderByPlan := NewOrderByPlan(orders...)
 		tree.Add(orderByPlan)
 	}
 
