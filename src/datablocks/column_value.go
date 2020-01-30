@@ -24,8 +24,3 @@ func NewColumnValue(col columns.Column) *ColumnValue {
 func (cv *ColumnValue) NumRows() int {
 	return len(cv.values)
 }
-
-func (cv *ColumnValue) Insert(v datatypes.Value) error {
-	cv.values = append(cv.values, v)
-	return nil
-}

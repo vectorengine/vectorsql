@@ -51,6 +51,28 @@ func TestSelectExecutor(t *testing.T) {
 				[]interface{}{4},
 			),
 		},
+		{
+			name:  "filter",
+			query: "SELECT * FROM range(1, 5) WHERE i>2",
+			expect: mocks.NewBlockFromSlice(
+				[]columns.Column{
+					{Name: "i", DataType: datatypes.NewInt32DataType()},
+				},
+				[]interface{}{3},
+				[]interface{}{4},
+			),
+		},
+		{
+			name:  "orderby",
+			query: "SELECT * FROM range(1, 5) WHERE i>2 order by i desc",
+			expect: mocks.NewBlockFromSlice(
+				[]columns.Column{
+					{Name: "i", DataType: datatypes.NewInt32DataType()},
+				},
+				[]interface{}{4},
+				[]interface{}{3},
+			),
+		},
 	}
 
 	for _, test := range tests {
@@ -72,7 +94,7 @@ func TestSelectExecutor(t *testing.T) {
 		for x := range transform.In().Recv() {
 			expect := test.expect
 			actual := x.(*datablocks.DataBlock)
-			assert.Equal(t, expect, actual)
+			assert.True(t, mocks.DataBlockEqual(expect, actual))
 		}
 	}
 }

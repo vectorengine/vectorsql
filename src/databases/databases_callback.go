@@ -14,28 +14,24 @@ import (
 // Handlers.
 func fillDatabasesFunc(block *datablocks.DataBlock) error {
 	var dbs []IDatabase
-	columns := block.ColumnValues()
 
 	for _, database := range databases.databases {
 		dbs = append(dbs, database)
 	}
 	sort.Slice(dbs, func(i, j int) bool { return dbs[i].Name() < dbs[j].Name() })
 
+	batcher := datablocks.NewBatchWriter(block.Columns())
 	for _, database := range dbs {
-		if err := columns[0].Insert(datatypes.MakeString(database.Meta().GetDBName())); err != nil {
-			return err
-		}
-		if err := columns[1].Insert(datatypes.MakeString(database.Meta().GetEngineName())); err != nil {
-			return err
-		}
-		if err := columns[2].Insert(datatypes.MakeString(database.Meta().GetDataPath())); err != nil {
-			return err
-		}
-		if err := columns[3].Insert(datatypes.MakeString(database.Meta().GetMetaDataPath())); err != nil {
+		if err := batcher.WriteRow(
+			datatypes.MakeString(database.Meta().GetDBName()),
+			datatypes.MakeString(database.Meta().GetEngineName()),
+			datatypes.MakeString(database.Meta().GetDataPath()),
+			datatypes.MakeString(database.Meta().GetMetaDataPath()),
+		); err != nil {
 			return err
 		}
 	}
-	return nil
+	return block.Write(batcher)
 }
 
 func fillTablesFunc(dbName string, block *datablocks.DataBlock) error {
@@ -44,15 +40,15 @@ func fillTablesFunc(dbName string, block *datablocks.DataBlock) error {
 		return err
 	}
 
-	columns := block.ColumnValues()
+	batcher := datablocks.NewBatchWriter(block.Columns())
 	tables := database.GetTables()
 	for _, table := range tables {
-		if err := columns[0].Insert(datatypes.MakeString(table.getTable())); err != nil {
-			return err
-		}
-		if err := columns[1].Insert(datatypes.MakeString(table.getEngine())); err != nil {
+		if err := batcher.WriteRow(
+			datatypes.MakeString(table.getTable()),
+			datatypes.MakeString(table.getEngine()),
+		); err != nil {
 			return err
 		}
 	}
-	return nil
+	return block.Write(batcher)
 }

@@ -27,6 +27,7 @@ var (
 
 		// Table valued function.
 		FuncTableValuedFunctionRange.Name: FuncTableValuedFunctionRange,
+		FuncTableValuedFunctionZip.Name:   FuncTableValuedFunctionZip,
 	}
 )
 

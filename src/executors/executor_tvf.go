@@ -66,11 +66,16 @@ func (executor *TableValuedFunctionExecutor) Execute() (processors.IProcessor, e
 		block = datablocks.NewDataBlock([]columns.Column{
 			{Name: "i", DataType: datatypes.NewInt32DataType()},
 		})
+		batcher := datablocks.NewBatchWriter(block.Columns())
+
 		slice := result.AsSlice()
 		for _, data := range slice {
-			if err := block.ColumnValues()[0].Insert(data); err != nil {
+			if err := batcher.WriteRow(data); err != nil {
 				return nil, err
 			}
+		}
+		if err := block.Write(batcher); err != nil {
+			return nil, err
 		}
 	}
 	// Stream.

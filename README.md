@@ -31,19 +31,19 @@ $./bin/vectorsql-server -c conf/vectorsql-default.toml
 ```
 $clickhouse-client --compression=0
 
-VectorSQL :) select * from range(1,10) as r where i>=3 and i<8;
+VectorSQL :) select * from range(1,10) as r where i>=3 and i<8 and i!=5 order by i desc;
 
 SELECT *
 FROM range(1, 10) AS r
-WHERE (i >= 3) AND (i < 8)
+WHERE (i >= 3) AND (i < 8) AND (i != 5)
+ORDER BY i DESC
 
 ┌─i─┐
-│ 3 │
-│ 4 │
-│ 5 │
-│ 6 │
 │ 7 │
+│ 6 │
+│ 4 │
+│ 3 │
 └───┘
-↘ Progress: 0.00 rows, 0.00 B (0.00 rows/s., 0.00 B/s.) 
-5 rows in set. Elapsed: 0.007 sec.
+↖ Progress: 0.00 rows, 0.00 B (0.00 rows/s., 0.00 B/s.)
+4 rows in set. Elapsed: 0.008 sec.
 ```

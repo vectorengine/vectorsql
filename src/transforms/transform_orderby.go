@@ -29,33 +29,26 @@ func (t *OrderByTransform) Execute() {
 
 	defer out.Close()
 	onNext := func(x interface{}) {
-		var r interface{}
-
-		switch x := x.(type) {
+		switch y := x.(type) {
 		case *datablocks.DataBlock:
-			y, err := t.orderby(x)
-			if err != nil {
-				r = err
-			} else {
-				r = y
+			if err := t.orderby(y); err != nil {
+				x = err
 			}
-		case error:
-			r = x
 		}
-		out.Send(r)
+		out.Send(x)
 	}
 	t.Subscribe(onNext)
 }
 
-func (t *OrderByTransform) orderby(x *datablocks.DataBlock) (*datablocks.DataBlock, error) {
-	log := t.ctx.log
+func (t *OrderByTransform) orderby(x *datablocks.DataBlock) error {
 	plan := t.plan
 
+	var sorters []datablocks.Sorter
 	for _, order := range plan.Orders {
 		expr := order.Expression.(*planners.VariablePlan)
 		field := string(expr.Value)
 		direction := order.Direction
-		log.Debug("transforms->orderby-> field:%v, direction:%v", field, direction)
+		sorters = append(sorters, datablocks.NewSorter(field, direction))
 	}
-	return x, nil
+	return x.Sort(sorters...)
 }

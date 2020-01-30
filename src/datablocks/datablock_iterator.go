@@ -11,12 +11,14 @@ import (
 
 type DataBlockIterator struct {
 	cv      *ColumnValue
+	seqs    []datatypes.Value
 	current int
 }
 
-func NewDataBlockIterator(cv *ColumnValue) *DataBlockIterator {
+func newDataBlockIterator(seqs []datatypes.Value, cv *ColumnValue) *DataBlockIterator {
 	return &DataBlockIterator{
 		cv:      cv,
+		seqs:    seqs,
 		current: -1,
 	}
 }
@@ -26,10 +28,18 @@ func (it *DataBlockIterator) Column() columns.Column {
 }
 
 func (it *DataBlockIterator) Next() bool {
+	rows := it.cv.NumRows()
+	if it.seqs != nil {
+		rows = len(it.seqs)
+	}
 	it.current++
-	return it.current < it.cv.NumRows()
+	return it.current < rows
 }
 
 func (it *DataBlockIterator) Value() datatypes.Value {
-	return it.cv.values[it.current]
+	if it.seqs != nil {
+		return it.cv.values[it.seqs[it.current].AsInt()]
+	} else {
+		return it.cv.values[it.current]
+	}
 }

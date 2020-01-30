@@ -7,6 +7,8 @@ package executors
 import (
 	"planners"
 	"processors"
+
+	"base/errors"
 )
 
 type SelectExecutor struct {
@@ -36,15 +38,21 @@ func (executor *SelectExecutor) Execute() (processors.IProcessor, error) {
 		case *planners.TableValuedFunctionPlan:
 			executor := NewTableValuedFunctionExecutor(ectx, plan)
 			tree.Add(executor)
+		case *planners.ProjectPlan:
 		case *planners.ScanPlan:
 			executor := NewScanExecutor(ectx, plan)
 			tree.Add(executor)
 		case *planners.FilterPlan:
 			executor := NewFilterExecutor(ectx, plan)
 			tree.Add(executor)
+		case *planners.OrderByPlan:
+			executor := NewOrderByExecutor(ectx, plan)
+			tree.Add(executor)
 		case *planners.SinkPlan:
 			executor := NewSinkExecutor(ectx, plan)
 			tree.Add(executor)
+		default:
+			return nil, errors.Errorf("Unsupport plan:%T", plan)
 		}
 	}
 	pipeline, err := tree.BuildPipeline()
