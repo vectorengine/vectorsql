@@ -40,6 +40,10 @@ func (table *Table) getTable() string {
 	return table.table
 }
 
+func (table *Table) getDatabase() string {
+	return table.schema
+}
+
 func (table *Table) getEngine() string {
 	return table.engine
 }

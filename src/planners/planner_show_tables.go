@@ -24,7 +24,7 @@ func (plan *ShowTablesPlan) Name() string {
 }
 
 func (plan *ShowTablesPlan) Build() error {
-	query := "select * from system.tables order by name asc"
+	query := "select * from system.tables"
 	ast, err := parsers.Parse(query)
 	if err != nil {
 		return err

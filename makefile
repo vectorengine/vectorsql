@@ -5,7 +5,7 @@ build:
 	go build -v -o bin/vectorsql-server src/cmd/server.go
 
 goyacc:
-	goyacc -o src/parser/sql.go src/parser/sql.y
+	goyacc -o src/parsers/sqlparser/sql.go src/parsers/sqlparser/sql.y
 
 clean:
 	@echo "--> Cleaning..."
