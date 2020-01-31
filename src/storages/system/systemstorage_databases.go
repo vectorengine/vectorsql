@@ -65,9 +65,5 @@ func (storage *SystemDatabasesStorage) GetInputStream(session *sessions.Session,
 	log.Debug("Storage->System->Block:%+v", block)
 
 	// Stream.
-	stream := datastreams.NewNativeBlockInputStream()
-	if err := stream.Insert(block); err != nil {
-		return nil, err
-	}
-	return stream, nil
+	return datastreams.NewOneBlockInputStream(block), nil
 }

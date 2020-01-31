@@ -6,6 +6,5 @@ package datablocks
 
 type IDataBlockInputStream interface {
 	Name() string
-	Next() (*DataBlock, error)
-	Insert(*DataBlock) error
+	Read() (*DataBlock, error)
 }

@@ -61,9 +61,5 @@ func (storage *SystemTablesStorage) GetInputStream(session *sessions.Session, sc
 	}
 
 	// Stream.
-	stream := datastreams.NewNativeBlockInputStream()
-	if err := stream.Insert(block); err != nil {
-		return nil, err
-	}
-	return stream, nil
+	return datastreams.NewOneBlockInputStream(block), nil
 }

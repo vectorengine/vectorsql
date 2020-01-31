@@ -26,7 +26,7 @@ func (stream *MockBlockInputStream) Name() string {
 	return "MockBlockInputStream"
 }
 
-func (stream *MockBlockInputStream) Next() (*datablocks.DataBlock, error) {
+func (stream *MockBlockInputStream) Read() (*datablocks.DataBlock, error) {
 	stream.mu.RLock()
 	defer stream.mu.RUnlock()
 

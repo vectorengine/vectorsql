@@ -31,7 +31,7 @@ func (t *DataSourceTransform) Execute() {
 
 	defer out.Close()
 	for {
-		data, err := input.Next()
+		data, err := input.Read()
 		if err != nil {
 			log.Error("Transform->Input error:%+v", err)
 			out.Send(err)

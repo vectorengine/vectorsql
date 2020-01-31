@@ -50,14 +50,9 @@ func (storage *MemoryStorage) GetInputStream(session *sessions.Session, scan *pl
 	)
 
 	// Stream.
-	input := datastreams.NewNativeBlockInputStream()
-	for _, block := range storage.output.blocks {
-		if err := input.Insert(block); err != nil {
-			return nil, err
-		}
-	}
-	log.Debug("Storage->Memory->Return->Stream:%+v", input)
-	return input, nil
+	stream := datastreams.NewOneBlockInputStream(storage.output.blocks[0])
+	log.Debug("Storage->Memory->Return->Stream:%+v", stream)
+	return stream, nil
 }
 
 type NativeBlockOutputStream struct {

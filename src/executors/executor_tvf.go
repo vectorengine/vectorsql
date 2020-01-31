@@ -79,11 +79,7 @@ func (executor *TableValuedFunctionExecutor) Execute() (processors.IProcessor, e
 		}
 	}
 	// Stream.
-	stream := datastreams.NewNativeBlockInputStream()
-	if err := stream.Insert(block); err != nil {
-		return nil, err
-	}
-
+	stream := datastreams.NewOneBlockInputStream(block)
 	transformCtx := transforms.NewTransformContext(executor.ctx.log, executor.ctx.conf)
 	transform := transforms.NewDataSourceTransform(transformCtx, stream)
 	log.Debug("Executor->Return->Pipeline:%s", transform.Name())
