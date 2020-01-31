@@ -70,7 +70,7 @@ func (executor *TableValuedFunctionExecutor) Execute() (processors.IProcessor, e
 		block = datablocks.NewDataBlock([]columns.Column{
 			{Name: "i", DataType: datatypes.NewInt32DataType()},
 		})
-	case "rangetable":
+	case "rangetable", "randtable":
 		var cols []columns.Column
 		for i := 1; i < len(variables); i++ {
 			datatype, err := datatypes.DataTypeFactory(constants[i].AsString())

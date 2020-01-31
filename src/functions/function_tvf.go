@@ -6,6 +6,7 @@ package functions
 
 import (
 	"fmt"
+	"math/rand"
 
 	"datatypes"
 )
@@ -51,6 +52,33 @@ var FuncTableValuedFunctionRangeTable = &Function{
 					row[j-1] = datatypes.MakeString(fmt.Sprintf("string-%v", i))
 				case "UInt32", "Int32":
 					row[j-1] = datatypes.MakeInt(i)
+				}
+			}
+			values[i] = datatypes.MakeTuple(row...)
+		}
+		return datatypes.MakeTuple(values...), nil
+	},
+	Validator: All(
+		AtLeastNArgs(2),
+	),
+}
+
+var FuncTableValuedFunctionRandTable = &Function{
+	Name: "RANDTABLE",
+	Args: [][]string{
+		{""},
+	},
+	Logic: func(args ...*datatypes.Value) (*datatypes.Value, error) {
+		count := args[0].AsInt()
+		values := make([]*datatypes.Value, count)
+		for i := 0; i < count; i++ {
+			row := make([]*datatypes.Value, len(args)-1)
+			for j := 1; j < len(args); j++ {
+				switch args[j].AsString() {
+				case "String":
+					row[j-1] = datatypes.MakeString(fmt.Sprintf("string-%v", rand.Intn(count)))
+				case "UInt32", "Int32":
+					row[j-1] = datatypes.MakeInt(rand.Intn(count))
 				}
 			}
 			values[i] = datatypes.MakeTuple(row...)
