@@ -48,3 +48,7 @@ func (plan *MapPlan) String() string {
 func (plan *MapPlan) Add(p IPlan) {
 	plan.SubPlans = append(plan.SubPlans, p)
 }
+
+func (plan *MapPlan) AsPlans() []IPlan {
+	return plan.SubPlans
+}

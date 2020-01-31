@@ -46,4 +46,23 @@ ORDER BY i DESC
 └───┘
 ↖ Progress: 0.00 rows, 0.00 B (0.00 rows/s., 0.00 B/s.)
 4 rows in set. Elapsed: 0.008 sec.
+
+
+VectorSQL :) select * from rangetable(rows->10, c1->'UInt32', c2->'String') where c1>=3 and c1<8 and c1!=5 order by c1 desc, c2 desc;
+
+SELECT *
+FROM rangetable(rows -> 10, c1 -> 'UInt32', c2 -> 'String')
+WHERE (c1 >= 3) AND (c1 < 8) AND (c1 != 5)
+ORDER BY
+    c1 DESC,
+    c2 DESC
+
+┌─c1─┬─c2───────┐
+│  7 │ string-7 │
+│  6 │ string-6 │
+│  4 │ string-4 │
+│  3 │ string-3 │
+└────┴──────────┘
+↙ Progress: 0.00 rows, 0.00 B (0.00 rows/s., 0.00 B/s.)
+4 rows in set. Elapsed: 0.006 sec.
 ```

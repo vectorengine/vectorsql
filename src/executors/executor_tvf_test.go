@@ -42,6 +42,45 @@ func TestTVFExecutor(t *testing.T) {
 			),
 			estring: "\n->TableValuedFunctionExecutor\t--> \n->TableValuedFunctionNode\t--> (Func=[range], Args=[ConstantNode=<1>, ConstantNode=<5>])",
 		},
+
+		{
+			name: "TableValuedFunctionExecutor",
+			plan: planners.NewTableValuedFunctionPlan("rangetable",
+				planners.NewMapPlan(
+					planners.NewTableValuedFunctionExpressionPlan(
+						"",
+						planners.NewFunctionExpressionPlan("->",
+							planners.NewVariablePlan("row"),
+							planners.NewConstantPlan(3),
+						),
+					),
+					planners.NewTableValuedFunctionExpressionPlan(
+						"",
+						planners.NewFunctionExpressionPlan("->",
+							planners.NewVariablePlan("c1"),
+							planners.NewConstantPlan("UInt32"),
+						),
+					),
+					planners.NewTableValuedFunctionExpressionPlan(
+						"",
+						planners.NewFunctionExpressionPlan("->",
+							planners.NewVariablePlan("c2"),
+							planners.NewConstantPlan("String"),
+						),
+					),
+				),
+			),
+			expect: mocks.NewBlockFromSlice(
+				[]columns.Column{
+					{Name: "c1", DataType: datatypes.NewUInt32DataType()},
+					{Name: "c2", DataType: datatypes.NewStringDataType()},
+				},
+				[]interface{}{0, "string-0"},
+				[]interface{}{1, "string-1"},
+				[]interface{}{2, "string-2"},
+			),
+			estring: "\n->TableValuedFunctionExecutor\t--> \n->TableValuedFunctionNode\t--> (Func=[rangetable], Args=[TableValuedFunctionExpressionNode=(Func=[], Args=[FuncExpressionNode=(Func=[->], Args=[[VariableNode=[$row] ConstantNode=<3>]])]), TableValuedFunctionExpressionNode=(Func=[], Args=[FuncExpressionNode=(Func=[->], Args=[[VariableNode=[$c1] ConstantNode=<UInt32>]])]), TableValuedFunctionExpressionNode=(Func=[], Args=[FuncExpressionNode=(Func=[->], Args=[[VariableNode=[$c2] ConstantNode=<String>]])])])",
+		},
 	}
 
 	for _, test := range tests {

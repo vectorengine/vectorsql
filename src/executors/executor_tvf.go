@@ -32,7 +32,9 @@ func (executor *TableValuedFunctionExecutor) Name() string {
 }
 
 func (executor *TableValuedFunctionExecutor) Execute() (processors.IProcessor, error) {
-	var args []*datatypes.Value
+	var constants []*datatypes.Value
+	var variables []*datatypes.Value
+
 	plan := executor.plan
 	log := executor.ctx.log
 
@@ -40,7 +42,9 @@ func (executor *TableValuedFunctionExecutor) Execute() (processors.IProcessor, e
 	err := plan.Walk(func(plan planners.IPlan) (bool, error) {
 		switch plan := plan.(type) {
 		case *planners.ConstantPlan:
-			args = append(args, datatypes.ToValue(plan.Value))
+			constants = append(constants, datatypes.ToValue(plan.Value))
+		case *planners.VariablePlan:
+			variables = append(variables, datatypes.ToValue(plan.Value))
 		}
 		return true, nil
 	})
@@ -52,10 +56,10 @@ func (executor *TableValuedFunctionExecutor) Execute() (processors.IProcessor, e
 	if err != nil {
 		return nil, err
 	}
-	if err := function.Validator.Validate(args...); err != nil {
+	if err := function.Validator.Validate(constants...); err != nil {
 		return nil, err
 	}
-	result, err := function.Logic(args...)
+	result, err := function.Logic(constants...)
 	if err != nil {
 		return nil, err
 	}
@@ -66,18 +70,33 @@ func (executor *TableValuedFunctionExecutor) Execute() (processors.IProcessor, e
 		block = datablocks.NewDataBlock([]columns.Column{
 			{Name: "i", DataType: datatypes.NewInt32DataType()},
 		})
-		batcher := datablocks.NewBatchWriter(block.Columns())
-
-		slice := result.AsSlice()
-		for _, data := range slice {
-			if err := batcher.WriteRow(data); err != nil {
+	case "rangetable":
+		var cols []columns.Column
+		for i := 1; i < len(variables); i++ {
+			datatype, err := datatypes.DataTypeFactory(constants[i].AsString())
+			if err != nil {
 				return nil, err
 			}
+			cols = append(cols, columns.Column{
+				Name:     variables[i].AsString(),
+				DataType: datatype,
+			})
 		}
-		if err := block.Write(batcher); err != nil {
+		block = datablocks.NewDataBlock(cols)
+	}
+
+	// Block.
+	batcher := datablocks.NewBatchWriter(block.Columns())
+	slice := result.AsSlice()
+	for _, data := range slice {
+		if err := batcher.WriteRow(data.AsSlice()...); err != nil {
 			return nil, err
 		}
 	}
+	if err := block.Write(batcher); err != nil {
+		return nil, err
+	}
+
 	// Stream.
 	stream := datastreams.NewOneBlockInputStream(block)
 	transformCtx := transforms.NewTransformContext(executor.ctx.log, executor.ctx.conf)

@@ -29,8 +29,8 @@ func TestTableValuedFunctions(t *testing.T) {
 				datatypes.MakeInt(3),
 			},
 			expect: datatypes.MakeTuple(
-				datatypes.ToValue(1),
-				datatypes.ToValue(2),
+				datatypes.MakeTuple(datatypes.ToValue(1)),
+				datatypes.MakeTuple(datatypes.ToValue(2)),
 			),
 		},
 		{
@@ -39,6 +39,28 @@ func TestTableValuedFunctions(t *testing.T) {
 			args: []*datatypes.Value{
 				datatypes.MakeInt(1),
 				datatypes.MakeString("x"),
+			},
+			err: errors.New("type.error"),
+		},
+		{
+			name: "tvf-rangetable-ok",
+			fn:   FuncTableValuedFunctionRangeTable,
+			args: []*datatypes.Value{
+				datatypes.MakeInt(3),
+				datatypes.MakeString("UInt32"),
+				datatypes.MakeString("String"),
+			},
+			expect: datatypes.MakeTuple(
+				datatypes.MakeTuple(datatypes.ToValue(0), datatypes.ToValue("string-0")),
+				datatypes.MakeTuple(datatypes.ToValue(1), datatypes.ToValue("string-1")),
+				datatypes.MakeTuple(datatypes.ToValue(2), datatypes.ToValue("string-2")),
+			),
+		},
+		{
+			name: "tvf-rangetable-type-error",
+			fn:   FuncTableValuedFunctionRangeTable,
+			args: []*datatypes.Value{
+				datatypes.MakeInt(1),
 			},
 			err: errors.New("type.error"),
 		},
@@ -84,7 +106,6 @@ func TestTableValuedFunctions(t *testing.T) {
 	}
 
 	for _, test := range tests {
-
 		err := test.fn.Validator.Validate(test.args...)
 		if test.err != nil {
 			assert.NotNil(t, err)

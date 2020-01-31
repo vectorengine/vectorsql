@@ -26,8 +26,9 @@ var (
 		FuncLogicOr.Name:  FuncLogicOr,
 
 		// Table valued function.
-		FuncTableValuedFunctionRange.Name: FuncTableValuedFunctionRange,
-		FuncTableValuedFunctionZip.Name:   FuncTableValuedFunctionZip,
+		FuncTableValuedFunctionRange.Name:      FuncTableValuedFunctionRange,
+		FuncTableValuedFunctionRangeTable.Name: FuncTableValuedFunctionRangeTable,
+		FuncTableValuedFunctionZip.Name:        FuncTableValuedFunctionZip,
 	}
 )
 

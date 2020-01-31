@@ -37,7 +37,7 @@ func TestSelectPlan(t *testing.T) {
 			expect: "\n->ScanNode\t--> (table=[system, tables]), \n->ProjectNode\t--> (VariableNode=[$name], FuncExpressionNode=(Func=[SUM], Args=[[VariableNode=[$id]]]), FuncExpressionNode=(Func=[+], Args=[[VariableNode=[$id] ConstantNode=<1>]])), \n->FilterNode\t--> (AndNode=(Func=[AND], Left=[OrNode=(Func=[OR], Left=[BooleanExpressionNode=(Func=[=], Args=[[VariableNode=[$name] ConstantNode=<db1>]])], Right=[BooleanExpressionNode=(Func=[=], Args=[[VariableNode=[$name] ConstantNode=<db2>]])])], Right=[BooleanExpressionNode=(Func=[>], Args=[[FuncExpressionNode=(Func=[+], Args=[[VariableNode=[$id] ConstantNode=<1>]]) ConstantNode=<3>]])])), \n->SinkNode\t-->",
 		},
 		{
-			name:   "tvf",
+			name:   "tvf-range",
 			query:  "SELECT * FROM range(range_start -> 1, range_end -> 5) r",
 			expect: "\n->TableValuedFunctionNode\t--> (Func=[range], Args=[TableValuedFunctionExpressionNode=(Func=[], Args=[FuncExpressionNode=(Func=[->], Args=[[VariableNode=[$range_start] ConstantNode=<1>]])]), TableValuedFunctionExpressionNode=(Func=[], Args=[FuncExpressionNode=(Func=[->], Args=[[VariableNode=[$range_end] ConstantNode=<5>]])])]), \n->ProjectNode\t--> (), \n->SinkNode\t-->",
 		},
