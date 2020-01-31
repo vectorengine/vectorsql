@@ -25,20 +25,18 @@ func fillDatabasesFunc(block *datablocks.DataBlock) error {
 	return block.Write(batcher)
 }
 
-func fillTablesFunc(dbName string, block *datablocks.DataBlock) error {
-	database, err := databases.getDatabase(dbName)
-	if err != nil {
-		return err
-	}
-
+func fillTablesFunc(block *datablocks.DataBlock) error {
 	batcher := datablocks.NewBatchWriter(block.Columns())
-	tables := database.GetTables()
-	for _, table := range tables {
-		if err := batcher.WriteRow(
-			datatypes.MakeString(table.getTable()),
-			datatypes.MakeString(table.getEngine()),
-		); err != nil {
-			return err
+	for _, database := range databases.databases {
+		tables := database.GetTables()
+		for _, table := range tables {
+			if err := batcher.WriteRow(
+				datatypes.MakeString(table.getTable()),
+				datatypes.MakeString(table.getDatabase()),
+				datatypes.MakeString(table.getEngine()),
+			); err != nil {
+				return err
+			}
 		}
 	}
 	return block.Write(batcher)

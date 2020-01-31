@@ -12,7 +12,7 @@ import (
 )
 
 type (
-	TablesFillFunc    func(string, *datablocks.DataBlock) error
+	TablesFillFunc    func(*datablocks.DataBlock) error
 	DatabasesFillFunc func(*datablocks.DataBlock) error
 )
 type SystemStorageContext struct {

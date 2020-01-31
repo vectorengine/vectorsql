@@ -32,6 +32,7 @@ func (storage *SystemTablesStorage) Name() string {
 func (storage *SystemTablesStorage) Columns() []columns.Column {
 	return []columns.Column{
 		{Name: "name", DataType: datatypes.NewStringDataType()},
+		{Name: "database", DataType: datatypes.NewStringDataType()},
 		{Name: "engine", DataType: datatypes.NewStringDataType()},
 	}
 }
@@ -43,7 +44,6 @@ func (storage *SystemTablesStorage) GetOutputStream(session *sessions.Session, s
 func (storage *SystemTablesStorage) GetInputStream(session *sessions.Session, scan *planners.ScanPlan) (datablocks.IDataBlockInputStream, error) {
 	var cols []columns.Column
 	ctx := storage.ctx
-	dbName := session.GetDatabase()
 
 	// Column.
 	for _, col := range storage.Columns() {
@@ -56,7 +56,7 @@ func (storage *SystemTablesStorage) GetInputStream(session *sessions.Session, sc
 
 	// Block.
 	block := datablocks.NewDataBlock(cols)
-	if err := ctx.tablesFillFunc(dbName, block); err != nil {
+	if err := ctx.tablesFillFunc(block); err != nil {
 		return nil, err
 	}
 
