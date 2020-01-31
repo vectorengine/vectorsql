@@ -9,18 +9,18 @@ import (
 	"datatypes"
 )
 
-type ColumnValue struct {
+type DataBlockValue struct {
 	column columns.Column
 	values []*datatypes.Value
 }
 
-func NewColumnValue(col columns.Column) *ColumnValue {
-	return &ColumnValue{
+func NewDataBlockValue(col columns.Column) *DataBlockValue {
+	return &DataBlockValue{
 		column: col,
 		values: make([]*datatypes.Value, 0, 1024),
 	}
 }
 
-func (cv *ColumnValue) NumRows() int {
-	return len(cv.values)
+func (v *DataBlockValue) NumRows() int {
+	return len(v.values)
 }

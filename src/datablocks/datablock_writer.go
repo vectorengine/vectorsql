@@ -10,14 +10,14 @@ import (
 )
 
 type BatchWriter struct {
-	values []*ColumnValue
+	values []*DataBlockValue
 }
 
 func NewBatchWriter(cols []columns.Column) *BatchWriter {
-	var values []*ColumnValue
+	var values []*DataBlockValue
 
 	for _, col := range cols {
-		cv := NewColumnValue(col)
+		cv := NewDataBlockValue(col)
 		values = append(values, cv)
 	}
 	return &BatchWriter{

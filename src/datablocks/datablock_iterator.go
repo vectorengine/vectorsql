@@ -10,12 +10,12 @@ import (
 )
 
 type DataBlockIterator struct {
-	cv      *ColumnValue
+	cv      *DataBlockValue
 	seqs    []*datatypes.Value
 	current int
 }
 
-func newDataBlockIterator(seqs []*datatypes.Value, cv *ColumnValue) *DataBlockIterator {
+func newDataBlockIterator(seqs []*datatypes.Value, cv *DataBlockValue) *DataBlockIterator {
 	return &DataBlockIterator{
 		cv:      cv,
 		seqs:    seqs,
