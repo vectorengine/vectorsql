@@ -5,7 +5,6 @@
 package functions
 
 import (
-	"errors"
 	"testing"
 
 	"datatypes"
@@ -19,7 +18,7 @@ func TestTableValuedFunctions(t *testing.T) {
 		fn     *Function
 		args   []*datatypes.Value
 		expect *datatypes.Value
-		err    error
+		err    string
 	}{
 		{
 			name: "tvf-range-ok",
@@ -40,7 +39,7 @@ func TestTableValuedFunctions(t *testing.T) {
 				datatypes.MakeInt(1),
 				datatypes.MakeString("x"),
 			},
-			err: errors.New("type.error"),
+			err: ("bad argument at index 1: expected type 3 but got 6"),
 		},
 		{
 			name: "tvf-rangetable-ok",
@@ -62,7 +61,7 @@ func TestTableValuedFunctions(t *testing.T) {
 			args: []*datatypes.Value{
 				datatypes.MakeInt(1),
 			},
-			err: errors.New("type.error"),
+			err: ("expected at least 2 arguments, but got 1"),
 		},
 		{
 			name: "tvf-zip-ok",
@@ -98,17 +97,19 @@ func TestTableValuedFunctions(t *testing.T) {
 			name: "tvf-zip-type-error",
 			fn:   FuncTableValuedFunctionZip,
 			args: []*datatypes.Value{
-				datatypes.ToValue(1),
-				datatypes.ToValue(2),
+				datatypes.MakeTuple(
+					datatypes.ToValue(1),
+					datatypes.ToValue(2),
+				),
 			},
-			err: errors.New("type.error"),
+			err: ("expected at least 2 arguments, but got 1"),
 		},
 	}
 
 	for _, test := range tests {
 		err := test.fn.Validator.Validate(test.args...)
-		if test.err != nil {
-			assert.NotNil(t, err)
+		if test.err != "" {
+			assert.Equal(t, test.err, err.Error())
 			continue
 		} else {
 			assert.Nil(t, err)

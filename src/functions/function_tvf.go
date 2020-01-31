@@ -30,7 +30,7 @@ var FuncTableValuedFunctionRange = &Function{
 	},
 	Validator: All(
 		ExactlyNArgs(2),
-		OneOf(
+		All(
 			AllArgs(TypeOf(datatypes.ZeroInt())),
 		),
 	),
@@ -60,6 +60,9 @@ var FuncTableValuedFunctionRangeTable = &Function{
 	},
 	Validator: All(
 		AtLeastNArgs(2),
+		Arg(0, TypeOf(datatypes.ZeroInt())),
+		Arg(1, TypeOf(datatypes.ZeroString())),
+		IfArgPresent(2, Arg(2, TypeOf(datatypes.ZeroString()))),
 	),
 }
 
@@ -87,6 +90,9 @@ var FuncTableValuedFunctionRandTable = &Function{
 	},
 	Validator: All(
 		AtLeastNArgs(2),
+		Arg(0, TypeOf(datatypes.ZeroInt())),
+		Arg(1, TypeOf(datatypes.ZeroString())),
+		IfArgPresent(2, Arg(2, TypeOf(datatypes.ZeroString()))),
 	),
 }
 

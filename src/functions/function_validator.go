@@ -1,3 +1,4 @@
+// Copyright 2019 The OctoSQL Authors.
 // Copyright 2020 The VectorSQL Authors.
 //
 // Code is licensed under Apache License, Version 2.0.
@@ -31,24 +32,6 @@ func All(validators ...IValidator) *all {
 func (v *all) Validate(args ...*datatypes.Value) error {
 	for _, validator := range v.validators {
 		err := validator.Validate(args...)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-type singleAll struct {
-	validators []ISingleArgumentValidator
-}
-
-func SingleAll(validators ...ISingleArgumentValidator) *singleAll {
-	return &singleAll{validators: validators}
-}
-
-func (v *singleAll) Validate(args *datatypes.Value) error {
-	for _, validator := range v.validators {
-		err := validator.Validate(args)
 		if err != nil {
 			return err
 		}
@@ -105,6 +88,22 @@ func (v *typeOf) Validate(arg *datatypes.Value) error {
 	return nil
 }
 
+type ifArgPresent struct {
+	i         int
+	validator IValidator
+}
+
+func IfArgPresent(i int, validator IValidator) *ifArgPresent {
+	return &ifArgPresent{i: i, validator: validator}
+}
+
+func (v *ifArgPresent) Validate(args ...*datatypes.Value) error {
+	if len(args) < v.i+1 {
+		return nil
+	}
+	return v.validator.Validate(args...)
+}
+
 type atLeastNArgs struct {
 	n int
 }
@@ -116,6 +115,37 @@ func AtLeastNArgs(n int) *atLeastNArgs {
 func (v *atLeastNArgs) Validate(args ...*datatypes.Value) error {
 	if len(args) < v.n {
 		return errors.Errorf("expected at least %s, but got %v", argumentCount(v.n), len(args))
+	}
+	return nil
+}
+
+type atMostNArgs struct {
+	n int
+}
+
+func AtMostNArgs(n int) *atMostNArgs {
+	return &atMostNArgs{n: n}
+}
+
+func (v *atMostNArgs) Validate(args ...*datatypes.Value) error {
+	if len(args) > v.n {
+		return errors.Errorf("expected at most %s, but got %v", argumentCount(v.n), len(args))
+	}
+	return nil
+}
+
+type arg struct {
+	i         int
+	validator ISingleArgumentValidator
+}
+
+func Arg(i int, validator ISingleArgumentValidator) *arg {
+	return &arg{i: i, validator: validator}
+}
+
+func (v *arg) Validate(args ...*datatypes.Value) error {
+	if err := v.validator.Validate(args[v.i]); err != nil {
+		return fmt.Errorf("bad argument at index %v: %v", v.i, err)
 	}
 	return nil
 }
