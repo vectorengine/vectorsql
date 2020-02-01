@@ -8,7 +8,7 @@ import (
 	"sort"
 	"strings"
 
-	"datatypes"
+	"datavalues"
 	"functions"
 
 	"base/errors"
@@ -36,17 +36,17 @@ func (block *DataBlock) Sort(sorters ...Sorter) error {
 			return errors.Errorf("Can't find column:%v", sorter.column)
 		}
 		sort.Slice(matrix[:], func(i, j int) bool {
-			cmp, err := datatypes.Compare(matrix[i], matrix[j])
+			cmp, err := datavalues.Compare(matrix[i], matrix[j])
 			if err != nil {
 				return false
 			}
 			switch strings.ToUpper(sorter.direction) {
 			case "ASC":
-				return cmp == datatypes.LessThan
+				return cmp == datavalues.LessThan
 			case "DESC":
-				return cmp == datatypes.GreaterThan
+				return cmp == datavalues.GreaterThan
 			default:
-				return cmp == datatypes.LessThan
+				return cmp == datavalues.LessThan
 			}
 		})
 	} else {
@@ -57,21 +57,21 @@ func (block *DataBlock) Sort(sorters ...Sorter) error {
 
 		// Seqs column.
 		max := block.NumRows()
-		seqs := make([]*datatypes.Value, max)
+		seqs := make([]*datavalues.Value, max)
 		for i := 0; i < max; i++ {
-			seqs[i] = datatypes.ToValue(i)
+			seqs[i] = datavalues.ToValue(i)
 		}
 
 		// Sort columns.
-		var tuples []*datatypes.Value
+		var tuples []*datavalues.Value
 		for _, sorter := range sorters {
 			cv, ok := block.valuesmap[sorter.column]
 			if !ok {
 				return errors.Errorf("Can't find column:%v", sorter.column)
 			}
-			tuples = append(tuples, datatypes.MakeTuple(cv.values...))
+			tuples = append(tuples, datavalues.MakeTuple(cv.values...))
 		}
-		tuples = append(tuples, datatypes.MakeTuple(seqs...))
+		tuples = append(tuples, datavalues.MakeTuple(seqs...))
 
 		// Zip.
 		if err := zipFunc.Validator.Validate(tuples...); err != nil {
@@ -88,27 +88,27 @@ func (block *DataBlock) Sort(sorters ...Sorter) error {
 			irows := matrix[i].AsSlice()
 			jrows := matrix[j].AsSlice()
 			for x := 0; x < len(irows)-1; x++ {
-				cmp, err := datatypes.Compare(irows[x], jrows[x])
+				cmp, err := datavalues.Compare(irows[x], jrows[x])
 				if err != nil {
 					return false
 				}
-				if cmp == datatypes.Equal {
+				if cmp == datavalues.Equal {
 					continue
 				}
 				switch strings.ToUpper(sorters[x].direction) {
 				case "ASC":
-					return cmp == datatypes.LessThan
+					return cmp == datavalues.LessThan
 				case "DESC":
-					return cmp == datatypes.GreaterThan
+					return cmp == datavalues.GreaterThan
 				default:
-					return cmp == datatypes.LessThan
+					return cmp == datavalues.LessThan
 				}
 			}
 			return false
 		})
 
 		// Final.
-		finalSeqs := make([]*datatypes.Value, max)
+		finalSeqs := make([]*datavalues.Value, max)
 		for i, tuple := range matrix {
 			finalSeqs[i] = tuple.AsSlice()[len(sorters)]
 		}

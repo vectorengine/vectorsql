@@ -5,7 +5,7 @@
 package functions
 
 import (
-	"datatypes"
+	"datavalues"
 )
 
 var FuncCompareEqual = &Function{
@@ -13,14 +13,14 @@ var FuncCompareEqual = &Function{
 	Args: [][]string{
 		{"left", "right"},
 	},
-	Logic: func(args ...*datatypes.Value) (*datatypes.Value, error) {
+	Logic: func(args ...*datavalues.Value) (*datavalues.Value, error) {
 		v1 := args[0]
 		v2 := args[1]
-		cmp, err := datatypes.Compare(v1, v2)
+		cmp, err := datavalues.Compare(v1, v2)
 		if err != nil || cmp != 0 {
-			return datatypes.MakeBool(false), err
+			return datavalues.MakeBool(false), err
 		}
-		return datatypes.MakeBool(true), nil
+		return datavalues.MakeBool(true), nil
 	},
 	Validator: All(
 		ExactlyNArgs(2),
@@ -32,14 +32,14 @@ var FuncCompareNotEqual = &Function{
 	Args: [][]string{
 		{"left", "right"},
 	},
-	Logic: func(args ...*datatypes.Value) (*datatypes.Value, error) {
+	Logic: func(args ...*datavalues.Value) (*datavalues.Value, error) {
 		v1 := args[0]
 		v2 := args[1]
-		cmp, err := datatypes.Compare(v1, v2)
+		cmp, err := datavalues.Compare(v1, v2)
 		if err != nil || cmp == 0 {
-			return datatypes.MakeBool(false), err
+			return datavalues.MakeBool(false), err
 		}
-		return datatypes.MakeBool(true), nil
+		return datavalues.MakeBool(true), nil
 	},
 	Validator: All(
 		ExactlyNArgs(2),
@@ -51,14 +51,14 @@ var FuncCompareGreaterThan = &Function{
 	Args: [][]string{
 		{"left", "right"},
 	},
-	Logic: func(args ...*datatypes.Value) (*datatypes.Value, error) {
+	Logic: func(args ...*datavalues.Value) (*datavalues.Value, error) {
 		v1 := args[0]
 		v2 := args[1]
-		cmp, err := datatypes.Compare(v1, v2)
+		cmp, err := datavalues.Compare(v1, v2)
 		if err != nil || (cmp <= 0) {
-			return datatypes.MakeBool(false), err
+			return datavalues.MakeBool(false), err
 		}
-		return datatypes.MakeBool(true), nil
+		return datavalues.MakeBool(true), nil
 	},
 	Validator: All(
 		ExactlyNArgs(2),
@@ -70,14 +70,14 @@ var FuncCompareGreaterEqual = &Function{
 	Args: [][]string{
 		{"left", "right"},
 	},
-	Logic: func(args ...*datatypes.Value) (*datatypes.Value, error) {
+	Logic: func(args ...*datavalues.Value) (*datavalues.Value, error) {
 		v1 := args[0]
 		v2 := args[1]
-		cmp, err := datatypes.Compare(v1, v2)
+		cmp, err := datavalues.Compare(v1, v2)
 		if err != nil || (cmp < 0) {
-			return datatypes.MakeBool(false), err
+			return datavalues.MakeBool(false), err
 		}
-		return datatypes.MakeBool(true), nil
+		return datavalues.MakeBool(true), nil
 	},
 	Validator: All(
 		ExactlyNArgs(2),
@@ -89,14 +89,14 @@ var FuncCompareLessThan = &Function{
 	Args: [][]string{
 		{"left", "right"},
 	},
-	Logic: func(args ...*datatypes.Value) (*datatypes.Value, error) {
+	Logic: func(args ...*datavalues.Value) (*datavalues.Value, error) {
 		v1 := args[0]
 		v2 := args[1]
-		cmp, err := datatypes.Compare(v1, v2)
+		cmp, err := datavalues.Compare(v1, v2)
 		if err != nil || (cmp >= 0) {
-			return datatypes.MakeBool(false), err
+			return datavalues.MakeBool(false), err
 		}
-		return datatypes.MakeBool(true), nil
+		return datavalues.MakeBool(true), nil
 	},
 	Validator: All(
 		ExactlyNArgs(2),
@@ -108,14 +108,14 @@ var FuncCompareLessEqual = &Function{
 	Args: [][]string{
 		{"left", "right"},
 	},
-	Logic: func(args ...*datatypes.Value) (*datatypes.Value, error) {
+	Logic: func(args ...*datavalues.Value) (*datavalues.Value, error) {
 		v1 := args[0]
 		v2 := args[1]
-		cmp, err := datatypes.Compare(v1, v2)
+		cmp, err := datavalues.Compare(v1, v2)
 		if err != nil || (cmp > 0) {
-			return datatypes.MakeBool(false), err
+			return datavalues.MakeBool(false), err
 		}
-		return datatypes.MakeBool(true), nil
+		return datavalues.MakeBool(true), nil
 	},
 	Validator: All(
 		ExactlyNArgs(2),
@@ -127,17 +127,17 @@ var FuncCompareLike = &Function{
 	Args: [][]string{
 		{"left", "right"},
 	},
-	Logic: func(args ...*datatypes.Value) (*datatypes.Value, error) {
+	Logic: func(args ...*datavalues.Value) (*datavalues.Value, error) {
 		v1 := args[0]
 		v2 := args[1]
 
-		r := datatypes.Like(v2.ToRawValue().(string), v1)
-		return datatypes.MakeBool(r), nil
+		r := datavalues.Like(v2.ToRawValue().(string), v1)
+		return datavalues.MakeBool(r), nil
 	},
 	Validator: All(
 		ExactlyNArgs(2),
 		OneOf(
-			AllArgs(TypeOf(datatypes.ZeroString())),
+			AllArgs(TypeOf(datavalues.ZeroString())),
 		),
 	),
 }

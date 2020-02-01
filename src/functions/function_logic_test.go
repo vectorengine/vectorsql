@@ -7,7 +7,7 @@ package functions
 import (
 	"testing"
 
-	"datatypes"
+	"datavalues"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -16,45 +16,45 @@ func TestLogicFunctions(t *testing.T) {
 	tests := []struct {
 		name   string
 		fn     *Function
-		args   []*datatypes.Value
-		expect *datatypes.Value
+		args   []*datavalues.Value
+		expect *datavalues.Value
 		err    error
 	}{
 		{
 			name: "and-ok",
 			fn:   FuncLogicAnd,
-			args: []*datatypes.Value{
-				datatypes.MakeBool(true),
-				datatypes.MakeBool(true),
+			args: []*datavalues.Value{
+				datavalues.MakeBool(true),
+				datavalues.MakeBool(true),
 			},
-			expect: datatypes.MakeBool(true),
+			expect: datavalues.MakeBool(true),
 		},
 		{
 			name: "and-not-ok",
 			fn:   FuncLogicAnd,
-			args: []*datatypes.Value{
-				datatypes.MakeBool(true),
-				datatypes.MakeBool(false),
+			args: []*datavalues.Value{
+				datavalues.MakeBool(true),
+				datavalues.MakeBool(false),
 			},
-			expect: datatypes.MakeBool(false),
+			expect: datavalues.MakeBool(false),
 		},
 		{
 			name: "or-ok",
 			fn:   FuncLogicOr,
-			args: []*datatypes.Value{
-				datatypes.MakeBool(true),
-				datatypes.MakeBool(false),
+			args: []*datavalues.Value{
+				datavalues.MakeBool(true),
+				datavalues.MakeBool(false),
 			},
-			expect: datatypes.MakeBool(true),
+			expect: datavalues.MakeBool(true),
 		},
 		{
 			name: "and-not-ok",
 			fn:   FuncLogicOr,
-			args: []*datatypes.Value{
-				datatypes.MakeBool(false),
-				datatypes.MakeBool(false),
+			args: []*datavalues.Value{
+				datavalues.MakeBool(false),
+				datavalues.MakeBool(false),
 			},
-			expect: datatypes.MakeBool(false),
+			expect: datavalues.MakeBool(false),
 		},
 	}
 

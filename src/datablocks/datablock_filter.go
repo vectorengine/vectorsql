@@ -5,10 +5,10 @@
 package datablocks
 
 import (
-	"datatypes"
+	"datavalues"
 )
 
-func (block *DataBlock) Filter(checks []*datatypes.Value) error {
+func (block *DataBlock) Filter(checks []*datavalues.Value) error {
 	// In place filter.
 	for _, cv := range block.values {
 		n := 0

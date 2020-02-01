@@ -8,7 +8,7 @@ import (
 	"errors"
 	"testing"
 
-	"datatypes"
+	"datavalues"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -17,160 +17,160 @@ func TestCompareFunctions(t *testing.T) {
 	tests := []struct {
 		name   string
 		fn     *Function
-		args   []*datatypes.Value
-		expect *datatypes.Value
+		args   []*datavalues.Value
+		expect *datavalues.Value
 		err    error
 	}{
 		{
 			name: "equal-ok",
 			fn:   FuncCompareEqual,
-			args: []*datatypes.Value{
-				datatypes.MakeInt(1),
-				datatypes.MakeInt(1),
+			args: []*datavalues.Value{
+				datavalues.MakeInt(1),
+				datavalues.MakeInt(1),
 			},
-			expect: datatypes.MakeBool(true),
+			expect: datavalues.MakeBool(true),
 		},
 		{
 			name: "equal-not-ok",
 			fn:   FuncCompareEqual,
-			args: []*datatypes.Value{
-				datatypes.MakeInt(1),
-				datatypes.MakeInt(2),
+			args: []*datavalues.Value{
+				datavalues.MakeInt(1),
+				datavalues.MakeInt(2),
 			},
-			expect: datatypes.MakeBool(false),
+			expect: datavalues.MakeBool(false),
 		},
 		{
 			name: "notequal-ok",
 			fn:   FuncCompareNotEqual,
-			args: []*datatypes.Value{
-				datatypes.MakeInt(2),
-				datatypes.MakeInt(1),
+			args: []*datavalues.Value{
+				datavalues.MakeInt(2),
+				datavalues.MakeInt(1),
 			},
-			expect: datatypes.MakeBool(true),
+			expect: datavalues.MakeBool(true),
 		},
 		{
 			name: "notequal-not-ok",
 			fn:   FuncCompareNotEqual,
-			args: []*datatypes.Value{
-				datatypes.MakeInt(2),
-				datatypes.MakeInt(2),
+			args: []*datavalues.Value{
+				datavalues.MakeInt(2),
+				datavalues.MakeInt(2),
 			},
-			expect: datatypes.MakeBool(false),
+			expect: datavalues.MakeBool(false),
 		},
 		{
 			name: "greaterthan-ok",
 			fn:   FuncCompareGreaterThan,
-			args: []*datatypes.Value{
-				datatypes.MakeInt(2),
-				datatypes.MakeInt(1),
+			args: []*datavalues.Value{
+				datavalues.MakeInt(2),
+				datavalues.MakeInt(1),
 			},
-			expect: datatypes.MakeBool(true),
+			expect: datavalues.MakeBool(true),
 		},
 		{
 			name: "greaterthan-not-ok",
 			fn:   FuncCompareGreaterThan,
-			args: []*datatypes.Value{
-				datatypes.MakeInt(2),
-				datatypes.MakeInt(2),
+			args: []*datavalues.Value{
+				datavalues.MakeInt(2),
+				datavalues.MakeInt(2),
 			},
-			expect: datatypes.MakeBool(false),
+			expect: datavalues.MakeBool(false),
 		},
 		{
 			name: "greaterequal-ok",
 			fn:   FuncCompareGreaterEqual,
-			args: []*datatypes.Value{
-				datatypes.MakeInt(2),
-				datatypes.MakeInt(2),
+			args: []*datavalues.Value{
+				datavalues.MakeInt(2),
+				datavalues.MakeInt(2),
 			},
-			expect: datatypes.MakeBool(true),
+			expect: datavalues.MakeBool(true),
 		},
 		{
 			name: "greaterequal-ok",
 			fn:   FuncCompareGreaterEqual,
-			args: []*datatypes.Value{
-				datatypes.MakeInt(2),
-				datatypes.MakeInt(1),
+			args: []*datavalues.Value{
+				datavalues.MakeInt(2),
+				datavalues.MakeInt(1),
 			},
-			expect: datatypes.MakeBool(true),
+			expect: datavalues.MakeBool(true),
 		},
 		{
 			name: "greaterequal-not-ok",
 			fn:   FuncCompareGreaterEqual,
-			args: []*datatypes.Value{
-				datatypes.MakeInt(1),
-				datatypes.MakeInt(2),
+			args: []*datavalues.Value{
+				datavalues.MakeInt(1),
+				datavalues.MakeInt(2),
 			},
-			expect: datatypes.MakeBool(false),
+			expect: datavalues.MakeBool(false),
 		},
 		{
 			name: "lessthan-ok",
 			fn:   FuncCompareLessThan,
-			args: []*datatypes.Value{
-				datatypes.MakeInt(1),
-				datatypes.MakeInt(2),
+			args: []*datavalues.Value{
+				datavalues.MakeInt(1),
+				datavalues.MakeInt(2),
 			},
-			expect: datatypes.MakeBool(true),
+			expect: datavalues.MakeBool(true),
 		},
 		{
 			name: "lessthan-not-ok",
 			fn:   FuncCompareLessThan,
-			args: []*datatypes.Value{
-				datatypes.MakeInt(2),
-				datatypes.MakeInt(2),
+			args: []*datavalues.Value{
+				datavalues.MakeInt(2),
+				datavalues.MakeInt(2),
 			},
-			expect: datatypes.MakeBool(false),
+			expect: datavalues.MakeBool(false),
 		},
 		{
 			name: "lessequal-ok",
 			fn:   FuncCompareLessEqual,
-			args: []*datatypes.Value{
-				datatypes.MakeInt(2),
-				datatypes.MakeInt(2),
+			args: []*datavalues.Value{
+				datavalues.MakeInt(2),
+				datavalues.MakeInt(2),
 			},
-			expect: datatypes.MakeBool(true),
+			expect: datavalues.MakeBool(true),
 		},
 		{
 			name: "lessequal-ok",
 			fn:   FuncCompareLessEqual,
-			args: []*datatypes.Value{
-				datatypes.MakeInt(1),
-				datatypes.MakeInt(2),
+			args: []*datavalues.Value{
+				datavalues.MakeInt(1),
+				datavalues.MakeInt(2),
 			},
-			expect: datatypes.MakeBool(true),
+			expect: datavalues.MakeBool(true),
 		},
 		{
 			name: "lessequal-not-ok",
 			fn:   FuncCompareLessEqual,
-			args: []*datatypes.Value{
-				datatypes.MakeInt(2),
-				datatypes.MakeInt(1),
+			args: []*datavalues.Value{
+				datavalues.MakeInt(2),
+				datavalues.MakeInt(1),
 			},
-			expect: datatypes.MakeBool(false),
+			expect: datavalues.MakeBool(false),
 		},
 		{
 			name: "like-ok",
 			fn:   FuncCompareLike,
-			args: []*datatypes.Value{
-				datatypes.MakeString("xxx"),
-				datatypes.MakeString(`x%`),
+			args: []*datavalues.Value{
+				datavalues.MakeString("xxx"),
+				datavalues.MakeString(`x%`),
 			},
-			expect: datatypes.MakeBool(true),
+			expect: datavalues.MakeBool(true),
 		},
 		{
 			name: "like-not-ok",
 			fn:   FuncCompareLike,
-			args: []*datatypes.Value{
-				datatypes.MakeString("xxx"),
-				datatypes.MakeString(`%y`),
+			args: []*datavalues.Value{
+				datavalues.MakeString("xxx"),
+				datavalues.MakeString(`%y`),
 			},
-			expect: datatypes.MakeBool(false),
+			expect: datavalues.MakeBool(false),
 		},
 		{
 			name: "like-type-error",
 			fn:   FuncCompareLike,
-			args: []*datatypes.Value{
-				datatypes.MakeInt(1),
-				datatypes.MakeString(`%y`),
+			args: []*datavalues.Value{
+				datavalues.MakeInt(1),
+				datavalues.MakeString(`%y`),
 			},
 			err: errors.New("type.error"),
 		},

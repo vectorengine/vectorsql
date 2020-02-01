@@ -6,7 +6,7 @@ package transforms
 
 import (
 	"datablocks"
-	"datatypes"
+	"datavalues"
 	"functions"
 	"planners"
 	"processors"
@@ -54,13 +54,11 @@ func (t *FilterTransform) filter(x *datablocks.DataBlock) error {
 	return x.Filter(checks)
 }
 
-func (t *FilterTransform) check(x *datablocks.DataBlock, plan planners.IPlan) ([]*datatypes.Value, error) {
+func (t *FilterTransform) check(x *datablocks.DataBlock, plan planners.IPlan) ([]*datavalues.Value, error) {
 	switch plan := plan.(type) {
 	case *planners.BooleanExpressionPlan:
-		checks := make([]*datatypes.Value, x.NumRows())
-
-		right := datatypes.ToValue(plan.Args[1].(*planners.ConstantPlan).Value)
-
+		checks := make([]*datavalues.Value, x.NumRows())
+		right := datavalues.ToValue(plan.Args[1].(*planners.ConstantPlan).Value)
 		colName := plan.Args[0].(*planners.VariablePlan).Value
 		iter, err := x.Iterator(colName)
 		if err != nil {

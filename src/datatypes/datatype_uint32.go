@@ -7,6 +7,8 @@ package datatypes
 import (
 	"reflect"
 
+	"datavalues"
+
 	"base/binary"
 	"base/errors"
 )
@@ -31,7 +33,7 @@ func (datatype *UInt32DataType) Name() string {
 	return DataTypeUInt32Name
 }
 
-func (datatype *UInt32DataType) Serialize(writer *binary.Writer, v *Value) error {
+func (datatype *UInt32DataType) Serialize(writer *binary.Writer, v *datavalues.Value) error {
 	if err := writer.UInt32(uint32(v.AsInt())); err != nil {
 		return errors.Wrap(err)
 	}

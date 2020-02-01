@@ -6,18 +6,18 @@ package datablocks
 
 import (
 	"columns"
-	"datatypes"
+	"datavalues"
 )
 
 type DataBlockValue struct {
 	column columns.Column
-	values []*datatypes.Value
+	values []*datavalues.Value
 }
 
 func NewDataBlockValue(col columns.Column) *DataBlockValue {
 	return &DataBlockValue{
 		column: col,
-		values: make([]*datatypes.Value, 0, 1024),
+		values: make([]*datavalues.Value, 0, 1024),
 	}
 }
 

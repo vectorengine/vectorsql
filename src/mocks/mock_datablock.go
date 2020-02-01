@@ -9,7 +9,7 @@ import (
 
 	"columns"
 	"datablocks"
-	"datatypes"
+	"datavalues"
 )
 
 func NewBlockFromSlice(cols []columns.Column, datas ...[]interface{}) *datablocks.DataBlock {
@@ -17,9 +17,9 @@ func NewBlockFromSlice(cols []columns.Column, datas ...[]interface{}) *datablock
 	batcher := datablocks.NewBatchWriter(block.Columns())
 	for _, data := range datas {
 		if len(data) > 0 {
-			var row []*datatypes.Value
+			var row []*datavalues.Value
 			for i := range cols {
-				row = append(row, datatypes.ToValue(data[i]))
+				row = append(row, datavalues.ToValue(data[i]))
 			}
 			_ = batcher.WriteRow(row...)
 		}
@@ -43,7 +43,7 @@ func DataBlockEqual(a *datablocks.DataBlock, b *datablocks.DataBlock) bool {
 
 		for aiter.Next() {
 			biter.Next()
-			if cmp, err := datatypes.Compare(aiter.Value(), biter.Value()); err != nil || cmp != datatypes.Equal {
+			if cmp, err := datavalues.Compare(aiter.Value(), biter.Value()); err != nil || cmp != datavalues.Equal {
 				return false
 			}
 		}

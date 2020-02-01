@@ -5,7 +5,7 @@
 package functions
 
 import (
-	"datatypes"
+	"datavalues"
 )
 
 var FuncLogicAnd = &Function{
@@ -13,16 +13,16 @@ var FuncLogicAnd = &Function{
 	Args: [][]string{
 		{"left", "right"},
 	},
-	Logic: func(args ...*datatypes.Value) (*datatypes.Value, error) {
+	Logic: func(args ...*datavalues.Value) (*datavalues.Value, error) {
 		v1 := args[0]
 		v2 := args[1]
 
-		return datatypes.MakeBool(v1.AsBool() && v2.AsBool()), nil
+		return datavalues.MakeBool(v1.AsBool() && v2.AsBool()), nil
 	},
 	Validator: All(
 		ExactlyNArgs(2),
 		OneOf(
-			AllArgs(TypeOf(datatypes.ZeroBool())),
+			AllArgs(TypeOf(datavalues.ZeroBool())),
 		),
 	),
 }
@@ -32,16 +32,16 @@ var FuncLogicOr = &Function{
 	Args: [][]string{
 		{"left", "right"},
 	},
-	Logic: func(args ...*datatypes.Value) (*datatypes.Value, error) {
+	Logic: func(args ...*datavalues.Value) (*datavalues.Value, error) {
 		v1 := args[0]
 		v2 := args[1]
 
-		return datatypes.MakeBool(v1.AsBool() || v2.AsBool()), nil
+		return datavalues.MakeBool(v1.AsBool() || v2.AsBool()), nil
 	},
 	Validator: All(
 		ExactlyNArgs(2),
 		OneOf(
-			AllArgs(TypeOf(datatypes.ZeroBool())),
+			AllArgs(TypeOf(datavalues.ZeroBool())),
 		),
 	),
 }

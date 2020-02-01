@@ -7,7 +7,7 @@ package functions
 import (
 	"testing"
 
-	"datatypes"
+	"datavalues"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -16,90 +16,90 @@ func TestTableValuedFunctions(t *testing.T) {
 	tests := []struct {
 		name   string
 		fn     *Function
-		args   []*datatypes.Value
-		expect *datatypes.Value
+		args   []*datavalues.Value
+		expect *datavalues.Value
 		err    string
 	}{
 		{
 			name: "tvf-range-ok",
 			fn:   FuncTableValuedFunctionRange,
-			args: []*datatypes.Value{
-				datatypes.MakeInt(1),
-				datatypes.MakeInt(3),
+			args: []*datavalues.Value{
+				datavalues.MakeInt(1),
+				datavalues.MakeInt(3),
 			},
-			expect: datatypes.MakeTuple(
-				datatypes.MakeTuple(datatypes.ToValue(1)),
-				datatypes.MakeTuple(datatypes.ToValue(2)),
+			expect: datavalues.MakeTuple(
+				datavalues.MakeTuple(datavalues.ToValue(1)),
+				datavalues.MakeTuple(datavalues.ToValue(2)),
 			),
 		},
 		{
 			name: "tvf-range-type-error",
 			fn:   FuncTableValuedFunctionRange,
-			args: []*datatypes.Value{
-				datatypes.MakeInt(1),
-				datatypes.MakeString("x"),
+			args: []*datavalues.Value{
+				datavalues.MakeInt(1),
+				datavalues.MakeString("x"),
 			},
 			err: ("bad argument at index 1: expected type 3 but got 6"),
 		},
 		{
 			name: "tvf-rangetable-ok",
 			fn:   FuncTableValuedFunctionRangeTable,
-			args: []*datatypes.Value{
-				datatypes.MakeInt(3),
-				datatypes.MakeString("UInt32"),
-				datatypes.MakeString("String"),
+			args: []*datavalues.Value{
+				datavalues.MakeInt(3),
+				datavalues.MakeString("UInt32"),
+				datavalues.MakeString("String"),
 			},
-			expect: datatypes.MakeTuple(
-				datatypes.MakeTuple(datatypes.ToValue(0), datatypes.ToValue("string-0")),
-				datatypes.MakeTuple(datatypes.ToValue(1), datatypes.ToValue("string-1")),
-				datatypes.MakeTuple(datatypes.ToValue(2), datatypes.ToValue("string-2")),
+			expect: datavalues.MakeTuple(
+				datavalues.MakeTuple(datavalues.ToValue(0), datavalues.ToValue("string-0")),
+				datavalues.MakeTuple(datavalues.ToValue(1), datavalues.ToValue("string-1")),
+				datavalues.MakeTuple(datavalues.ToValue(2), datavalues.ToValue("string-2")),
 			),
 		},
 		{
 			name: "tvf-rangetable-type-error",
 			fn:   FuncTableValuedFunctionRangeTable,
-			args: []*datatypes.Value{
-				datatypes.MakeInt(1),
+			args: []*datavalues.Value{
+				datavalues.MakeInt(1),
 			},
 			err: ("expected at least 2 arguments, but got 1"),
 		},
 		{
 			name: "tvf-zip-ok",
 			fn:   FuncTableValuedFunctionZip,
-			args: []*datatypes.Value{
-				datatypes.MakeTuple(
-					datatypes.ToValue(1),
-					datatypes.ToValue(2),
+			args: []*datavalues.Value{
+				datavalues.MakeTuple(
+					datavalues.ToValue(1),
+					datavalues.ToValue(2),
 				),
-				datatypes.MakeTuple(
-					datatypes.ToValue("a"),
-					datatypes.ToValue("b"),
+				datavalues.MakeTuple(
+					datavalues.ToValue("a"),
+					datavalues.ToValue("b"),
 				),
-				datatypes.MakeTuple(
-					datatypes.ToValue(11),
-					datatypes.ToValue(22),
+				datavalues.MakeTuple(
+					datavalues.ToValue(11),
+					datavalues.ToValue(22),
 				),
 			},
-			expect: datatypes.MakeTuple(
-				datatypes.MakeTuple(
-					datatypes.ToValue(1),
-					datatypes.ToValue("a"),
-					datatypes.ToValue(11),
+			expect: datavalues.MakeTuple(
+				datavalues.MakeTuple(
+					datavalues.ToValue(1),
+					datavalues.ToValue("a"),
+					datavalues.ToValue(11),
 				),
-				datatypes.MakeTuple(
-					datatypes.ToValue(2),
-					datatypes.ToValue("b"),
-					datatypes.ToValue(22),
+				datavalues.MakeTuple(
+					datavalues.ToValue(2),
+					datavalues.ToValue("b"),
+					datavalues.ToValue(22),
 				),
 			),
 		},
 		{
 			name: "tvf-zip-type-error",
 			fn:   FuncTableValuedFunctionZip,
-			args: []*datatypes.Value{
-				datatypes.MakeTuple(
-					datatypes.ToValue(1),
-					datatypes.ToValue(2),
+			args: []*datavalues.Value{
+				datavalues.MakeTuple(
+					datavalues.ToValue(1),
+					datavalues.ToValue(2),
 				),
 			},
 			err: ("expected at least 2 arguments, but got 1"),
@@ -125,13 +125,13 @@ func TestTableValuedFunctionZipPerformance(t *testing.T) {
 	fn := FuncTableValuedFunctionZip
 
 	loop := 10000
-	t1 := make([]*datatypes.Value, loop)
-	t2 := make([]*datatypes.Value, loop)
+	t1 := make([]*datavalues.Value, loop)
+	t2 := make([]*datavalues.Value, loop)
 	for i := 0; i < loop; i++ {
-		t1[i] = datatypes.ToValue(i)
-		t2[i] = datatypes.ToValue(i)
+		t1[i] = datavalues.ToValue(i)
+		t2[i] = datavalues.ToValue(i)
 	}
 
-	_, err := fn.Logic(datatypes.MakeTuple(t1...), datatypes.MakeTuple(t2...))
+	_, err := fn.Logic(datavalues.MakeTuple(t1...), datavalues.MakeTuple(t2...))
 	assert.Nil(t, err)
 }

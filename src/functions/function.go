@@ -5,12 +5,12 @@
 package functions
 
 import (
-	"datatypes"
+	"datavalues"
 )
 
 type Function struct {
 	Name      string
 	Args      [][]string
-	Logic     func(...*datatypes.Value) (*datatypes.Value, error)
+	Logic     func(...*datavalues.Value) (*datavalues.Value, error)
 	Validator IValidator
 }

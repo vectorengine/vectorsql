@@ -6,7 +6,7 @@ package databases
 
 import (
 	"datablocks"
-	"datatypes"
+	"datavalues"
 )
 
 // Handlers.
@@ -14,10 +14,10 @@ func fillDatabasesFunc(block *datablocks.DataBlock) error {
 	batcher := datablocks.NewBatchWriter(block.Columns())
 	for _, database := range databases.databases {
 		if err := batcher.WriteRow(
-			datatypes.MakeString(database.Meta().GetDBName()),
-			datatypes.MakeString(database.Meta().GetEngineName()),
-			datatypes.MakeString(database.Meta().GetDataPath()),
-			datatypes.MakeString(database.Meta().GetMetaDataPath()),
+			datavalues.MakeString(database.Meta().GetDBName()),
+			datavalues.MakeString(database.Meta().GetEngineName()),
+			datavalues.MakeString(database.Meta().GetDataPath()),
+			datavalues.MakeString(database.Meta().GetMetaDataPath()),
 		); err != nil {
 			return err
 		}
@@ -31,9 +31,9 @@ func fillTablesFunc(block *datablocks.DataBlock) error {
 		tables := database.GetTables()
 		for _, table := range tables {
 			if err := batcher.WriteRow(
-				datatypes.MakeString(table.getTable()),
-				datatypes.MakeString(table.getDatabase()),
-				datatypes.MakeString(table.getEngine()),
+				datavalues.MakeString(table.getTable()),
+				datavalues.MakeString(table.getDatabase()),
+				datavalues.MakeString(table.getEngine()),
 			); err != nil {
 				return err
 			}

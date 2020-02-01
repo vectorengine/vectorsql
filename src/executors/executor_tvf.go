@@ -9,6 +9,7 @@ import (
 	"datablocks"
 	"datastreams"
 	"datatypes"
+	"datavalues"
 	"functions"
 	"planners"
 	"processors"
@@ -28,8 +29,8 @@ func NewTableValuedFunctionExecutor(ctx *ExecutorContext, plan *planners.TableVa
 }
 
 func (executor *TableValuedFunctionExecutor) Execute() (processors.IProcessor, error) {
-	var constants []*datatypes.Value
-	var variables []*datatypes.Value
+	var constants []*datavalues.Value
+	var variables []*datavalues.Value
 
 	plan := executor.plan
 	log := executor.ctx.log
@@ -38,9 +39,9 @@ func (executor *TableValuedFunctionExecutor) Execute() (processors.IProcessor, e
 	err := plan.Walk(func(plan planners.IPlan) (bool, error) {
 		switch plan := plan.(type) {
 		case *planners.ConstantPlan:
-			constants = append(constants, datatypes.ToValue(plan.Value))
+			constants = append(constants, datavalues.ToValue(plan.Value))
 		case *planners.VariablePlan:
-			variables = append(variables, datatypes.ToValue(plan.Value))
+			variables = append(variables, datavalues.ToValue(plan.Value))
 		}
 		return true, nil
 	})

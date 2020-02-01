@@ -1,6 +1,6 @@
 // From OctoSQL
 syntax = "proto3";
-package datatypes;
+package datavalues;
 
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/duration.proto";

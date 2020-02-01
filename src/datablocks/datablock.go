@@ -6,14 +6,14 @@ package datablocks
 
 import (
 	"columns"
-	"datatypes"
+	"datavalues"
 
 	"base/errors"
 )
 
 type DataBlock struct {
 	info      *DataBlockInfo
-	seqs      []*datatypes.Value
+	seqs      []*datavalues.Value
 	values    []*DataBlockValue
 	immutable bool
 	valuesmap map[string]*DataBlockValue
@@ -35,7 +35,7 @@ func NewDataBlock(cols []columns.Column) *DataBlock {
 	}
 }
 
-func (block *DataBlock) setSeqs(seqs []*datatypes.Value) {
+func (block *DataBlock) setSeqs(seqs []*datavalues.Value) {
 	block.seqs = seqs
 	block.immutable = true
 }
