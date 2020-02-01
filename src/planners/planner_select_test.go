@@ -47,6 +47,121 @@ func TestSelectPlan(t *testing.T) {
 }`,
 		},
 		{
+			name:  "filter",
+			query: "select * from t1 where (id>1 and id<8) or id=9 and c>2019.12 or d='name'",
+			expect: `{
+    "Name": "SelectPlan",
+    "SubPlan": {
+        "Name": "MapPlan",
+        "SubPlans": [
+            {
+                "Name": "ScanPlan",
+                "Table": "t1",
+                "Schema": ""
+            },
+            {
+                "Name": "ProjectPlan",
+                "SubPlan": {
+                    "Name": "MapPlan"
+                }
+            },
+            {
+                "Name": "FilterPlan",
+                "SubPlan": {
+                    "Name": "OrPlan",
+                    "FuncName": "OR",
+                    "Left": {
+                        "Name": "OrPlan",
+                        "FuncName": "OR",
+                        "Left": {
+                            "Name": "AndPlan",
+                            "FuncName": "AND",
+                            "Left": {
+                                "Name": "BooleanExpressionPlan",
+                                "Args": [
+                                    {
+                                        "Name": "VariablePlan",
+                                        "Value": "id"
+                                    },
+                                    {
+                                        "Name": "ConstantPlan",
+                                        "Value": 1
+                                    }
+                                ],
+                                "FuncName": "\u003e"
+                            },
+                            "Right": {
+                                "Name": "BooleanExpressionPlan",
+                                "Args": [
+                                    {
+                                        "Name": "VariablePlan",
+                                        "Value": "id"
+                                    },
+                                    {
+                                        "Name": "ConstantPlan",
+                                        "Value": 8
+                                    }
+                                ],
+                                "FuncName": "\u003c"
+                            }
+                        },
+                        "Right": {
+                            "Name": "AndPlan",
+                            "FuncName": "AND",
+                            "Left": {
+                                "Name": "BooleanExpressionPlan",
+                                "Args": [
+                                    {
+                                        "Name": "VariablePlan",
+                                        "Value": "id"
+                                    },
+                                    {
+                                        "Name": "ConstantPlan",
+                                        "Value": 9
+                                    }
+                                ],
+                                "FuncName": "="
+                            },
+                            "Right": {
+                                "Name": "BooleanExpressionPlan",
+                                "Args": [
+                                    {
+                                        "Name": "VariablePlan",
+                                        "Value": "c"
+                                    },
+                                    {
+                                        "Name": "ConstantPlan",
+                                        "Value": 2019.12
+                                    }
+                                ],
+                                "FuncName": "\u003e"
+                            }
+                        }
+                    },
+                    "Right": {
+                        "Name": "BooleanExpressionPlan",
+                        "Args": [
+                            {
+                                "Name": "VariablePlan",
+                                "Value": "d"
+                            },
+                            {
+                                "Name": "ConstantPlan",
+                                "Value": "name"
+                            }
+                        ],
+                        "FuncName": "="
+                    }
+                }
+            },
+            {
+                "Name": "SinkPlan"
+            }
+        ]
+    }
+}`,
+		},
+		{
 			name:  "orderby",
 			query: "select * from t1 order by c1 desc, c2 asc, c3 desc",
 			expect: `{
