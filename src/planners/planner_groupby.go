@@ -9,23 +9,25 @@ import (
 )
 
 type GroupByPlan struct {
-	Name    string
-	SubPlan *MapPlan
+	Name        string
+	GroupBys    *MapPlan `json:",omitempty"`
+	Aggregators *MapPlan `json:",omitempty"`
 }
 
-func NewGroupByPlan(plan *MapPlan) *GroupByPlan {
+func NewGroupByPlan(aggregators *MapPlan, groupbys *MapPlan) *GroupByPlan {
 	return &GroupByPlan{
-		Name:    "GroupByPlan",
-		SubPlan: plan,
+		Name:        "GroupByPlan",
+		GroupBys:    groupbys,
+		Aggregators: aggregators,
 	}
 }
 
 func (plan *GroupByPlan) Build() error {
-	return plan.SubPlan.Build()
+	return nil
 }
 
 func (plan *GroupByPlan) Walk(visit Visit) error {
-	return Walk(visit, plan.SubPlan)
+	return Walk(visit, plan.GroupBys, plan.Aggregators)
 }
 
 func (plan *GroupByPlan) String() string {

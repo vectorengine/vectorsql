@@ -39,7 +39,10 @@ func (plan *MapPlan) String() string {
 		return err.Error()
 	}
 	return string(out)
+}
 
+func (plan *MapPlan) Length() int {
+	return len(plan.SubPlans)
 }
 
 func (plan *MapPlan) Add(p IPlan) {

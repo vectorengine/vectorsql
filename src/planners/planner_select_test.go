@@ -99,125 +99,6 @@ func TestSelectPlan(t *testing.T) {
 }`,
 		},
 		{
-			name:  "simple",
-			query: "select name, sum(id), (id+1) from system.tables where (name='db1' or name='db2') and (id+1)>3",
-			expect: `{
-    "Name": "SelectPlan",
-    "SubPlan": {
-        "Name": "MapPlan",
-        "SubPlans": [
-            {
-                "Name": "ScanPlan",
-                "Table": "tables",
-                "Schema": "system"
-            },
-            {
-                "Name": "ProjectPlan",
-                "SubPlan": {
-                    "Name": "MapPlan",
-                    "SubPlans": [
-                        {
-                            "Name": "VariablePlan",
-                            "Value": "name"
-                        },
-                        {
-                            "Name": "FunctionExpressionPlan",
-                            "FuncName": "SUM",
-                            "Args": [
-                                {
-                                    "Name": "VariablePlan",
-                                    "Value": "id"
-                                }
-                            ]
-                        },
-                        {
-                            "Name": "FunctionExpressionPlan",
-                            "FuncName": "+",
-                            "Args": [
-                                {
-                                    "Name": "VariablePlan",
-                                    "Value": "id"
-                                },
-                                {
-                                    "Name": "ConstantPlan",
-                                    "Value": 1
-                                }
-                            ]
-                        }
-                    ]
-                }
-            },
-            {
-                "Name": "FilterPlan",
-                "SubPlan": {
-                    "Name": "AndPlan",
-                    "FuncName": "AND",
-                    "Left": {
-                        "Name": "OrPlan",
-                        "FuncName": "OR",
-                        "Left": {
-                            "Name": "BooleanExpressionPlan",
-                            "Args": [
-                                {
-                                    "Name": "VariablePlan",
-                                    "Value": "name"
-                                },
-                                {
-                                    "Name": "ConstantPlan",
-                                    "Value": "db1"
-                                }
-                            ],
-                            "FuncName": "="
-                        },
-                        "Right": {
-                            "Name": "BooleanExpressionPlan",
-                            "Args": [
-                                {
-                                    "Name": "VariablePlan",
-                                    "Value": "name"
-                                },
-                                {
-                                    "Name": "ConstantPlan",
-                                    "Value": "db2"
-                                }
-                            ],
-                            "FuncName": "="
-                        }
-                    },
-                    "Right": {
-                        "Name": "BooleanExpressionPlan",
-                        "Args": [
-                            {
-                                "Name": "FunctionExpressionPlan",
-                                "FuncName": "+",
-                                "Args": [
-                                    {
-                                        "Name": "VariablePlan",
-                                        "Value": "id"
-                                    },
-                                    {
-                                        "Name": "ConstantPlan",
-                                        "Value": 1
-                                    }
-                                ]
-                            },
-                            {
-                                "Name": "ConstantPlan",
-                                "Value": 3
-                            }
-                        ],
-                        "FuncName": "\u003e"
-                    }
-                }
-            },
-            {
-                "Name": "SinkPlan"
-            }
-        ]
-    }
-}`,
-		},
-		{
 			name:  "tvf-range",
 			query: "SELECT * FROM range(range_start -> 1, range_end -> 5) r",
 			expect: `{
@@ -286,7 +167,7 @@ func TestSelectPlan(t *testing.T) {
 		},
 		{
 			name:  "select-aggregate",
-			query: "SELECT max(a), sum(b) FROM t1 group by c",
+			query: "SELECT max(a), sum(b), c, (id+1) FROM t1 where (id+1)!=2 group by d,e order by c desc",
 			expect: `{
     "Name": "SelectPlan",
     "SubPlan": {
@@ -300,6 +181,70 @@ func TestSelectPlan(t *testing.T) {
             {
                 "Name": "ProjectPlan",
                 "SubPlan": {
+                    "Name": "MapPlan",
+                    "SubPlans": [
+                        {
+                            "Name": "VariablePlan",
+                            "Value": "a"
+                        },
+                        {
+                            "Name": "VariablePlan",
+                            "Value": "b"
+                        },
+                        {
+                            "Name": "VariablePlan",
+                            "Value": "c"
+                        },
+                        {
+                            "Name": "VariablePlan",
+                            "Value": "id"
+                        }
+                    ]
+                }
+            },
+            {
+                "Name": "FilterPlan",
+                "SubPlan": {
+                    "Name": "BooleanExpressionPlan",
+                    "Args": [
+                        {
+                            "Name": "FunctionExpressionPlan",
+                            "FuncName": "+",
+                            "Args": [
+                                {
+                                    "Name": "VariablePlan",
+                                    "Value": "id"
+                                },
+                                {
+                                    "Name": "ConstantPlan",
+                                    "Value": 1
+                                }
+                            ]
+                        },
+                        {
+                            "Name": "ConstantPlan",
+                            "Value": 2
+                        }
+                    ],
+                    "FuncName": "!="
+                }
+            },
+            {
+                "Name": "GroupByPlan",
+                "GroupBys": {
+                    "Name": "MapPlan",
+                    "SubPlans": [
+                        {
+                            "Name": "VariablePlan",
+                            "Value": "d"
+                        },
+                        {
+                            "Name": "VariablePlan",
+                            "Value": "e"
+                        }
+                    ]
+                },
+                "Aggregators": {
                     "Name": "MapPlan",
                     "SubPlans": [
                         {
@@ -321,21 +266,35 @@ func TestSelectPlan(t *testing.T) {
                                     "Value": "b"
                                 }
                             ]
+                        },
+                        {
+                            "Name": "FunctionExpressionPlan",
+                            "FuncName": "+",
+                            "Args": [
+                                {
+                                    "Name": "VariablePlan",
+                                    "Value": "id"
+                                },
+                                {
+                                    "Name": "ConstantPlan",
+                                    "Value": 1
+                                }
+                            ]
                         }
                     ]
                 }
             },
             {
-                "Name": "GroupByPlan",
-                "SubPlan": {
-                    "Name": "MapPlan",
-                    "SubPlans": [
-                        {
+                "Name": "OrderByPlan",
+                "Orders": [
+                    {
+                        "Expression": {
                             "Name": "VariablePlan",
                             "Value": "c"
-                        }
-                    ]
-                }
+                        },
+                        "Direction": "desc"
+                    }
+                ]
             },
             {
                 "Name": "SinkPlan"

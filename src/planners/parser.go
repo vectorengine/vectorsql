@@ -122,23 +122,37 @@ func parseTableValuedFunctionArgument(expr *sqlparser.TableValuedFunctionArgumen
 	}
 }
 
-func parseProject(sel sqlparser.SelectExprs) (*MapPlan, error) {
-	tree := NewMapPlan()
+func parseProject(sel sqlparser.SelectExprs) (*MapPlan, *MapPlan, error) {
+	all := NewMapPlan()
 
 	if _, ok := sel[0].(*sqlparser.StarExpr); !ok {
 		for i, expr := range sel {
 			aliasedExpression, ok := expr.(*sqlparser.AliasedExpr)
 			if !ok {
-				return nil, errors.Errorf("Expected aliased expression in select on index:%v, got:%+v %+v", i, expr, reflect.TypeOf(expr))
+				return nil, nil, errors.Errorf("Expected aliased expression in select on index:%v, got:%+v %+v", i, expr, reflect.TypeOf(expr))
 			}
 			child, err := parseExpression(aliasedExpression.Expr)
 			if err != nil {
-				return nil, err
+				return nil, nil, err
 			}
-			tree.Add(child)
+			all.Add(child)
 		}
 	}
-	return tree, nil
+
+	projects := NewMapPlan()
+	aggregators := NewMapPlan()
+	if err := all.Walk(func(plan IPlan) (bool, error) {
+		switch plan := plan.(type) {
+		case *VariablePlan:
+			projects.Add(plan)
+		case *FunctionExpressionPlan:
+			aggregators.Add(plan)
+		}
+		return true, nil
+	}); err != nil {
+		return nil, nil, err
+	}
+	return projects, aggregators, nil
 }
 
 func parseGroupBy(groupby sqlparser.GroupBy) (*MapPlan, error) {

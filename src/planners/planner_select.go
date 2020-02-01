@@ -36,11 +36,11 @@ func (plan *SelectPlan) Build() error {
 	tree.Add(source)
 
 	// Project.
-	project, err := parseProject(ast.SelectExprs)
+	projects, aggregators, err := parseProject(ast.SelectExprs)
 	if err != nil {
 		return err
 	}
-	projectPlan := NewProjectPlan(project)
+	projectPlan := NewProjectPlan(projects)
 	tree.Add(projectPlan)
 
 	// Filter.
@@ -54,12 +54,12 @@ func (plan *SelectPlan) Build() error {
 	}
 
 	// GroupBy.
-	if len(ast.GroupBy) > 0 {
-		groupBy, err := parseGroupBy(ast.GroupBy)
+	if aggregators.Length() > 0 {
+		groupbys, err := parseGroupBy(ast.GroupBy)
 		if err != nil {
 			return err
 		}
-		groupByPlan := NewGroupByPlan(groupBy)
+		groupByPlan := NewGroupByPlan(aggregators, groupbys)
 		tree.Add(groupByPlan)
 	}
 
