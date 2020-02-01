@@ -59,7 +59,7 @@ func TestOrderByExecutor(t *testing.T) {
 				[]interface{}{"y", 12},
 				[]interface{}{"z", 13},
 			),
-			estring: "\n->OrderByExecutor\t--> (\n->OrderByNode\t--> [(field:VariableNode=[$name], direction:asc)(field:VariableNode=[$age], direction:desc)])",
+			estring: "OrderByExecutor",
 		},
 	}
 

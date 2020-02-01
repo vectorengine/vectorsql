@@ -21,7 +21,6 @@ func TestCreateDatabasePlan(t *testing.T) {
 	plan := NewCreateDatabasePlan(statement.(*sqlparser.DBDDL))
 	err = plan.Build()
 	assert.Nil(t, err)
-	t.Logf("%v", plan.Name())
 
 	err = plan.Walk(nil)
 	assert.Nil(t, err)

@@ -5,10 +5,11 @@
 package planners
 
 import (
-	"fmt"
+	"encoding/json"
 )
 
 type OrPlan struct {
+	Name     string
 	FuncName string
 	Left     IPlan
 	Right    IPlan
@@ -16,14 +17,11 @@ type OrPlan struct {
 
 func NewOrPlan(args ...IPlan) *OrPlan {
 	return &OrPlan{
+		Name:     "OrPlan",
 		FuncName: "OR",
 		Left:     args[0],
 		Right:    args[1],
 	}
-}
-
-func (plan *OrPlan) Name() string {
-	return "OrNode"
 }
 
 func (plan *OrPlan) Build() error {
@@ -35,7 +33,9 @@ func (plan *OrPlan) Walk(visit Visit) error {
 }
 
 func (plan *OrPlan) String() string {
-	res := plan.Name()
-	res += fmt.Sprintf("=(Func=[%s], Left=[%+v], Right=[%+v])", plan.FuncName, plan.Left, plan.Right)
-	return res
+	out, err := json.MarshalIndent(plan, "", "    ")
+	if err != nil {
+		return err.Error()
+	}
+	return string(out)
 }

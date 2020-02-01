@@ -22,10 +22,6 @@ func NewCreateDatabaseExecutor(ctx *ExecutorContext, plan planners.IPlan) IExecu
 	}
 }
 
-func (executor *CreateDatabaseExecutor) Name() string {
-	return "CreateDatabaseExecutor"
-}
-
 func (executor *CreateDatabaseExecutor) Execute() (processors.IProcessor, error) {
 	ectx := executor.ctx
 	log := executor.ctx.log
@@ -45,5 +41,5 @@ func (executor *CreateDatabaseExecutor) Execute() (processors.IProcessor, error)
 }
 
 func (executor *CreateDatabaseExecutor) String() string {
-	return executor.Name()
+	return "CreateDatabaseExecutor"
 }

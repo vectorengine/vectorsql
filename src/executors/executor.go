@@ -9,7 +9,6 @@ import (
 )
 
 type IExecutor interface {
-	Name() string
 	String() string
 	Execute() (processors.IProcessor, error)
 }

@@ -22,10 +22,6 @@ func NewDropTableExecutor(ctx *ExecutorContext, plan planners.IPlan) IExecutor {
 	}
 }
 
-func (executor *DropTableExecutor) Name() string {
-	return "DropTableExecutor"
-}
-
 func (executor *DropTableExecutor) Execute() (processors.IProcessor, error) {
 	ectx := executor.ctx
 	log := executor.ctx.log
@@ -50,5 +46,5 @@ func (executor *DropTableExecutor) Execute() (processors.IProcessor, error) {
 }
 
 func (executor *DropTableExecutor) String() string {
-	return executor.Name()
+	return "DropTableExecutor"
 }

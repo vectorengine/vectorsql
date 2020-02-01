@@ -33,7 +33,7 @@ func TestCreateDatabaseExecutor(t *testing.T) {
 		{
 			name:    "drop-db",
 			query:   "drop database db1",
-			estring: "DropDatabaseExecutor(DropDatabaseNode(AST: &{Action:drop DBName:db1 IfExists:false Collate: Charset: Options:<nil> StatementBase:{}}\n)\n)",
+			estring: "DropDatabaseExecutor",
 		},
 	}
 

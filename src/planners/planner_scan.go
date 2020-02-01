@@ -5,25 +5,23 @@
 package planners
 
 import (
-	"fmt"
+	"encoding/json"
 )
 
 type ScanPlan struct {
+	Name    string
 	Table   string
 	Schema  string
-	Filter  *FilterPlan
-	Project *ProjectPlan
+	Filter  *FilterPlan  `json:",omitempty"`
+	Project *ProjectPlan `json:",omitempty"`
 }
 
 func NewScanPlan(table string, schema string) *ScanPlan {
 	return &ScanPlan{
+		Name:   "ScanPlan",
 		Table:  table,
 		Schema: schema,
 	}
-}
-
-func (plan *ScanPlan) Name() string {
-	return "ScanNode"
 }
 
 func (plan *ScanPlan) Build() error {
@@ -35,10 +33,9 @@ func (plan *ScanPlan) Walk(visit Visit) error {
 }
 
 func (plan *ScanPlan) String() string {
-	res := "\n"
-	res += "->"
-	res += plan.Name()
-	res += "\t--> "
-	res += fmt.Sprintf("(table=[%v, %v])", plan.Schema, plan.Table)
-	return res
+	out, err := json.MarshalIndent(plan, "", "\t")
+	if err != nil {
+		return err.Error()
+	}
+	return string(out)
 }

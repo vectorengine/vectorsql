@@ -27,10 +27,6 @@ func NewTableValuedFunctionExecutor(ctx *ExecutorContext, plan *planners.TableVa
 	}
 }
 
-func (executor *TableValuedFunctionExecutor) Name() string {
-	return "TableValuedFunctionExecutor"
-}
-
 func (executor *TableValuedFunctionExecutor) Execute() (processors.IProcessor, error) {
 	var constants []*datatypes.Value
 	var variables []*datatypes.Value
@@ -106,10 +102,5 @@ func (executor *TableValuedFunctionExecutor) Execute() (processors.IProcessor, e
 }
 
 func (executor *TableValuedFunctionExecutor) String() string {
-	res := "\n"
-	res += "->"
-	res += executor.Name()
-	res += "\t--> "
-	res += executor.plan.String()
-	return res
+	return "TableValuedFunctionExecutor"
 }

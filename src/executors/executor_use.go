@@ -22,10 +22,6 @@ func NewUseExecutor(ctx *ExecutorContext, plan planners.IPlan) IExecutor {
 	}
 }
 
-func (executor *UseExecutor) Name() string {
-	return "UseExecutor"
-}
-
 func (executor *UseExecutor) Execute() (processors.IProcessor, error) {
 	ectx := executor.ctx
 	log := executor.ctx.log
@@ -42,5 +38,5 @@ func (executor *UseExecutor) Execute() (processors.IProcessor, error) {
 }
 
 func (executor *UseExecutor) String() string {
-	return executor.Name()
+	return "UseExecutor"
 }

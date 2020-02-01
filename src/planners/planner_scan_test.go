@@ -14,12 +14,15 @@ func TestScanPlan(t *testing.T) {
 	plan := NewScanPlan("t1", "db1")
 	err := plan.Build()
 	assert.Nil(t, err)
-	t.Logf("%v", plan.Name())
 
 	err = plan.Walk(nil)
 	assert.Nil(t, err)
 
-	expect := "\n->ScanNode\t--> (table=[db1, t1])"
+	expect := `{
+	"Name": "ScanPlan",
+	"Table": "t1",
+	"Schema": "db1"
+}`
 	actual := plan.String()
 	assert.Equal(t, expect, actual)
 }

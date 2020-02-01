@@ -5,26 +5,24 @@
 package planners
 
 import (
-	"fmt"
+	"encoding/json"
 )
-
-type OrderByPlan struct {
-	Orders []Order
-}
 
 type Order struct {
 	Expression IPlan
 	Direction  string
 }
 
-func NewOrderByPlan(orders ...Order) *OrderByPlan {
-	return &OrderByPlan{
-		Orders: orders,
-	}
+type OrderByPlan struct {
+	Name   string
+	Orders []Order
 }
 
-func (plan *OrderByPlan) Name() string {
-	return "OrderByNode"
+func NewOrderByPlan(orders ...Order) *OrderByPlan {
+	return &OrderByPlan{
+		Name:   "OrderByPlan",
+		Orders: orders,
+	}
 }
 
 func (plan *OrderByPlan) Build() error {
@@ -36,14 +34,9 @@ func (plan *OrderByPlan) Walk(visit Visit) error {
 }
 
 func (plan *OrderByPlan) String() string {
-	res := "\n"
-	res += "->"
-	res += plan.Name()
-	res += "\t--> "
-	res += "["
-	for _, expr := range plan.Orders {
-		res += fmt.Sprintf("(field:%s, direction:%v)", expr.Expression, expr.Direction)
+	out, err := json.MarshalIndent(plan, "", "    ")
+	if err != nil {
+		return err.Error()
 	}
-	res += "]"
-	return res
+	return string(out)
 }

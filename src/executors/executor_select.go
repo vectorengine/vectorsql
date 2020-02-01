@@ -65,10 +65,6 @@ func (executor *SelectExecutor) Execute() (processors.IProcessor, error) {
 	return pipeline.Last(), nil
 }
 
-func (executor *SelectExecutor) Name() string {
-	return "SelectExecutor"
-}
-
 func (executor *SelectExecutor) String() string {
-	return executor.tree.String()
+	return "SelectExecutor"
 }

@@ -22,10 +22,6 @@ func NewFilterExecutor(ctx *ExecutorContext, plan *planners.FilterPlan) *FilterE
 	}
 }
 
-func (executor *FilterExecutor) Name() string {
-	return "FilterExecutor"
-}
-
 func (executor *FilterExecutor) Execute() (processors.IProcessor, error) {
 	log := executor.ctx.log
 	conf := executor.ctx.conf
@@ -38,12 +34,5 @@ func (executor *FilterExecutor) Execute() (processors.IProcessor, error) {
 }
 
 func (executor *FilterExecutor) String() string {
-	res := "\n"
-	res += "->"
-	res += executor.Name()
-	res += "\t--> "
-	res += "("
-	res += executor.plan.String()
-	res += ")"
-	return res
+	return "FilterExecutor"
 }

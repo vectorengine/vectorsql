@@ -51,7 +51,7 @@ func TestFilterExecutor(t *testing.T) {
 				},
 				[]interface{}{"y", 10},
 			),
-			estring: "\n->FilterExecutor\t--> (\n->FilterNode\t--> (BooleanExpressionNode=(Func=[=], Args=[[VariableNode=[$name] ConstantNode=<y>]])))",
+			estring: "FilterExecutor",
 		},
 	}
 

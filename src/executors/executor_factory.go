@@ -5,6 +5,8 @@
 package executors
 
 import (
+	"reflect"
+
 	"planners"
 
 	"base/errors"
@@ -12,19 +14,19 @@ import (
 
 type executorCreator func(ctx *ExecutorContext, plan planners.IPlan) IExecutor
 
-var table = map[string]executorCreator{
-	(&planners.UsePlan{}).Name():            NewUseExecutor,
-	(&planners.SelectPlan{}).Name():         NewSelectExecutor,
-	(&planners.CreateDatabasePlan{}).Name(): NewCreateDatabaseExecutor,
-	(&planners.DropDatabasePlan{}).Name():   NewDropDatabaseExecutor,
-	(&planners.CreateTablePlan{}).Name():    NewCreateTableExecutor,
-	(&planners.DropTablePlan{}).Name():      NewDropTableExecutor,
-	(&planners.ShowDatabasesPlan{}).Name():  NewShowDatabasesExecutor,
-	(&planners.ShowTablesPlan{}).Name():     NewShowTablesExecutor,
+var table = map[reflect.Type]executorCreator{
+	(reflect.TypeOf(&planners.UsePlan{})):          NewUseExecutor,
+	reflect.TypeOf(&planners.SelectPlan{}):         NewSelectExecutor,
+	reflect.TypeOf(&planners.CreateDatabasePlan{}): NewCreateDatabaseExecutor,
+	reflect.TypeOf(&planners.DropDatabasePlan{}):   NewDropDatabaseExecutor,
+	reflect.TypeOf(&planners.CreateTablePlan{}):    NewCreateTableExecutor,
+	reflect.TypeOf(&planners.DropTablePlan{}):      NewDropTableExecutor,
+	reflect.TypeOf(&planners.ShowDatabasesPlan{}):  NewShowDatabasesExecutor,
+	reflect.TypeOf(&planners.ShowTablesPlan{}):     NewShowTablesExecutor,
 }
 
 func ExecutorFactory(ctx *ExecutorContext, plan planners.IPlan) (IExecutor, error) {
-	creator, ok := table[plan.Name()]
+	creator, ok := table[reflect.TypeOf(plan)]
 	if !ok {
 		return nil, errors.Errorf("Couldn't get the executor:%T", plan)
 	}

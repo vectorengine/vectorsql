@@ -23,10 +23,6 @@ func NewScanExecutor(ctx *ExecutorContext, plan *planners.ScanPlan) *ScanExecuto
 	}
 }
 
-func (executor *ScanExecutor) Name() string {
-	return "ScanExecutor"
-}
-
 func (executor *ScanExecutor) Execute() (processors.IProcessor, error) {
 	log := executor.ctx.log
 	conf := executor.ctx.conf
@@ -55,10 +51,5 @@ func (executor *ScanExecutor) Execute() (processors.IProcessor, error) {
 }
 
 func (executor *ScanExecutor) String() string {
-	res := "\n"
-	res += "->"
-	res += executor.Name()
-	res += "\t--> "
-	res += executor.plan.String()
-	return res
+	return "ScanExecutor"
 }

@@ -7,20 +7,20 @@ package planners
 import (
 	"parsers"
 
+	"encoding/json"
+
 	"parsers/sqlparser"
 )
 
 type ShowDatabasesPlan struct {
-	Ast     *sqlparser.Show
+	Name    string
 	SubPlan IPlan
 }
 
 func NewShowDatabasesPlan(ast sqlparser.Statement) IPlan {
-	return &ShowDatabasesPlan{Ast: ast.(*sqlparser.Show)}
-}
-
-func (plan *ShowDatabasesPlan) Name() string {
-	return "ShowDatabasesNode"
+	return &ShowDatabasesPlan{
+		Name: "ShowDatabasesPlan",
+	}
 }
 
 func (plan *ShowDatabasesPlan) Build() error {
@@ -38,13 +38,9 @@ func (plan *ShowDatabasesPlan) Walk(visit Visit) error {
 }
 
 func (plan *ShowDatabasesPlan) String() string {
-	res := plan.Name()
-
-	buf := sqlparser.NewTrackedBuffer(nil)
-	plan.Ast.Format(buf)
-
-	res += "("
-	res += "AST: " + buf.String() + "\n"
-	res += ")"
-	return res
+	out, err := json.MarshalIndent(plan, "", "    ")
+	if err != nil {
+		return err.Error()
+	}
+	return string(out)
 }

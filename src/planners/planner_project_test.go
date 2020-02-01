@@ -19,14 +19,28 @@ func TestProjectPlan(t *testing.T) {
 	plan := NewProjectPlan(plans)
 	err := plan.Build()
 	assert.Nil(t, err)
-	t.Logf("%v", plan.Name())
 
 	err = plan.Walk(func(plan IPlan) (bool, error) {
 		return true, nil
 	})
 	assert.Nil(t, err)
 
-	expect := "\n->ProjectNode\t--> (VariableNode=[$name], VariableNode=[$age])"
+	expect := `{
+    "Name": "ProjectPlan",
+    "SubPlan": {
+        "Name": "MapPlan",
+        "SubPlans": [
+            {
+                "Name": "VariablePlan",
+                "Value": "name"
+            },
+            {
+                "Name": "VariablePlan",
+                "Value": "age"
+            }
+        ]
+    }
+}`
 	actual := plan.String()
 	assert.Equal(t, expect, actual)
 }

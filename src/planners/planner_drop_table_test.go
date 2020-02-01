@@ -21,12 +21,34 @@ func TestDropTablePlan(t *testing.T) {
 	plan := NewDropTablePlan(statement.(*sqlparser.DDL))
 	err = plan.Build()
 	assert.Nil(t, err)
-	t.Logf("%v", plan.Name())
 
 	err = plan.Walk(nil)
 	assert.Nil(t, err)
 
-	expect := "DropTableNode(AST: drop table t1\n)"
+	expect := `{
+    "Name": "DropTablePlan",
+    "Ast": {
+        "Action": "drop",
+        "FromTables": [
+            {
+                "Name": "t1",
+                "Qualifier": ""
+            }
+        ],
+        "ToTables": null,
+        "Table": {
+            "Name": "",
+            "Qualifier": ""
+        },
+        "IfExists": false,
+        "TableSpec": null,
+        "OptLike": null,
+        "PartitionSpec": null,
+        "VindexSpec": null,
+        "VindexCols": null,
+        "AutoIncSpec": null
+    }
+}`
 	actual := plan.String()
 	assert.Equal(t, expect, actual)
 }

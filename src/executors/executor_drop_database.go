@@ -22,10 +22,6 @@ func NewDropDatabaseExecutor(ctx *ExecutorContext, plan planners.IPlan) IExecuto
 	}
 }
 
-func (executor *DropDatabaseExecutor) Name() string {
-	return "DropDatabaseExecutor"
-}
-
 func (executor *DropDatabaseExecutor) Execute() (processors.IProcessor, error) {
 	ectx := executor.ctx
 	log := executor.ctx.log
@@ -45,9 +41,5 @@ func (executor *DropDatabaseExecutor) Execute() (processors.IProcessor, error) {
 }
 
 func (executor *DropDatabaseExecutor) String() string {
-	res := executor.Name()
-	res += "("
-	res += executor.plan.String() + "\n"
-	res += ")"
-	return res
+	return "DropDatabaseExecutor"
 }

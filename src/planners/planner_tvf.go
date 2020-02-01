@@ -5,10 +5,11 @@
 package planners
 
 import (
-	"fmt"
+	"encoding/json"
 )
 
 type TableValuedFunctionPlan struct {
+	Name     string
 	As       string
 	FuncName string
 	SubPlan  *MapPlan
@@ -16,13 +17,10 @@ type TableValuedFunctionPlan struct {
 
 func NewTableValuedFunctionPlan(name string, plan *MapPlan) *TableValuedFunctionPlan {
 	return &TableValuedFunctionPlan{
+		Name:     "TableValuedFunctionPlan",
 		FuncName: name,
 		SubPlan:  plan,
 	}
-}
-
-func (plan *TableValuedFunctionPlan) Name() string {
-	return "TableValuedFunctionNode"
 }
 
 func (plan *TableValuedFunctionPlan) Build() error {
@@ -34,10 +32,9 @@ func (plan *TableValuedFunctionPlan) Walk(visit Visit) error {
 }
 
 func (plan *TableValuedFunctionPlan) String() string {
-	res := "\n"
-	res += "->"
-	res += plan.Name()
-	res += "\t--> "
-	res += fmt.Sprintf("(Func=[%s], Args=[%+v])", plan.FuncName, plan.SubPlan)
-	return res
+	out, err := json.MarshalIndent(plan, "", "    ")
+	if err != nil {
+		return err.Error()
+	}
+	return string(out)
 }

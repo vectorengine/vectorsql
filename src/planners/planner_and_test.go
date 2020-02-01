@@ -25,14 +25,44 @@ func TestAndPlan(t *testing.T) {
 	)
 	err := plan.Build()
 	assert.Nil(t, err)
-	t.Logf("%v", plan.Name())
 
 	err = plan.Walk(func(plan IPlan) (bool, error) {
 		return true, nil
 	})
 	assert.Nil(t, err)
 
-	expect := "AndNode=(Func=[AND], Left=[BooleanExpressionNode=(Func=[=], Args=[[VariableNode=[$name] ConstantNode=<x>]])], Right=[BooleanExpressionNode=(Func=[=], Args=[[VariableNode=[$name] ConstantNode=<y>]])])"
+	expect := `{
+    "Name": "AndPlan",
+    "FuncName": "AND",
+    "Left": {
+        "Name": "BooleanExpressionPlan",
+        "Args": [
+            {
+                "Name": "VariablePlan",
+                "Value": "name"
+            },
+            {
+                "Name": "ConstantPlan",
+                "Value": "x"
+            }
+        ],
+        "FuncName": "="
+    },
+    "Right": {
+        "Name": "BooleanExpressionPlan",
+        "Args": [
+            {
+                "Name": "VariablePlan",
+                "Value": "name"
+            },
+            {
+                "Name": "ConstantPlan",
+                "Value": "y"
+            }
+        ],
+        "FuncName": "="
+    }
+}`
 	actual := plan.String()
 	assert.Equal(t, expect, actual)
 }

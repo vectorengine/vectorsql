@@ -5,23 +5,21 @@
 package planners
 
 import (
-	"fmt"
+	"encoding/json"
 )
 
 type TableValuedFunctionExpressionPlan struct {
+	Name     string
 	FuncName string
 	SubPlan  IPlan
 }
 
 func NewTableValuedFunctionExpressionPlan(name string, plan IPlan) *TableValuedFunctionExpressionPlan {
 	return &TableValuedFunctionExpressionPlan{
+		Name:     "TableValuedFunctionExpressionPlan",
 		FuncName: name,
 		SubPlan:  plan,
 	}
-}
-
-func (plan *TableValuedFunctionExpressionPlan) Name() string {
-	return "TableValuedFunctionExpressionNode"
 }
 
 func (plan *TableValuedFunctionExpressionPlan) Build() error {
@@ -33,8 +31,9 @@ func (plan *TableValuedFunctionExpressionPlan) Walk(visit Visit) error {
 }
 
 func (plan *TableValuedFunctionExpressionPlan) String() string {
-	res := plan.Name()
-	res += fmt.Sprintf("=(Func=[%s], Args=[%+v])", plan.FuncName, plan.SubPlan)
-	return res
-
+	out, err := json.MarshalIndent(plan, "", "    ")
+	if err != nil {
+		return err.Error()
+	}
+	return string(out)
 }

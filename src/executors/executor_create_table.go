@@ -22,10 +22,6 @@ func NewCreateTableExecutor(ctx *ExecutorContext, plan planners.IPlan) IExecutor
 	}
 }
 
-func (executor *CreateTableExecutor) Name() string {
-	return "CreateTableExecutor"
-}
-
 func (executor *CreateTableExecutor) Execute() (processors.IProcessor, error) {
 	ectx := executor.ctx
 	log := executor.ctx.log
@@ -49,5 +45,5 @@ func (executor *CreateTableExecutor) Execute() (processors.IProcessor, error) {
 }
 
 func (executor *CreateTableExecutor) String() string {
-	return executor.Name()
+	return "CreateTableExecutor"
 }

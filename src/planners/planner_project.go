@@ -4,20 +4,20 @@
 
 package planners
 
-import ()
+import (
+	"encoding/json"
+)
 
 type ProjectPlan struct {
+	Name    string
 	SubPlan *MapPlan
 }
 
 func NewProjectPlan(plan *MapPlan) *ProjectPlan {
 	return &ProjectPlan{
+		Name:    "ProjectPlan",
 		SubPlan: plan,
 	}
-}
-
-func (plan *ProjectPlan) Name() string {
-	return "ProjectNode"
 }
 
 func (plan *ProjectPlan) Build() error {
@@ -29,12 +29,9 @@ func (plan *ProjectPlan) Walk(visit Visit) error {
 }
 
 func (plan *ProjectPlan) String() string {
-	res := "\n"
-	res += "->"
-	res += plan.Name()
-	res += "\t--> "
-	res += "("
-	res += plan.SubPlan.String()
-	res += ")"
-	return res
+	out, err := json.MarshalIndent(plan, "", "    ")
+	if err != nil {
+		return err.Error()
+	}
+	return string(out)
 }

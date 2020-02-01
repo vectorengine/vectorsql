@@ -5,24 +5,22 @@
 package planners
 
 import (
-	"fmt"
+	"encoding/json"
 
 	"base/errors"
 	"parsers/sqlparser"
 )
 
 type DropDatabasePlan struct {
-	Ast *sqlparser.DBDDL
+	Name string
+	Ast  *sqlparser.DBDDL
 }
 
 func NewDropDatabasePlan(ast sqlparser.Statement) IPlan {
 	return &DropDatabasePlan{
-		Ast: ast.(*sqlparser.DBDDL),
+		Name: "DropDatabasePlan",
+		Ast:  ast.(*sqlparser.DBDDL),
 	}
-}
-
-func (plan *DropDatabasePlan) Name() string {
-	return "DropDatabaseNode"
 }
 
 func (plan *DropDatabasePlan) Build() error {
@@ -37,9 +35,9 @@ func (plan *DropDatabasePlan) Walk(visit Visit) error {
 }
 
 func (plan *DropDatabasePlan) String() string {
-	res := plan.Name()
-	res += "("
-	res += "AST: " + fmt.Sprintf("%+v", plan.Ast) + "\n"
-	res += ")"
-	return res
+	out, err := json.MarshalIndent(plan, "", "    ")
+	if err != nil {
+		return err.Error()
+	}
+	return string(out)
 }

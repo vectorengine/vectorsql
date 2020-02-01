@@ -4,17 +4,18 @@
 
 package planners
 
-import ()
+import (
+	"encoding/json"
+)
 
 type SinkPlan struct {
+	Name string
 }
 
 func NewSinkPlan() *SinkPlan {
-	return &SinkPlan{}
-}
-
-func (plan *SinkPlan) Name() string {
-	return "SinkNode"
+	return &SinkPlan{
+		Name: "SinkPlan",
+	}
 }
 
 func (plan *SinkPlan) Build() error {
@@ -26,9 +27,9 @@ func (plan *SinkPlan) Walk(visit Visit) error {
 }
 
 func (plan *SinkPlan) String() string {
-	res := "\n"
-	res += "->"
-	res += plan.Name()
-	res += "\t--> "
-	return res
+	out, err := json.MarshalIndent(plan, "", "    ")
+	if err != nil {
+		return err.Error()
+	}
+	return string(out)
 }

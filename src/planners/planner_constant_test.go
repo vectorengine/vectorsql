@@ -14,12 +14,14 @@ func TestConstantPlan(t *testing.T) {
 	plan := NewConstantPlan("t1")
 	err := plan.Build()
 	assert.Nil(t, err)
-	t.Logf("%v", plan.Name())
 
 	err = plan.Walk(nil)
 	assert.Nil(t, err)
 
-	expect := "ConstantNode=<t1>"
+	expect := `{
+    "Name": "ConstantPlan",
+    "Value": "t1"
+}`
 	actual := plan.String()
 	assert.Equal(t, expect, actual)
 }

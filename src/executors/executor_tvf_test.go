@@ -24,7 +24,7 @@ func TestTVFExecutor(t *testing.T) {
 		estring string
 	}{
 		{
-			name: "TableValuedFunctionExecutor",
+			name: "TableValuedFunctionExecutor-range",
 			plan: planners.NewTableValuedFunctionPlan("range",
 				planners.NewMapPlan(
 					planners.NewConstantPlan(1),
@@ -40,11 +40,11 @@ func TestTVFExecutor(t *testing.T) {
 				[]interface{}{3},
 				[]interface{}{4},
 			),
-			estring: "\n->TableValuedFunctionExecutor\t--> \n->TableValuedFunctionNode\t--> (Func=[range], Args=[ConstantNode=<1>, ConstantNode=<5>])",
+			estring: "TableValuedFunctionExecutor",
 		},
 
 		{
-			name: "TableValuedFunctionExecutor",
+			name: "TableValuedFunctionExecutor-rangetable",
 			plan: planners.NewTableValuedFunctionPlan("rangetable",
 				planners.NewMapPlan(
 					planners.NewTableValuedFunctionExpressionPlan(
@@ -79,7 +79,7 @@ func TestTVFExecutor(t *testing.T) {
 				[]interface{}{1, "string-1"},
 				[]interface{}{2, "string-2"},
 			),
-			estring: "\n->TableValuedFunctionExecutor\t--> \n->TableValuedFunctionNode\t--> (Func=[rangetable], Args=[TableValuedFunctionExpressionNode=(Func=[], Args=[FuncExpressionNode=(Func=[->], Args=[[VariableNode=[$row] ConstantNode=<3>]])]), TableValuedFunctionExpressionNode=(Func=[], Args=[FuncExpressionNode=(Func=[->], Args=[[VariableNode=[$c1] ConstantNode=<UInt32>]])]), TableValuedFunctionExpressionNode=(Func=[], Args=[FuncExpressionNode=(Func=[->], Args=[[VariableNode=[$c2] ConstantNode=<String>]])])])",
+			estring: "TableValuedFunctionExecutor",
 		},
 	}
 
@@ -99,7 +99,6 @@ func TestTVFExecutor(t *testing.T) {
 		assert.Nil(t, err)
 		pipeline.Run()
 
-		assert.Equal(t, test.name, executor1.Name())
 		assert.Equal(t, test.estring, executor1.String())
 
 		for x := range pipeline.Last().In().Recv() {

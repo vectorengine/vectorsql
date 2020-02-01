@@ -17,8 +17,8 @@ func TestUseExecutor(t *testing.T) {
 	tests := []struct {
 		name    string
 		query   string
-		estring string
 		err     string
+		estring string
 	}{
 		{
 			name:  "use-db",
@@ -38,7 +38,7 @@ func TestUseExecutor(t *testing.T) {
 		{
 			name:    "drop-db",
 			query:   "drop database db1",
-			estring: "DropDatabaseExecutor(DropDatabaseNode(AST: &{Action:drop DBName:db1 IfExists:false Collate: Charset: Options:<nil> StatementBase:{}}\n)\n)",
+			estring: "DropDatabaseExecutor",
 		},
 	}
 

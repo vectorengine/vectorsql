@@ -14,12 +14,13 @@ func TestSinkPlan(t *testing.T) {
 	plan := NewSinkPlan()
 	err := plan.Build()
 	assert.Nil(t, err)
-	t.Logf("%v", plan.Name())
 
 	err = plan.Walk(nil)
 	assert.Nil(t, err)
 
-	expect := "\n->SinkNode\t--> "
+	expect := `{
+    "Name": "SinkPlan"
+}`
 	actual := plan.String()
 	assert.Equal(t, expect, actual)
 }

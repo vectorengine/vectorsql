@@ -5,21 +5,19 @@
 package planners
 
 import (
-	"fmt"
+	"encoding/json"
 )
 
 type VariablePlan struct {
+	Name  string
 	Value string
 }
 
 func NewVariablePlan(value string) *VariablePlan {
 	return &VariablePlan{
+		Name:  "VariablePlan",
 		Value: value,
 	}
-}
-
-func (plan *VariablePlan) Name() string {
-	return "VariableNode"
 }
 
 func (plan *VariablePlan) Build() error {
@@ -31,7 +29,9 @@ func (plan *VariablePlan) Walk(visit Visit) error {
 }
 
 func (plan *VariablePlan) String() string {
-	res := plan.Name()
-	res += fmt.Sprintf("=[$%+v]", plan.Value)
-	return res
+	out, err := json.MarshalIndent(plan, "", "\t")
+	if err != nil {
+		return err.Error()
+	}
+	return string(out)
 }

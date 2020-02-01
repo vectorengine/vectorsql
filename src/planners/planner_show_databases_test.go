@@ -21,14 +21,50 @@ func TestShowDatabasesPlan(t *testing.T) {
 	plan := NewShowDatabasesPlan(statement.(*sqlparser.Show))
 	err = plan.Build()
 	assert.Nil(t, err)
-	t.Logf("%v", plan.Name())
 
 	err = plan.Walk(func(plan IPlan) (bool, error) {
 		return true, nil
 	})
 	assert.Nil(t, err)
 
-	expect := "ShowDatabasesNode(AST: show databases\n)"
+	expect := `{
+    "Name": "ShowDatabasesPlan",
+    "SubPlan": {
+        "Name": "SelectPlan",
+        "SubPlan": {
+            "Name": "MapPlan",
+            "SubPlans": [
+                {
+                    "Name": "ScanPlan",
+                    "Table": "databases",
+                    "Schema": "system"
+                },
+                {
+                    "Name": "ProjectPlan",
+                    "SubPlan": {
+                        "Name": "MapPlan"
+                    }
+                },
+                {
+                    "Name": "OrderByPlan",
+                    "Orders": [
+                        {
+                            "Expression": {
+                                "Name": "VariablePlan",
+                                "Value": "name"
+                            },
+                            "Direction": "asc"
+                        }
+                    ]
+                },
+                {
+                    "Name": "SinkPlan"
+                }
+            ]
+        }
+    }
+}`
+
 	actual := plan.String()
 	assert.Equal(t, expect, actual)
 }

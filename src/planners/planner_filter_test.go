@@ -31,7 +31,43 @@ func TestFilterPlan(t *testing.T) {
 					NewConstantPlan("db2"),
 				),
 			),
-			expect: "\n->FilterNode\t--> (BooleanExpressionNode=(Func=[OR], Args=[[BooleanExpressionNode=(Func=[=], Args=[[VariableNode=[$name] ConstantNode=<db1>]]) BooleanExpressionNode=(Func=[=], Args=[[VariableNode=[$name] ConstantNode=<db2>]])]]))",
+			expect: `{
+    "Name": "FilterPlan",
+    "SubPlan": {
+        "Name": "BooleanExpressionPlan",
+        "Args": [
+            {
+                "Name": "BooleanExpressionPlan",
+                "Args": [
+                    {
+                        "Name": "VariablePlan",
+                        "Value": "name"
+                    },
+                    {
+                        "Name": "ConstantPlan",
+                        "Value": "db1"
+                    }
+                ],
+                "FuncName": "="
+            },
+            {
+                "Name": "BooleanExpressionPlan",
+                "Args": [
+                    {
+                        "Name": "VariablePlan",
+                        "Value": "name"
+                    },
+                    {
+                        "Name": "ConstantPlan",
+                        "Value": "db2"
+                    }
+                ],
+                "FuncName": "="
+            }
+        ],
+        "FuncName": "OR"
+    }
+}`,
 		},
 	}
 
@@ -39,7 +75,6 @@ func TestFilterPlan(t *testing.T) {
 		plan := NewFilterPlan(test.plan)
 		err := plan.Build()
 		assert.Nil(t, err)
-		t.Logf("%v", plan.Name())
 
 		err = plan.Walk(func(plan IPlan) (bool, error) {
 			return true, nil

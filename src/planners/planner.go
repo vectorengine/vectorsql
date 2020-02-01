@@ -7,7 +7,6 @@ package planners
 import ()
 
 type IPlan interface {
-	Name() string
 	Build() error
 	Walk(visit Visit) error
 	String() string

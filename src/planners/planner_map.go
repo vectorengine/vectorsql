@@ -5,21 +5,19 @@
 package planners
 
 import (
-	"strings"
+	"encoding/json"
 )
 
 type MapPlan struct {
-	SubPlans []IPlan
+	Name     string
+	SubPlans []IPlan `json:",omitempty"`
 }
 
 func NewMapPlan(plans ...IPlan) *MapPlan {
 	return &MapPlan{
+		Name:     "MapPlan",
 		SubPlans: plans,
 	}
-}
-
-func (plan *MapPlan) Name() string {
-	return "MapNode"
 }
 
 func (plan *MapPlan) Build() error {
@@ -36,13 +34,12 @@ func (plan *MapPlan) Walk(visit Visit) error {
 }
 
 func (plan *MapPlan) String() string {
-	res := ""
-	for _, child := range plan.SubPlans {
-		res += child.String()
-		res += ", "
+	out, err := json.MarshalIndent(plan, "", "    ")
+	if err != nil {
+		return err.Error()
 	}
-	res = strings.TrimRight(res, ", ")
-	return res
+	return string(out)
+
 }
 
 func (plan *MapPlan) Add(p IPlan) {

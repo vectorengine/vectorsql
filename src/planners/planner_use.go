@@ -5,21 +5,21 @@
 package planners
 
 import (
+	"encoding/json"
+
 	"parsers/sqlparser"
 )
 
 type UsePlan struct {
-	Ast *sqlparser.Use
+	Name string
+	Ast  *sqlparser.Use
 }
 
 func NewUsePlan(ast sqlparser.Statement) IPlan {
 	return &UsePlan{
-		Ast: ast.(*sqlparser.Use),
+		Name: "UsePlan",
+		Ast:  ast.(*sqlparser.Use),
 	}
-}
-
-func (plan *UsePlan) Name() string {
-	return "UseNode"
 }
 
 func (plan *UsePlan) Build() error {
@@ -31,13 +31,9 @@ func (plan *UsePlan) Walk(visit Visit) error {
 }
 
 func (plan *UsePlan) String() string {
-	res := plan.Name()
-
-	buf := sqlparser.NewTrackedBuffer(nil)
-	plan.Ast.Format(buf)
-
-	res += "("
-	res += "AST: " + buf.String() + "\n"
-	res += ")"
-	return res
+	out, err := json.MarshalIndent(plan, "", "    ")
+	if err != nil {
+		return err.Error()
+	}
+	return string(out)
 }

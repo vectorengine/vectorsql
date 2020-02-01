@@ -5,27 +5,27 @@
 package planners
 
 import (
+	"encoding/json"
+
 	"parsers/sqlparser"
 )
 
 type SelectPlan struct {
-	Ast     *sqlparser.Select
-	SubPlan *MapPlan
+	Name    string
+	SubPlan *MapPlan `json:",omitempty"`
+	ast     *sqlparser.Select
 }
 
 func NewSelectPlan(ast sqlparser.Statement) IPlan {
 	return &SelectPlan{
-		Ast:     ast.(*sqlparser.Select),
+		Name:    "SelectPlan",
+		ast:     ast.(*sqlparser.Select),
 		SubPlan: NewMapPlan(),
 	}
 }
 
-func (plan *SelectPlan) Name() string {
-	return "SelectNode"
-}
-
 func (plan *SelectPlan) Build() error {
-	ast := plan.Ast
+	ast := plan.ast
 	tree := plan.SubPlan
 
 	// Source.
@@ -73,5 +73,9 @@ func (plan *SelectPlan) Walk(visit Visit) error {
 }
 
 func (plan *SelectPlan) String() string {
-	return plan.SubPlan.String()
+	out, err := json.MarshalIndent(plan, "", "    ")
+	if err != nil {
+		return err.Error()
+	}
+	return string(out)
 }

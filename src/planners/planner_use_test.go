@@ -21,12 +21,16 @@ func TestUsePlan(t *testing.T) {
 	plan := NewUsePlan(statement.(*sqlparser.Use))
 	err = plan.Build()
 	assert.Nil(t, err)
-	t.Logf("%v", plan.Name())
 
 	err = plan.Walk(nil)
 	assert.Nil(t, err)
 
-	expect := "UseNode(AST: use db1\n)"
+	expect := `{
+    "Name": "UsePlan",
+    "Ast": {
+        "DBName": "db1"
+    }
+}`
 	actual := plan.String()
 	assert.Equal(t, expect, actual)
 }

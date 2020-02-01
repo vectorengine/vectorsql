@@ -14,12 +14,14 @@ func TestVariablePlan(t *testing.T) {
 	plan := NewVariablePlan("v1")
 	err := plan.Build()
 	assert.Nil(t, err)
-	t.Logf("%v", plan.Name())
 
 	err = plan.Walk(nil)
 	assert.Nil(t, err)
 
-	expect := "VariableNode=[$v1]"
+	expect := `{
+	"Name": "VariablePlan",
+	"Value": "v1"
+}`
 	actual := plan.String()
 	assert.Equal(t, expect, actual)
 }

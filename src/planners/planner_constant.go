@@ -5,21 +5,19 @@
 package planners
 
 import (
-	"fmt"
+	"encoding/json"
 )
 
 type ConstantPlan struct {
+	Name  string
 	Value interface{}
 }
 
 func NewConstantPlan(value interface{}) *ConstantPlan {
 	return &ConstantPlan{
+		Name:  "ConstantPlan",
 		Value: value,
 	}
-}
-
-func (plan *ConstantPlan) Name() string {
-	return "ConstantNode"
 }
 
 func (plan *ConstantPlan) Build() error {
@@ -31,7 +29,9 @@ func (plan *ConstantPlan) Walk(visit Visit) error {
 }
 
 func (plan *ConstantPlan) String() string {
-	res := plan.Name()
-	res += fmt.Sprintf("=<%+v>", plan.Value)
-	return res
+	out, err := json.MarshalIndent(plan, "", "    ")
+	if err != nil {
+		return err.Error()
+	}
+	return string(out)
 }

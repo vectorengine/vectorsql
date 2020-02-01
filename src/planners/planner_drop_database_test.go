@@ -21,12 +21,21 @@ func TestDropDatabasePlan(t *testing.T) {
 	plan := NewDropDatabasePlan(statement.(*sqlparser.DBDDL))
 	err = plan.Build()
 	assert.Nil(t, err)
-	t.Logf("%v", plan.Name())
 
 	err = plan.Walk(nil)
 	assert.Nil(t, err)
 
-	expect := "DropDatabaseNode(AST: &{Action:drop DBName:db1 IfExists:false Collate: Charset: Options:<nil> StatementBase:{}}\n)"
+	expect := `{
+    "Name": "DropDatabasePlan",
+    "Ast": {
+        "Action": "drop",
+        "DBName": "db1",
+        "IfExists": false,
+        "Collate": "",
+        "Charset": "",
+        "Options": null
+    }
+}`
 	actual := plan.String()
 	assert.Equal(t, expect, actual)
 }

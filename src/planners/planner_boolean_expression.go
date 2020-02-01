@@ -5,23 +5,21 @@
 package planners
 
 import (
-	"fmt"
+	"encoding/json"
 )
 
 type BooleanExpressionPlan struct {
+	Name     string
 	Args     []IPlan
 	FuncName string
 }
 
 func NewBooleanExpressionPlan(fnname string, args ...IPlan) *BooleanExpressionPlan {
 	return &BooleanExpressionPlan{
+		Name:     "BooleanExpressionPlan",
 		FuncName: fnname,
 		Args:     args,
 	}
-}
-
-func (plan *BooleanExpressionPlan) Name() string {
-	return "BooleanExpressionNode"
 }
 
 func (plan *BooleanExpressionPlan) Build() error {
@@ -33,7 +31,9 @@ func (plan *BooleanExpressionPlan) Walk(visit Visit) error {
 }
 
 func (plan *BooleanExpressionPlan) String() string {
-	res := plan.Name()
-	res += fmt.Sprintf("=(Func=[%s], Args=[%+v])", plan.FuncName, plan.Args)
-	return res
+	out, err := json.MarshalIndent(plan, "", "    ")
+	if err != nil {
+		return err.Error()
+	}
+	return string(out)
 }

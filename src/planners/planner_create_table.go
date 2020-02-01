@@ -5,22 +5,22 @@
 package planners
 
 import (
+	"encoding/json"
+
 	"base/errors"
 	"parsers/sqlparser"
 )
 
 type CreateTablePlan struct {
-	Ast *sqlparser.DDL
+	Name string
+	Ast  *sqlparser.DDL
 }
 
 func NewCreateTablePlan(ast sqlparser.Statement) IPlan {
 	return &CreateTablePlan{
-		Ast: ast.(*sqlparser.DDL),
+		Name: "CreateTablePlan",
+		Ast:  ast.(*sqlparser.DDL),
 	}
-}
-
-func (plan *CreateTablePlan) Name() string {
-	return "CreateTableNode"
 }
 
 func (plan *CreateTablePlan) Build() error {
@@ -35,13 +35,9 @@ func (plan *CreateTablePlan) Walk(visit Visit) error {
 }
 
 func (plan *CreateTablePlan) String() string {
-	res := plan.Name()
-
-	buf := sqlparser.NewTrackedBuffer(nil)
-	plan.Ast.Format(buf)
-
-	res += "("
-	res += "AST: " + buf.String() + "\n"
-	res += ")"
-	return res
+	out, err := json.MarshalIndent(plan, "", "    ")
+	if err != nil {
+		return err.Error()
+	}
+	return string(out)
 }

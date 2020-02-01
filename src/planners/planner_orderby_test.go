@@ -32,7 +32,32 @@ func TestOrderByPlan(t *testing.T) {
 					Direction:  "desc",
 				},
 			),
-			expect: "\n->OrderByNode\t--> [(field:VariableNode=[$c1], direction:desc)(field:VariableNode=[$c2], direction:asc)(field:VariableNode=[$c3], direction:desc)]",
+			expect: `{
+    "Name": "OrderByPlan",
+    "Orders": [
+        {
+            "Expression": {
+                "Name": "VariablePlan",
+                "Value": "c1"
+            },
+            "Direction": "desc"
+        },
+        {
+            "Expression": {
+                "Name": "VariablePlan",
+                "Value": "c2"
+            },
+            "Direction": "asc"
+        },
+        {
+            "Expression": {
+                "Name": "VariablePlan",
+                "Value": "c3"
+            },
+            "Direction": "desc"
+        }
+    ]
+}`,
 		},
 	}
 
@@ -40,7 +65,6 @@ func TestOrderByPlan(t *testing.T) {
 		plan := test.plan
 		err := plan.Build()
 		assert.Nil(t, err)
-		t.Logf("%v", plan.Name())
 
 		err = plan.Walk(func(plan IPlan) (bool, error) {
 			return true, nil

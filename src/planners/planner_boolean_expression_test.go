@@ -17,13 +17,25 @@ func TestBooleanExpressionPlan(t *testing.T) {
 	)
 	err := plan.Build()
 	assert.Nil(t, err)
-	t.Logf("%v", plan.Name())
 
 	_ = plan.Walk(func(plan IPlan) (bool, error) {
 		return true, nil
 	})
 
-	expect := "BooleanExpressionNode=(Func=[>], Args=[[VariableNode=[$a] ConstantNode=<2>]])"
+	expect := `{
+    "Name": "BooleanExpressionPlan",
+    "Args": [
+        {
+            "Name": "VariablePlan",
+            "Value": "a"
+        },
+        {
+            "Name": "ConstantPlan",
+            "Value": 2
+        }
+    ],
+    "FuncName": "\u003e"
+}`
 	actual := plan.String()
 	assert.Equal(t, expect, actual)
 }

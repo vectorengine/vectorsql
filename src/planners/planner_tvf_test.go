@@ -35,7 +35,58 @@ func TestTVFPlan(t *testing.T) {
 					),
 				),
 			),
-			expect: "\n->TableValuedFunctionNode\t--> (Func=[rangetable], Args=[FuncExpressionNode=(Func=[], Args=[[VariableNode=[$rows] ConstantNode=<1000>]]), FuncExpressionNode=(Func=[], Args=[[VariableNode=[$c1] ConstantNode=<UInt32>]]), FuncExpressionNode=(Func=[], Args=[[VariableNode=[$c2] ConstantNode=<String>]])])",
+			expect: `{
+    "Name": "TableValuedFunctionPlan",
+    "As": "",
+    "FuncName": "rangetable",
+    "SubPlan": {
+        "Name": "MapPlan",
+        "SubPlans": [
+            {
+                "Name": "FunctionExpressionPlan",
+                "FuncName": "",
+                "Args": [
+                    {
+                        "Name": "VariablePlan",
+                        "Value": "rows"
+                    },
+                    {
+                        "Name": "ConstantPlan",
+                        "Value": 1000
+                    }
+                ]
+            },
+            {
+                "Name": "FunctionExpressionPlan",
+                "FuncName": "",
+                "Args": [
+                    {
+                        "Name": "VariablePlan",
+                        "Value": "c1"
+                    },
+                    {
+                        "Name": "ConstantPlan",
+                        "Value": "UInt32"
+                    }
+                ]
+            },
+            {
+                "Name": "FunctionExpressionPlan",
+                "FuncName": "",
+                "Args": [
+                    {
+                        "Name": "VariablePlan",
+                        "Value": "c2"
+                    },
+                    {
+                        "Name": "ConstantPlan",
+                        "Value": "String"
+                    }
+                ]
+            }
+        ]
+    }
+}`,
 		},
 	}
 

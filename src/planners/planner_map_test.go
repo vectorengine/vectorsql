@@ -26,14 +26,46 @@ func TestMapPlan(t *testing.T) {
 	plan := NewMapPlan(plans...)
 	err := plan.Build()
 	assert.Nil(t, err)
-	t.Logf("%v", plan.Name())
 
 	err = plan.Walk(func(plan IPlan) (bool, error) {
 		return true, nil
 	})
 	assert.Nil(t, err)
 
-	expect := "BooleanExpressionNode=(Func=[=], Args=[[VariableNode=[$name] ConstantNode=<db1>]]), BooleanExpressionNode=(Func=[=], Args=[[VariableNode=[$name] ConstantNode=<db2>]])"
+	expect := `{
+    "Name": "MapPlan",
+    "SubPlans": [
+        {
+            "Name": "BooleanExpressionPlan",
+            "Args": [
+                {
+                    "Name": "VariablePlan",
+                    "Value": "name"
+                },
+                {
+                    "Name": "ConstantPlan",
+                    "Value": "db1"
+                }
+            ],
+            "FuncName": "="
+        },
+        {
+            "Name": "BooleanExpressionPlan",
+            "Args": [
+                {
+                    "Name": "VariablePlan",
+                    "Value": "name"
+                },
+                {
+                    "Name": "ConstantPlan",
+                    "Value": "db2"
+                }
+            ],
+            "FuncName": "="
+        }
+    ]
+}`
+
 	actual := plan.String()
 	assert.Equal(t, expect, actual)
 }

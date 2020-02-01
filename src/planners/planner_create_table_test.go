@@ -21,12 +21,57 @@ func TestCreateTablePlan(t *testing.T) {
 	plan := NewCreateTablePlan(statement.(*sqlparser.DDL))
 	err = plan.Build()
 	assert.Nil(t, err)
-	t.Logf("%v", plan.Name())
 
 	err = plan.Walk(nil)
 	assert.Nil(t, err)
 
-	expect := "CreateTableNode(AST: create table t1 (\n\ta UInt32\n)\n)"
+	expect := `{
+    "Name": "CreateTablePlan",
+    "Ast": {
+        "Action": "create",
+        "FromTables": null,
+        "ToTables": null,
+        "Table": {
+            "Name": "t1",
+            "Qualifier": ""
+        },
+        "IfExists": false,
+        "TableSpec": {
+            "Columns": [
+                {
+                    "Name": "a",
+                    "Type": {
+                        "Type": "UInt32",
+                        "NotNull": false,
+                        "Autoincrement": false,
+                        "Default": null,
+                        "OnUpdate": null,
+                        "Comment": null,
+                        "Length": null,
+                        "Unsigned": false,
+                        "Zerofill": false,
+                        "Scale": null,
+                        "Charset": "",
+                        "Collate": "",
+                        "EnumValues": null,
+                        "KeyOpt": 0
+                    }
+                }
+            ],
+            "Indexes": null,
+            "Constraints": null,
+            "Options": {
+                "Engine": "",
+                "Formatter": ""
+            }
+        },
+        "OptLike": null,
+        "PartitionSpec": null,
+        "VindexSpec": null,
+        "VindexCols": null,
+        "AutoIncSpec": null
+    }
+}`
 	actual := plan.String()
 	assert.Equal(t, expect, actual)
 }

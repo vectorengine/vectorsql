@@ -35,7 +35,7 @@ func TestScanExecutor(t *testing.T) {
 				},
 				[]interface{}{"system", "SYSTEM", "data9000/data/system", "data9000/metadata/system"},
 			),
-			estring: "\n->ScanExecutor\t--> \n->ScanNode\t--> (table=[system, databases])",
+			estring: "ScanExecutor",
 		},
 	}
 
@@ -55,7 +55,6 @@ func TestScanExecutor(t *testing.T) {
 		assert.Nil(t, err)
 		pipeline.Run()
 
-		assert.Equal(t, test.name, executor1.Name())
 		assert.Equal(t, test.estring, executor1.String())
 
 		for x := range pipeline.Last().In().Recv() {
