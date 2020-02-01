@@ -49,7 +49,3 @@ func (executor *ScanExecutor) Execute() (processors.IProcessor, error) {
 	log.Debug("Executor->Return->Pipeline:%v", transform)
 	return transform, nil
 }
-
-func (executor *ScanExecutor) String() string {
-	return "ScanExecutor"
-}

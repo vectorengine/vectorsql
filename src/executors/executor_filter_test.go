@@ -21,11 +21,10 @@ import (
 
 func TestFilterExecutor(t *testing.T) {
 	tests := []struct {
-		name    string
-		plan    planners.IPlan
-		estring string
-		source  *datablocks.DataBlock
-		expect  *datablocks.DataBlock
+		name   string
+		plan   planners.IPlan
+		source *datablocks.DataBlock
+		expect *datablocks.DataBlock
 	}{
 		{
 			name: "simple",
@@ -51,7 +50,6 @@ func TestFilterExecutor(t *testing.T) {
 				},
 				[]interface{}{"y", 10},
 			),
-			estring: "FilterExecutor",
 		},
 	}
 
@@ -83,6 +81,5 @@ func TestFilterExecutor(t *testing.T) {
 			return nil
 		})
 		assert.Nil(t, err)
-		assert.Equal(t, test.estring, filter.String())
 	}
 }

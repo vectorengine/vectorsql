@@ -32,7 +32,3 @@ func (executor *OrderByExecutor) Execute() (processors.IProcessor, error) {
 	log.Debug("Executor->Return->Pipeline:%v", transform)
 	return transform, nil
 }
-
-func (executor *OrderByExecutor) String() string {
-	return "OrderByExecutor"
-}

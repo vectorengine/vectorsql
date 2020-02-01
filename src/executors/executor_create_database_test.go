@@ -15,15 +15,13 @@ import (
 
 func TestCreateDatabaseExecutor(t *testing.T) {
 	tests := []struct {
-		name    string
-		query   string
-		estring string
-		err     string
+		name  string
+		query string
+		err   string
 	}{
 		{
-			name:    "create-db",
-			query:   "create database db1",
-			estring: "CreateDatabaseExecutor",
+			name:  "create-db",
+			query: "create database db1",
 		},
 		{
 			name:  "create-exists",
@@ -31,9 +29,8 @@ func TestCreateDatabaseExecutor(t *testing.T) {
 			err:   "database:db1 exists",
 		},
 		{
-			name:    "drop-db",
-			query:   "drop database db1",
-			estring: "DropDatabaseExecutor",
+			name:  "drop-db",
+			query: "drop database db1",
 		},
 	}
 
@@ -54,7 +51,6 @@ func TestCreateDatabaseExecutor(t *testing.T) {
 		} else {
 			assert.Nil(t, err)
 			assert.Nil(t, transform)
-			assert.Equal(t, test.estring, executor.String())
 		}
 	}
 }

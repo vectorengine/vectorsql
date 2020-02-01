@@ -5,9 +5,6 @@
 package executors
 
 import (
-	"fmt"
-	"strings"
-
 	"processors"
 )
 
@@ -38,15 +35,4 @@ func (tree *ExecutorTree) BuildPipeline() (*processors.Pipeline, error) {
 		pipeline.Add(transform)
 	}
 	return pipeline, nil
-}
-
-func (tree *ExecutorTree) String() string {
-	res := ""
-	for _, child := range tree.subExecutors {
-		res += fmt.Sprintf("%+v", child)
-		//res += child.String()
-		res += ", "
-	}
-	res = strings.TrimRight(res, ", ")
-	return res
 }

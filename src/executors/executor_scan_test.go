@@ -18,10 +18,9 @@ import (
 
 func TestScanExecutor(t *testing.T) {
 	tests := []struct {
-		name    string
-		plan    *planners.ScanPlan
-		expect  *datablocks.DataBlock
-		estring string
+		name   string
+		plan   *planners.ScanPlan
+		expect *datablocks.DataBlock
 	}{
 		{
 			name: "ScanExecutor",
@@ -35,7 +34,6 @@ func TestScanExecutor(t *testing.T) {
 				},
 				[]interface{}{"system", "SYSTEM", "data9000/data/system", "data9000/metadata/system"},
 			),
-			estring: "ScanExecutor",
 		},
 	}
 
@@ -54,8 +52,6 @@ func TestScanExecutor(t *testing.T) {
 		pipeline, err := tree.BuildPipeline()
 		assert.Nil(t, err)
 		pipeline.Run()
-
-		assert.Equal(t, test.estring, executor1.String())
 
 		for x := range pipeline.Last().In().Recv() {
 			expect := test.expect

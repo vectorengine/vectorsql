@@ -101,7 +101,3 @@ func (executor *TableValuedFunctionExecutor) Execute() (processors.IProcessor, e
 	log.Debug("Executor->Return->Pipeline:%s", transform.Name())
 	return transform, nil
 }
-
-func (executor *TableValuedFunctionExecutor) String() string {
-	return "TableValuedFunctionExecutor"
-}

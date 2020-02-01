@@ -67,19 +67,6 @@ func parseExpression(expr sqlparser.Expr) (IPlan, error) {
 		return NewFunctionExpressionPlan(expr.Operator, left, right), nil
 	case *sqlparser.ParenExpr:
 		return parseExpression(expr.Expr)
-	case sqlparser.ValTuple:
-		if len(expr) == 1 {
-			return parseExpression(expr)
-		}
-		exprs := make([]IPlan, 0, 4)
-		for _, exp := range expr {
-			parsed, err := parseExpression(exp)
-			if err != nil {
-				return nil, err
-			}
-			exprs = append(exprs, parsed)
-		}
-		return NewMapPlan(exprs...), nil
 	}
 	return nil, errors.Errorf("Unsupported expression %+v %+v", expr, reflect.TypeOf(expr))
 }
@@ -150,6 +137,19 @@ func parseProject(sel sqlparser.SelectExprs) (*MapPlan, error) {
 			}
 			tree.Add(child)
 		}
+	}
+	return tree, nil
+}
+
+func parseGroupBy(groupby sqlparser.GroupBy) (*MapPlan, error) {
+	tree := NewMapPlan()
+
+	for i := range groupby {
+		sub, err := parseExpression(groupby[i])
+		if err != nil {
+			return nil, err
+		}
+		tree.Add(sub)
 	}
 	return tree, nil
 }

@@ -32,7 +32,3 @@ func (executor *FilterExecutor) Execute() (processors.IProcessor, error) {
 	log.Debug("Executor->Return->Pipeline:%v", transform)
 	return transform, nil
 }
-
-func (executor *FilterExecutor) String() string {
-	return "FilterExecutor"
-}

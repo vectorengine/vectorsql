@@ -15,20 +15,17 @@ import (
 
 func TestCreateTableExecutor(t *testing.T) {
 	tests := []struct {
-		name    string
-		query   string
-		estring string
-		err     string
+		name  string
+		query string
+		err   string
 	}{
 		{
-			name:    "create-db",
-			query:   "create database db1",
-			estring: "CreateDatabaseExecutor",
+			name:  "create-db",
+			query: "create database db1",
 		},
 		{
-			name:    "create-table",
-			query:   "create table db1.t1(a UInt32) Engine=Memory",
-			estring: "CreateTableExecutor",
+			name:  "create-table",
+			query: "create table db1.t1(a UInt32) Engine=Memory",
 		},
 		{
 			name:  "create-table-exists",
@@ -36,9 +33,8 @@ func TestCreateTableExecutor(t *testing.T) {
 			err:   "db1.t1 exists",
 		},
 		{
-			name:    "drop",
-			query:   "drop database db1",
-			estring: "DropDatabaseExecutor",
+			name:  "drop",
+			query: "drop database db1",
 		},
 	}
 
@@ -59,7 +55,6 @@ func TestCreateTableExecutor(t *testing.T) {
 		} else {
 			assert.Nil(t, err)
 			assert.Nil(t, transform)
-			assert.Equal(t, test.estring, executor.String())
 		}
 	}
 }

@@ -284,6 +284,66 @@ func TestSelectPlan(t *testing.T) {
     }
 }`,
 		},
+		{
+			name:  "select-aggregate",
+			query: "SELECT max(a), sum(b) FROM t1 group by c",
+			expect: `{
+    "Name": "SelectPlan",
+    "SubPlan": {
+        "Name": "MapPlan",
+        "SubPlans": [
+            {
+                "Name": "ScanPlan",
+                "Table": "t1",
+                "Schema": ""
+            },
+            {
+                "Name": "ProjectPlan",
+                "SubPlan": {
+                    "Name": "MapPlan",
+                    "SubPlans": [
+                        {
+                            "Name": "FunctionExpressionPlan",
+                            "FuncName": "MAX",
+                            "Args": [
+                                {
+                                    "Name": "VariablePlan",
+                                    "Value": "a"
+                                }
+                            ]
+                        },
+                        {
+                            "Name": "FunctionExpressionPlan",
+                            "FuncName": "SUM",
+                            "Args": [
+                                {
+                                    "Name": "VariablePlan",
+                                    "Value": "b"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            },
+            {
+                "Name": "GroupByPlan",
+                "SubPlan": {
+                    "Name": "MapPlan",
+                    "SubPlans": [
+                        {
+                            "Name": "VariablePlan",
+                            "Value": "c"
+                        }
+                    ]
+                }
+            },
+            {
+                "Name": "SinkPlan"
+            }
+        ]
+    }
+}`,
+		},
 	}
 
 	for _, test := range tests {

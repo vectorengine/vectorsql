@@ -15,7 +15,7 @@ import (
 type executorCreator func(ctx *ExecutorContext, plan planners.IPlan) IExecutor
 
 var table = map[reflect.Type]executorCreator{
-	(reflect.TypeOf(&planners.UsePlan{})):          NewUseExecutor,
+	reflect.TypeOf(&planners.UsePlan{}):            NewUseExecutor,
 	reflect.TypeOf(&planners.SelectPlan{}):         NewSelectExecutor,
 	reflect.TypeOf(&planners.CreateDatabasePlan{}): NewCreateDatabaseExecutor,
 	reflect.TypeOf(&planners.DropDatabasePlan{}):   NewDropDatabaseExecutor,

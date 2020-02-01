@@ -64,7 +64,3 @@ func (executor *SelectExecutor) Execute() (processors.IProcessor, error) {
 	log.Debug("Executor->Return->Pipeline:%s", pipeline)
 	return pipeline.Last(), nil
 }
-
-func (executor *SelectExecutor) String() string {
-	return "SelectExecutor"
-}

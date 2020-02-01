@@ -65,7 +65,9 @@ func TestMapPlan(t *testing.T) {
         }
     ]
 }`
-
 	actual := plan.String()
 	assert.Equal(t, expect, actual)
+
+	subplans := plan.AsPlans()
+	assert.NotNil(t, subplans)
 }

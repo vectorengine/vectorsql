@@ -21,11 +21,10 @@ import (
 
 func TestOrderByExecutor(t *testing.T) {
 	tests := []struct {
-		name    string
-		plan    planners.IPlan
-		estring string
-		source  *datablocks.DataBlock
-		expect  *datablocks.DataBlock
+		name   string
+		plan   planners.IPlan
+		source *datablocks.DataBlock
+		expect *datablocks.DataBlock
 	}{
 		{
 			name: "simple",
@@ -59,7 +58,6 @@ func TestOrderByExecutor(t *testing.T) {
 				[]interface{}{"y", 12},
 				[]interface{}{"z", 13},
 			),
-			estring: "OrderByExecutor",
 		},
 	}
 
@@ -91,6 +89,5 @@ func TestOrderByExecutor(t *testing.T) {
 			return nil
 		})
 		assert.Nil(t, err)
-		assert.Equal(t, test.estring, orderby.String())
 	}
 }

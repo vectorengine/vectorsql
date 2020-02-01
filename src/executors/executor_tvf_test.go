@@ -18,10 +18,9 @@ import (
 
 func TestTVFExecutor(t *testing.T) {
 	tests := []struct {
-		name    string
-		plan    *planners.TableValuedFunctionPlan
-		expect  *datablocks.DataBlock
-		estring string
+		name   string
+		plan   *planners.TableValuedFunctionPlan
+		expect *datablocks.DataBlock
 	}{
 		{
 			name: "TableValuedFunctionExecutor-range",
@@ -40,7 +39,6 @@ func TestTVFExecutor(t *testing.T) {
 				[]interface{}{3},
 				[]interface{}{4},
 			),
-			estring: "TableValuedFunctionExecutor",
 		},
 
 		{
@@ -79,7 +77,6 @@ func TestTVFExecutor(t *testing.T) {
 				[]interface{}{1, "string-1"},
 				[]interface{}{2, "string-2"},
 			),
-			estring: "TableValuedFunctionExecutor",
 		},
 	}
 
@@ -98,8 +95,6 @@ func TestTVFExecutor(t *testing.T) {
 		pipeline, err := tree.BuildPipeline()
 		assert.Nil(t, err)
 		pipeline.Run()
-
-		assert.Equal(t, test.estring, executor1.String())
 
 		for x := range pipeline.Last().In().Recv() {
 			expect := test.expect
