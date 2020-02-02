@@ -31,7 +31,7 @@ func DefaultServerConfig() Server {
 		Path:             "./data9000",
 		DisplayName:      "VectorSQL",
 		DefaultDatabase:  "default",
-		DefaultBlockSize: 1000000,
+		DefaultBlockSize: 65536,
 	}
 }
 

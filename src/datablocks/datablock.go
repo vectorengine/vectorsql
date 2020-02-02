@@ -101,3 +101,63 @@ func (block *DataBlock) Write(batcher *BatchWriter) error {
 	}
 	return nil
 }
+
+func (block *DataBlock) Split(chunksize int) []*DataBlock {
+	cols := block.Columns()
+	nums := block.NumRows()
+	chunks := (nums / chunksize) + 1
+	blocks := make([]*DataBlock, chunks)
+	for i := range blocks {
+		blocks[i] = NewDataBlock(cols)
+	}
+
+	for i := range cols {
+		it := newDataBlockIterator(block.seqs, block.values[i])
+		for j := 0; j < len(blocks); j++ {
+			begin := j * chunksize
+			end := (j + 1) * chunksize
+			if end > nums {
+				end = nums
+			}
+			blocks[j].values[i].values = make([]*datavalues.Value, (end - begin))
+			for k := begin; k < end; k++ {
+				it.Next()
+				blocks[j].values[i].values[k-begin] = it.Value()
+			}
+		}
+	}
+	return blocks
+}
+
+func (block *DataBlock) SplitAsync(chunksize int) <-chan *DataBlock {
+	cols := block.Columns()
+	nums := block.NumRows()
+	chunks := (nums / chunksize) + 1
+	blocks := make([]*DataBlock, chunks)
+	iters := block.Iterators()
+	for i := range blocks {
+		blocks[i] = NewDataBlock(cols)
+	}
+
+	ch := make(chan *DataBlock, chunks)
+	go func() {
+		defer close(ch)
+		for j := 0; j < len(blocks); j++ {
+			begin := j * chunksize
+			end := (j + 1) * chunksize
+			if end > nums {
+				end = nums
+			}
+			for i := range cols {
+				blocks[j].values[i].values = make([]*datavalues.Value, (end - begin))
+				it := iters[i]
+				for k := begin; k < end; k++ {
+					it.Next()
+					blocks[j].values[i].values[k-begin] = it.Value()
+				}
+			}
+			ch <- blocks[j]
+		}
+	}()
+	return ch
+}
