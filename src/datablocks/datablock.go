@@ -65,6 +65,24 @@ func (block *DataBlock) Columns() []columns.Column {
 	return cols
 }
 
+func (block *DataBlock) Iterator(name string) (*DataBlockIterator, error) {
+	cv, ok := block.valuesmap[name]
+	if !ok {
+		return nil, errors.Errorf("Can't find column:%v", name)
+	}
+	return newDataBlockIterator(block.seqs, cv), nil
+}
+
+func (block *DataBlock) Iterators() []*DataBlockIterator {
+	var iterators []*DataBlockIterator
+
+	for _, cv := range block.values {
+		iter := newDataBlockIterator(block.seqs, cv)
+		iterators = append(iterators, iter)
+	}
+	return iterators
+}
+
 func (block *DataBlock) Write(batcher *BatchWriter) error {
 	if block.immutable {
 		return errors.New("Block is immutable")
@@ -82,22 +100,4 @@ func (block *DataBlock) Write(batcher *BatchWriter) error {
 		cv.values = append(cv.values, col.values...)
 	}
 	return nil
-}
-
-func (block *DataBlock) Iterator(name string) (*DataBlockIterator, error) {
-	cv, ok := block.valuesmap[name]
-	if !ok {
-		return nil, errors.Errorf("Can't find column:%v", name)
-	}
-	return newDataBlockIterator(block.seqs, cv), nil
-}
-
-func (block *DataBlock) Iterators() []*DataBlockIterator {
-	var iterators []*DataBlockIterator
-
-	for _, cv := range block.values {
-		iter := newDataBlockIterator(block.seqs, cv)
-		iterators = append(iterators, iter)
-	}
-	return iterators
 }

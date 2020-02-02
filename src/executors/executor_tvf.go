@@ -5,6 +5,8 @@
 package executors
 
 import (
+	"strings"
+
 	"columns"
 	"datablocks"
 	"datastreams"
@@ -34,6 +36,7 @@ func (executor *TableValuedFunctionExecutor) Execute() (processors.IProcessor, e
 
 	plan := executor.plan
 	log := executor.ctx.log
+	conf := executor.ctx.conf
 
 	log.Debug("Executor->Enter->LogicalPlan:%s", executor.plan)
 	err := plan.Walk(func(plan planners.IPlan) (bool, error) {
@@ -61,14 +64,13 @@ func (executor *TableValuedFunctionExecutor) Execute() (processors.IProcessor, e
 		return nil, err
 	}
 
-	var block *datablocks.DataBlock
-	switch plan.FuncName {
-	case "range":
-		block = datablocks.NewDataBlock([]columns.Column{
+	var cols []columns.Column
+	switch strings.ToUpper(plan.FuncName) {
+	case "RANGE":
+		cols = []columns.Column{
 			{Name: "i", DataType: datatypes.NewInt32DataType()},
-		})
-	case "rangetable", "randtable":
-		var cols []columns.Column
+		}
+	case "RANGETABLE", "RANDTABLE":
 		for i := 1; i < len(variables); i++ {
 			datatype, err := datatypes.DataTypeFactory(constants[i].AsString())
 			if err != nil {
@@ -79,23 +81,36 @@ func (executor *TableValuedFunctionExecutor) Execute() (processors.IProcessor, e
 				DataType: datatype,
 			})
 		}
-		block = datablocks.NewDataBlock(cols)
 	}
 
 	// Block.
-	batcher := datablocks.NewBatchWriter(block.Columns())
+	var blocks []*datablocks.DataBlock
 	slice := result.AsSlice()
-	for _, data := range slice {
-		if err := batcher.WriteRow(data.AsSlice()...); err != nil {
+	slicesize := len(slice)
+	blocksize := conf.Server.DefaultBlockSize
+	chunks := (slicesize / blocksize)
+	for i := 0; i < chunks+1; i++ {
+		block := datablocks.NewDataBlock(cols)
+		batcher := datablocks.NewBatchWriter(cols)
+
+		begin := i * blocksize
+		end := (i + 1) * blocksize
+		if end > slicesize {
+			end = slicesize
+		}
+		for j := begin; j < end; j++ {
+			if err := batcher.WriteRow(slice[j].AsSlice()...); err != nil {
+				return nil, err
+			}
+		}
+		if err := block.Write(batcher); err != nil {
 			return nil, err
 		}
-	}
-	if err := block.Write(batcher); err != nil {
-		return nil, err
+		blocks = append(blocks, block)
 	}
 
 	// Stream.
-	stream := datastreams.NewOneBlockInputStream(block)
+	stream := datastreams.NewOneBlockInputStream(blocks...)
 	transformCtx := transforms.NewTransformContext(executor.ctx.log, executor.ctx.conf)
 	transform := transforms.NewDataSourceTransform(transformCtx, stream)
 	log.Debug("Executor->Return->Pipeline:%s", transform.Name())

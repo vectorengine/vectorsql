@@ -5,6 +5,8 @@
 package transforms
 
 import (
+	"sync"
+
 	"datablocks"
 	"planners"
 	"processors"
@@ -25,19 +27,41 @@ func NewOrderByTransform(ctx *TransformContext, plan *planners.OrderByPlan) proc
 }
 
 func (t *OrderByTransform) Execute() {
-	out := t.Out()
+	var wg sync.WaitGroup
+	var errors []error
+	var blocks []*datablocks.DataBlock
 
+	out := t.Out()
 	defer out.Close()
+
 	onNext := func(x interface{}) {
 		switch y := x.(type) {
 		case *datablocks.DataBlock:
-			if err := t.orderby(y); err != nil {
-				x = err
+			blocks = append(blocks, y)
+		case error:
+			errors = append(errors, y)
+		}
+	}
+	onDone := func() {
+		defer wg.Done()
+		if len(errors) > 0 {
+			out.Send(errors[0])
+		} else {
+			block, err := datablocks.Append(blocks...)
+			if err != nil {
+				out.Send(err)
+			} else {
+				if err := t.orderby(block); err != nil {
+					out.Send(err)
+				} else {
+					out.Send(block)
+				}
 			}
 		}
-		out.Send(x)
 	}
-	t.Subscribe(onNext)
+	wg.Add(1)
+	t.Subscribe(onNext, onDone)
+	wg.Wait()
 }
 
 func (t *OrderByTransform) orderby(x *datablocks.DataBlock) error {

@@ -19,17 +19,19 @@ type Server struct {
 	ListenHost              string
 	DisplayName             string
 	DefaultDatabase         string
+	DefaultBlockSize        int
 	CalculateTextStackTrace bool
 }
 
 func DefaultServerConfig() Server {
 	return Server{
-		TCPPort:         9000,
-		HTTPPort:        8123,
-		DebugPort:       8080,
-		Path:            "./data9000",
-		DefaultDatabase: "default",
-		DisplayName:     "VectorSQL",
+		TCPPort:          9000,
+		HTTPPort:         8123,
+		DebugPort:        8080,
+		Path:             "./data9000",
+		DisplayName:      "VectorSQL",
+		DefaultDatabase:  "default",
+		DefaultBlockSize: 1000000,
 	}
 }
 

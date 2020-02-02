@@ -12,13 +12,13 @@ import (
 
 type OneBlockInputStream struct {
 	mu      sync.RWMutex
-	block   *datablocks.DataBlock
+	blocks  []*datablocks.DataBlock
 	current int
 }
 
-func NewOneBlockInputStream(block *datablocks.DataBlock) datablocks.IDataBlockInputStream {
+func NewOneBlockInputStream(blocks ...*datablocks.DataBlock) datablocks.IDataBlockInputStream {
 	return &OneBlockInputStream{
-		block: block,
+		blocks: blocks,
 	}
 }
 
@@ -30,9 +30,10 @@ func (stream *OneBlockInputStream) Read() (*datablocks.DataBlock, error) {
 	stream.mu.RLock()
 	defer stream.mu.RUnlock()
 
-	if stream.current > 0 {
+	if stream.current >= len(stream.blocks) {
 		return nil, nil
 	}
+	block := stream.blocks[stream.current]
 	stream.current++
-	return stream.block, nil
+	return block, nil
 }
