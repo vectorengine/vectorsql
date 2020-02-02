@@ -424,6 +424,7 @@ var keywordsExtend = map[string]int{
 	"UInt32":   UINT32,
 	"UInt64":   UINT64,
 	"UUID":     UUID,
+	"FORMAT":   FORMAT,
 }
 
 // keywordStrings contains the reverse mapping of token to keyword strings

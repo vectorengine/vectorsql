@@ -90,6 +90,7 @@ func skipToEnd(yylex interface{}) {
   orderBy       OrderBy
   order         *Order
   limit         *Limit
+  formats        *Formats
   updateExprs   UpdateExprs
   setExprs      SetExprs
   updateExpr    *UpdateExpr
@@ -124,7 +125,7 @@ func skipToEnd(yylex interface{}) {
 
 %token LEX_ERROR
 %left <bytes> UNION
-%token <bytes> SELECT STREAM INSERT UPDATE DELETE FROM WHERE GROUP HAVING ORDER BY LIMIT OFFSET FOR
+%token <bytes> SELECT STREAM INSERT UPDATE DELETE FROM WHERE GROUP HAVING ORDER BY LIMIT OFFSET FOR FORMAT
 %token <bytes> ALL DISTINCT AS EXISTS ASC DESC INTO DUPLICATE KEY DEFAULT SET LOCK UNLOCK KEYS
 %token <bytes> VALUES LAST_INSERT_ID
 %token <bytes> NEXT VALUE SHARE MODE
@@ -275,6 +276,7 @@ func skipToEnd(yylex interface{}) {
 %type <str> asc_desc_opt
 %type <limit> limit_opt
 %type <str> lock_opt
+%type <formats> formats_opt
 %type <columns> ins_column_list column_list
 %type <partitions> opt_partition_clause partition_list
 %type <updateExprs> on_dup_opt
@@ -376,12 +378,13 @@ command:
 }
 
 select_statement:
-  base_select order_by_opt limit_opt lock_opt
+  base_select order_by_opt limit_opt lock_opt formats_opt
   {
     sel := $1.(*Select)
     sel.OrderBy = $2
     sel.Limit = $3
     sel.Lock = $4
+    sel.Formats = $5
     $$ = sel
   }
 | union_lhs union_op union_rhs order_by_opt limit_opt lock_opt
@@ -428,7 +431,7 @@ union_rhs:
 
 
 insert_statement:
-  insert_or_replace comment_opt ignore_opt into_table_name opt_partition_clause insert_data on_dup_opt
+  insert_or_replace comment_opt ignore_opt into_table_name opt_partition_clause insert_data on_dup_opt formats_opt
   {
     // insert_data returns a *Insert pre-filled with Columns & Values
     ins := $6
@@ -438,6 +441,7 @@ insert_statement:
     ins.Table = $4
     ins.Partitions = $5
     ins.OnDup = OnDup($7)
+    ins.Formats = $8
     $$ = ins
   }
 | insert_or_replace comment_opt ignore_opt into_table_name opt_partition_clause SET update_list on_dup_opt
@@ -3068,6 +3072,15 @@ lock_opt:
     $$ = ShareModeStr
   }
 
+formats_opt:
+ {
+   $$ = nil
+ }
+ | FORMAT ID
+ {
+   $$ = &Formats{FormatName: string($2)}
+ }
+
 // insert_data expands all combinations into a single rule.
 // This avoids a shift/reduce conflict while encountering the
 // following two possible constructs:
@@ -3343,7 +3356,7 @@ reserved_table_id:
 */
 reserved_keyword:
   ADD
-| ARRAY 
+| ARRAY
 | AND
 | AS
 | ASC
@@ -3459,6 +3472,7 @@ reserved_keyword:
 | WHEN
 | WHERE
 | WINDOW
+| FORMAT
 
 /*
   These are non-reserved Vitess, because they don't cause conflicts in the grammar.

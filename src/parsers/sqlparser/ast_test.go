@@ -195,6 +195,25 @@ func TestSetLimit(t *testing.T) {
 	}
 }
 
+func TestSetFormats(t *testing.T) {
+	src, err := Parse("select foo, bar from baz FORMAT csv")
+	if err != nil {
+		t.Error(err)
+	}
+	formats := src.(*Select).Formats
+	dst, err := Parse("select * from t limit 5")
+	if err != nil {
+		t.Error(err)
+	}
+	dst.(*Select).SetFormats(formats)
+	buf := NewTrackedBuffer(nil)
+	dst.Format(buf)
+	want := "select * from t limit 5 format csv"
+	if buf.String() != want {
+		t.Errorf("limit: %q, want %s", buf.String(), want)
+	}
+}
+
 func TestDDL(t *testing.T) {
 	testcases := []struct {
 		query    string

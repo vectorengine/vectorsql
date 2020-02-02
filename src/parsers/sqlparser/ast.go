@@ -334,6 +334,7 @@ type Select struct {
 	Having      *Where
 	OrderBy     OrderBy
 	Limit       *Limit
+	Formats     *Formats
 	Lock        string
 	StatementBase
 }
@@ -378,13 +379,17 @@ func (node *Select) SetLimit(limit *Limit) {
 	node.Limit = limit
 }
 
+func (node *Select) SetFormats(formats *Formats) {
+	node.Formats = formats
+}
+
 // Format formats the node.
 func (node *Select) Format(buf *TrackedBuffer) {
-	buf.Myprintf("select %v%s%s%s%v from %v%v%v%v%v%v%s",
+	buf.Myprintf("select %v%s%s%s%v from %v%v%v%v%v%v%s%v",
 		node.Comments, node.Cache, node.Distinct, node.Hints, node.SelectExprs,
 		node.From, node.Where,
 		node.GroupBy, node.Having, node.OrderBy,
-		node.Limit, node.Lock)
+		node.Limit, node.Lock, node.Formats)
 }
 
 func (node *Select) walkSubtree(visit Visit) error {
@@ -566,6 +571,7 @@ type Insert struct {
 	Columns    Columns
 	Rows       InsertRows
 	OnDup      OnDup
+	Formats    *Formats
 	StatementBase
 }
 
@@ -577,10 +583,10 @@ const (
 
 // Format formats the node.
 func (node *Insert) Format(buf *TrackedBuffer) {
-	buf.Myprintf("%s %v%sinto %v%v%v %v%v",
+	buf.Myprintf("%s %v%sinto %v%v%v %v%v%v",
 		node.Action,
 		node.Comments, node.Ignore,
-		node.Table, node.Partitions, node.Columns, node.Rows, node.OnDup)
+		node.Table, node.Partitions, node.Columns, node.Rows, node.OnDup, node.Formats)
 }
 
 func (node *Insert) walkSubtree(visit Visit) error {
@@ -3762,6 +3768,23 @@ func (node *Limit) walkSubtree(visit Visit) error {
 		node.Offset,
 		node.Rowcount,
 	)
+}
+
+// Formats respresents a FORMAT clause
+type Formats struct {
+	FormatName string
+}
+
+func (node *Formats) Format(buf *TrackedBuffer) {
+	if node == nil || node.FormatName == "" {
+		return
+	}
+	buf.Myprintf(" format ")
+	buf.Myprintf("%s", node.FormatName)
+}
+
+func (node *Formats) walkSubtree(visit Visit) error {
+	return nil
 }
 
 // Values represents a VALUES clause.
