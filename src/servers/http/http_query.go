@@ -61,8 +61,10 @@ func (s *HTTPHandler) processOrdinaryQuery(rw io.Writer, session *sessions.Sessi
 
 func (s *HTTPHandler) sendData(writer io.Writer, block *datablocks.DataBlock) error {
 	output := formats.FactoryGetOutput("TSV")(block, writer)
+	output.FormatPrefix()
 	if err := output.Write(block); err != nil {
 		return err
 	}
+	output.FormatSuffix()
 	return nil
 }
