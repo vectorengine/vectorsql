@@ -6,9 +6,6 @@ package processors
 
 import (
 	"context"
-	"time"
-
-	"base/counter"
 )
 
 type (
@@ -21,7 +18,6 @@ type (
 		out         *OutPort
 		name        string
 		ctx         context.Context
-		counter     *counter.Counter
 		pauseChan   chan struct{}
 		resumeChan  chan struct{}
 		nextHandler NextFunc
@@ -35,7 +31,6 @@ func NewBaseProcessor(name string) BaseProcessor {
 		out:        NewOutPort(name),
 		ctx:        context.Background(),
 		name:       name,
-		counter:    counter.NewCounter(),
 		pauseChan:  make(chan struct{}),
 		resumeChan: make(chan struct{}),
 	}
@@ -51,10 +46,6 @@ func (p *BaseProcessor) In() *InPort {
 
 func (p *BaseProcessor) Out() *OutPort {
 	return p.out
-}
-
-func (p *BaseProcessor) Metric() counter.Metric {
-	return p.counter.Metric()
 }
 
 func (p *BaseProcessor) To(receivers ...IProcessor) {
@@ -86,19 +77,10 @@ func (p *BaseProcessor) SetContext(ctx context.Context) {
 	p.ctx = ctx
 }
 
-func (p *BaseProcessor) AddMessage(n int64) {
-	p.counter.AddMessage(n)
-}
-
-func (p *BaseProcessor) AddDuration(n time.Duration) {
-	p.counter.AddDuration(n)
-}
-
 func (p *BaseProcessor) Subscribe(eventHandlers ...EventHandler) {
 	in := p.In()
 	out := p.Out()
 	ctx := p.ctx
-	counter := p.counter
 
 	for _, handler := range eventHandlers {
 		switch handler := handler.(type) {
@@ -109,7 +91,6 @@ func (p *BaseProcessor) Subscribe(eventHandlers ...EventHandler) {
 		}
 	}
 
-	start := time.Now()
 	defer func() {
 		out.Close()
 		close(p.pauseChan)
@@ -135,11 +116,9 @@ func (p *BaseProcessor) Subscribe(eventHandlers ...EventHandler) {
 				}
 				return
 			}
-			counter.AddLatency(time.Since(start))
 			if p.nextHandler != nil {
 				p.nextHandler(x)
 			}
-			start = time.Now()
 		}
 	}
 }

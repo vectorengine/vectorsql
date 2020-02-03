@@ -30,11 +30,10 @@ func NewServer(log *xlog.Log, conf *config.Config) *Server {
 
 func (s *Server) Start() {
 	log := s.log
+	s.debugServer.Start()
 
 	s.tcpServer.Start()
 	log.Info("Listening for connections with native protocol (tcp):%v", s.tcpServer.Address())
-
-	s.debugServer.Start()
 }
 
 func (s *Server) Stop() {

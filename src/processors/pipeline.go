@@ -7,8 +7,6 @@ package processors
 import (
 	"context"
 	"sync"
-
-	"base/counter"
 )
 
 type Pipeline struct {
@@ -20,14 +18,6 @@ type Pipeline struct {
 
 func NewPipeline(ctx context.Context) *Pipeline {
 	return &Pipeline{ctx: ctx}
-}
-
-func (pipeline *Pipeline) Metrics() []counter.Metric {
-	var metrics []counter.Metric
-	for _, proc := range pipeline.processors {
-		metrics = append(metrics, proc.Metric())
-	}
-	return metrics
 }
 
 func (pipeline *Pipeline) Add(proc IProcessor) *Pipeline {

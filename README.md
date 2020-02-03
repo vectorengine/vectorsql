@@ -50,3 +50,7 @@ ORDER BY
 ↖ Progress: 0.00 rows, 0.00 B (0.00 rows/s., 0.00 B/s.)
 5 rows in set. Elapsed: 0.007 sec.
 ```
+
+## Metrics
+
+http://localhost:8080/debug/metrics

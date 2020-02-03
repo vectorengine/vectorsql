@@ -5,10 +5,14 @@
 package datablocks
 
 import (
+	"expvar"
+	"time"
+
 	"columns"
 	"datavalues"
 
 	"base/errors"
+	"base/metric"
 )
 
 type DataBlock struct {
@@ -103,6 +107,8 @@ func (block *DataBlock) Write(batcher *BatchWriter) error {
 }
 
 func (block *DataBlock) Split(chunksize int) []*DataBlock {
+	defer expvar.Get(metric_datablock_split_sec).(metric.Metric).Record(time.Now())
+
 	cols := block.Columns()
 	nums := block.NumRows()
 	chunks := (nums / chunksize) + 1
@@ -127,37 +133,4 @@ func (block *DataBlock) Split(chunksize int) []*DataBlock {
 		}
 	}
 	return blocks
-}
-
-func (block *DataBlock) SplitAsync(chunksize int) <-chan *DataBlock {
-	cols := block.Columns()
-	nums := block.NumRows()
-	chunks := (nums / chunksize) + 1
-	blocks := make([]*DataBlock, chunks)
-	iters := block.Iterators()
-	for i := range blocks {
-		blocks[i] = NewDataBlock(cols)
-	}
-
-	ch := make(chan *DataBlock, chunks)
-	go func() {
-		defer close(ch)
-		for j := 0; j < len(blocks); j++ {
-			begin := j * chunksize
-			end := (j + 1) * chunksize
-			if end > nums {
-				end = nums
-			}
-			for i := range cols {
-				blocks[j].values[i].values = make([]*datavalues.Value, (end - begin))
-				it := iters[i]
-				for k := begin; k < end; k++ {
-					it.Next()
-					blocks[j].values[i].values[k-begin] = it.Value()
-				}
-			}
-			ch <- blocks[j]
-		}
-	}()
-	return ch
 }

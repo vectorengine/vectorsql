@@ -4,9 +4,7 @@
 
 package processors
 
-import (
-	"time"
-)
+import ()
 
 type MockSleepTransform struct {
 	ms int
@@ -22,10 +20,6 @@ func NewMockSleepTransform(name string, ms int) IProcessor {
 
 func (p *MockSleepTransform) Execute() {
 	onNext := func(x interface{}) {
-		start := time.Now()
-		time.Sleep(time.Millisecond * time.Duration(p.ms))
-		p.AddMessage(1)
-		p.AddDuration(time.Since(start))
 		p.Out().Send(x)
 	}
 	p.Subscribe(onNext)
@@ -43,7 +37,6 @@ func NewMockAddTransform(name string) IProcessor {
 
 func (p *MockAddTransform) Execute() {
 	onNext := func(x interface{}) {
-		p.AddMessage(1)
 		switch x := x.(type) {
 		case int:
 			x = x + 1
@@ -67,7 +60,6 @@ func NewMockMultiTransform(name string) IProcessor {
 
 func (p *MockMultiTransform) Execute() {
 	onNext := func(x interface{}) {
-		p.AddMessage(1)
 		switch x := x.(type) {
 		case int:
 			x = x * 4

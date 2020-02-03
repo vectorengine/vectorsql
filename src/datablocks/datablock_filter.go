@@ -5,10 +5,17 @@
 package datablocks
 
 import (
+	"expvar"
+	"time"
+
 	"datavalues"
+
+	"base/metric"
 )
 
 func (block *DataBlock) Filter(checks []*datavalues.Value) error {
+	defer expvar.Get(metric_datablock_filter_sec).(metric.Metric).Record(time.Now())
+
 	// In place filter.
 	for _, cv := range block.values {
 		n := 0

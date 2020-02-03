@@ -5,13 +5,17 @@
 package debug
 
 import (
+	"expvar"
 	"fmt"
+	"runtime"
+	"time"
+
+	"net/http"
+	_ "net/http/pprof"
 
 	"config"
 
-	"net/http"
-	"net/http/pprof"
-
+	"base/metric"
 	"base/xlog"
 )
 
@@ -31,15 +35,27 @@ func (s *DebugServer) Start() {
 	log := s.log
 	port := fmt.Sprintf(":%v", s.conf.Server.DebugPort)
 
-	r := http.NewServeMux()
-	r.HandleFunc("/debug/pprof/", pprof.Index)
-	r.HandleFunc("/debug/pprof/cmdline", pprof.Cmdline)
-	r.HandleFunc("/debug/pprof/profile", pprof.Profile)
-	r.HandleFunc("/debug/pprof/symbol", pprof.Symbol)
-	r.HandleFunc("/debug/pprof/trace", pprof.Trace)
+	// Some Go internal metrics.
+	expvar.Publish("#go:numgoroutine", metric.NewGauge("2m1s", "15m30s", "1h1m"))
+	expvar.Publish("#go:numcgocall", metric.NewGauge("2m1s", "15m30s", "1h1m"))
+	expvar.Publish("#go:alloc", metric.NewGauge("2m1s", "15m30s", "1h1m"))
+	expvar.Publish("#go:alloctotal", metric.NewGauge("2m1s", "15m30s", "1h1m"))
+	expvar.Publish("#go:heapobjects", metric.NewGauge("2m1s", "15m30s", "1h1m"))
+	go func() {
+		for range time.Tick(100 * time.Millisecond) {
+			m := &runtime.MemStats{}
+			runtime.ReadMemStats(m)
+			expvar.Get("#go:numgoroutine").(metric.Metric).Add(float64(runtime.NumGoroutine()))
+			expvar.Get("#go:numcgocall").(metric.Metric).Add(float64(runtime.NumCgoCall()))
+			expvar.Get("#go:alloc").(metric.Metric).Add(float64(m.Alloc) / 1000000)
+			expvar.Get("#go:alloctotal").(metric.Metric).Add(float64(m.TotalAlloc) / 1000000)
+			expvar.Get("#go:heapobjects").(metric.Metric).Add(float64(m.HeapObjects))
+		}
+	}()
+	http.Handle("/debug/metrics", metric.Handler(metric.Exposed))
 
 	go func() {
-		if err := http.ListenAndServe(port, r); err != nil {
+		if err := http.ListenAndServe(port, nil); err != nil {
 			panic(err)
 		}
 	}()
