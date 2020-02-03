@@ -49,7 +49,7 @@ func (s *HTTPHandler) processOrdinaryQuery(rw io.Writer, session *sessions.Sessi
 				return x
 			case *datablocks.DataBlock:
 				log.Debug("HTTPHandler->OrdinaryQuery->DataBlock: rows:%+v", x.NumRows())
-				if err := sendData(rw, x); err != nil {
+				if err := s.sendData(rw, x); err != nil {
 					return err
 				}
 			}
@@ -59,7 +59,7 @@ func (s *HTTPHandler) processOrdinaryQuery(rw io.Writer, session *sessions.Sessi
 	return nil
 }
 
-func sendData(writer io.Writer, block *datablocks.DataBlock) error {
+func (s *HTTPHandler) sendData(writer io.Writer, block *datablocks.DataBlock) error {
 	output := formats.FactoryGetOutput("TSV")(writer)
 	if err := output.Write(block); err != nil {
 		return err
