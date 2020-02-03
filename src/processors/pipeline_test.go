@@ -104,15 +104,6 @@ func TestPipelineSequentialDAG(t *testing.T) {
 	}()
 
 	err := pipeline1.Wait(func(x interface{}) error {
-		/*
-			if (x.(int) % 100) == 0 {
-				fmt.Print("Pipeline Metrcis:\n")
-				for _, metric := range pipeline2.Metrics() {
-					fmt.Printf("%+v\n", metric)
-				}
-				fmt.Print("\n")
-			}
-		*/
 		return nil
 	})
 	assert.Nil(t, err)
@@ -145,7 +136,6 @@ func TestPipelinePauseAndResume(t *testing.T) {
 		for i := 0; i < numbers; i++ {
 			out.Send(i)
 		}
-		pipeline1.Metrics()
 	}()
 
 	err := pipeline1.Wait(func(x interface{}) error {

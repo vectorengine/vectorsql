@@ -32,6 +32,7 @@ test:
 
 testbase:
 	go test -v -race base/xlog
+	go test -v -race base/metric
 
 testconfig:
 	go test -v -race config

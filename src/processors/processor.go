@@ -6,8 +6,6 @@ package processors
 
 import (
 	"context"
-
-	"base/counter"
 )
 
 type IProcessor interface {
@@ -19,6 +17,5 @@ type IProcessor interface {
 	Out() *OutPort
 	To(...IProcessor)
 	From(...IProcessor)
-	Metric() counter.Metric
 	SetContext(context.Context)
 }

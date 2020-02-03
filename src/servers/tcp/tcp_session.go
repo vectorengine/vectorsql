@@ -5,7 +5,9 @@
 package tcp
 
 import (
+	"expvar"
 	"net"
+	"time"
 
 	"datablocks"
 	"datastreams"
@@ -13,6 +15,7 @@ import (
 
 	"base/binary"
 	"base/errors"
+	"base/metric"
 	"servers/protocol"
 )
 
@@ -43,6 +46,8 @@ func (session *TCPSession) sendException(x error, withStack bool) error {
 }
 
 func (session *TCPSession) sendData(block *datablocks.DataBlock) error {
+	defer expvar.Get(metric_tcp_datablock_send_sec).(metric.Metric).Record(time.Now())
+
 	writer := session.writer
 	output := datastreams.NewNativeBlockOutputStream(writer)
 

@@ -5,13 +5,16 @@
 package datablocks
 
 import (
+	"expvar"
 	"sort"
 	"strings"
+	"time"
 
 	"datavalues"
 	"functions"
 
 	"base/errors"
+	"base/metric"
 )
 
 type Sorter struct {
@@ -27,6 +30,8 @@ func NewSorter(col string, direction string) Sorter {
 }
 
 func (block *DataBlock) Sort(sorters ...Sorter) error {
+	defer expvar.Get(metric_datablock_sort_sec).(metric.Metric).Record(time.Now())
+
 	if block.NumColumns() == 1 {
 		cv := block.values[0]
 		matrix := cv.values

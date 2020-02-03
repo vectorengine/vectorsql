@@ -5,10 +5,14 @@
 package functions
 
 import (
+	"expvar"
 	"fmt"
 	"math/rand"
+	"time"
 
 	"datavalues"
+
+	"base/metric"
 )
 
 var FuncTableValuedFunctionRange = &Function{
@@ -17,6 +21,8 @@ var FuncTableValuedFunctionRange = &Function{
 		{"left", "right"},
 	},
 	Logic: func(args ...*datavalues.Value) (*datavalues.Value, error) {
+		defer expvar.Get(metric_function_tvf_range_sec).(metric.Metric).Record(time.Now())
+
 		v1 := args[0].AsInt()
 		v2 := args[1].AsInt()
 		values := make([]*datavalues.Value, v2-v1)
@@ -42,6 +48,8 @@ var FuncTableValuedFunctionRangeTable = &Function{
 		{""},
 	},
 	Logic: func(args ...*datavalues.Value) (*datavalues.Value, error) {
+		defer expvar.Get(metric_function_tvf_rangetable_sec).(metric.Metric).Record(time.Now())
+
 		count := args[0].AsInt()
 		values := make([]*datavalues.Value, count)
 		for i := 0; i < count; i++ {
@@ -72,6 +80,8 @@ var FuncTableValuedFunctionRandTable = &Function{
 		{""},
 	},
 	Logic: func(args ...*datavalues.Value) (*datavalues.Value, error) {
+		defer expvar.Get(metric_function_tvf_randtable_sec).(metric.Metric).Record(time.Now())
+
 		count := args[0].AsInt()
 		values := make([]*datavalues.Value, count)
 		for i := 0; i < count; i++ {
@@ -102,6 +112,8 @@ var FuncTableValuedFunctionZip = &Function{
 		{""},
 	},
 	Logic: func(args ...*datavalues.Value) (*datavalues.Value, error) {
+		defer expvar.Get(metric_function_tvf_zip_sec).(metric.Metric).Record(time.Now())
+
 		argsize := len(args)
 		tuplesize := len(args[0].AsSlice())
 		values := make([]*datavalues.Value, tuplesize)
