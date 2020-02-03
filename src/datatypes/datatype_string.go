@@ -5,6 +5,7 @@
 package datatypes
 
 import (
+	"io"
 	"reflect"
 
 	"datavalues"
@@ -35,6 +36,13 @@ func (datatype *StringDataType) Name() string {
 
 func (datatype *StringDataType) Serialize(writer *binary.Writer, v *datavalues.Value) error {
 	if err := writer.String(v.ToRawValue().(string)); err != nil {
+		return errors.Wrap(err)
+	}
+	return nil
+}
+
+func (datatype *StringDataType) SerializeText(writer io.Writer, v *datavalues.Value) error {
+	if _, err := writer.Write([]byte(v.ToRawValue().(string))); err != nil {
 		return errors.Wrap(err)
 	}
 	return nil
