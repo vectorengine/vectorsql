@@ -5,18 +5,17 @@
 package tcp
 
 import (
-	"expvar"
 	"net"
 	"time"
-
-	"datablocks"
-	"datastreams"
-	"sessions"
 
 	"base/binary"
 	"base/errors"
 	"base/metric"
+	"datablocks"
+	"expvar"
+	"formats"
 	"servers/protocol"
+	"sessions"
 )
 
 type TCPSession struct {
@@ -49,7 +48,7 @@ func (session *TCPSession) sendData(block *datablocks.DataBlock) error {
 	defer expvar.Get(metric_tcp_datablock_send_sec).(metric.Metric).Record(time.Now())
 
 	writer := session.writer
-	output := datastreams.NewNativeBlockOutputStream(writer)
+	output := formats.FactoryGetOutput("Native")(writer)
 
 	if err := writer.Uvarint(uint64(protocol.ServerData)); err != nil {
 		return errors.Wrapf(err, "Couldn't write query header")

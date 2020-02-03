@@ -5,6 +5,7 @@
 package datatypes
 
 import (
+	"io"
 	"reflect"
 
 	"datavalues"
@@ -16,4 +17,5 @@ type IDataType interface {
 	Name() string
 	Type() reflect.Type
 	Serialize(*binary.Writer, *datavalues.Value) error
+	SerializeText(io.Writer, *datavalues.Value) error
 }

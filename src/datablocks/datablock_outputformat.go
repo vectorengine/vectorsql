@@ -5,7 +5,8 @@
 package datablocks
 
 type IDataBlockOutputFormat interface {
-	Name() string
+	IDataBlockOutputStream
+
 	FormatPrefix() ([]byte, error)
 	FormatSuffix() ([]byte, error)
 }

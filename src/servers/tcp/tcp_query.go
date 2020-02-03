@@ -9,20 +9,20 @@ import (
 
 	"datablocks"
 	"executors"
-	"optimizers"
-	"planners"
 	"processors"
 
 	"servers/protocol"
 )
 
 func (s *TCPHandler) processQuery(session *TCPSession) error {
-	var err error
+	var (
+		err error
 
-	log := s.log
-	conf := s.conf
-	reader := session.reader
-	xsession := session.session
+		log      = s.log
+		conf     = s.conf
+		reader   = session.reader
+		xsession = session.session
+	)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
@@ -34,25 +34,8 @@ func (s *TCPHandler) processQuery(session *TCPSession) error {
 	}
 	log.Debug("TCPHandler-Query->Enter:%+v", query.Query)
 
-	// Logical plans.
-	plan, err := planners.PlanFactory(query.Query)
+	sink, err := executors.ExecuteQuery(ctx, query.Query, log, conf, xsession)
 	if err != nil {
-		log.Error("%+v", err)
-		return session.sendException(err, conf.Server.CalculateTextStackTrace)
-	}
-	plan = optimizers.Optimize(plan, optimizers.DefaultOptimizers)
-
-	// Executors.
-	ectx := executors.NewExecutorContext(ctx, log, conf, xsession)
-	executor, err := executors.ExecutorFactory(ectx, plan)
-	if err != nil {
-		log.Error("%+v", err)
-		return session.sendException(err, conf.Server.CalculateTextStackTrace)
-	}
-
-	sink, err := executor.Execute()
-	if err != nil {
-		log.Error("%+v", err)
 		return session.sendException(err, conf.Server.CalculateTextStackTrace)
 	}
 

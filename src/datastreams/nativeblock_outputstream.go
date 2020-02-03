@@ -5,6 +5,7 @@
 package datastreams
 
 import (
+	"io"
 	"sync"
 
 	"datablocks"
@@ -15,10 +16,10 @@ import (
 
 type NativeBlockOutputStream struct {
 	mu     sync.RWMutex
-	writer *binary.Writer
+	writer io.Writer
 }
 
-func NewNativeBlockOutputStream(writer *binary.Writer) datablocks.IDataBlockOutputStream {
+func NewNativeBlockOutputStream(writer io.Writer) datablocks.IDataBlockOutputStream {
 	return &NativeBlockOutputStream{writer: writer}
 }
 
@@ -29,7 +30,7 @@ func (stream *NativeBlockOutputStream) Name() string {
 func (stream *NativeBlockOutputStream) Write(block *datablocks.DataBlock) error {
 	stream.mu.Lock()
 	defer stream.mu.Unlock()
-	writer := stream.writer
+	writer := binary.NewWriter(stream.writer)
 
 	// Block info.
 	info := block.Info()
