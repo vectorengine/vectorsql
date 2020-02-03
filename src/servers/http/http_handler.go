@@ -63,6 +63,7 @@ func (s *HTTPHandler) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 			fmt.Fprintf(rw, "%v", err.Error())
 			return
 		}
+		defer req.Body.Close()
 		query = string(bs)
 	}
 
