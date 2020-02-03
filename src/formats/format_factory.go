@@ -11,14 +11,14 @@ import (
 )
 
 type (
-	InputCreator  func(reader io.Reader) datablocks.IDataBlockInputFormat
-	OutputCreator func(writer io.Writer) datablocks.IDataBlockOutputFormat
+	InputCreator  func(sampleBlock *datablocks.DataBlock, reader io.Reader) datablocks.IDataBlockInputFormat
+	OutputCreator func(sampleBlock *datablocks.DataBlock, writer io.Writer) datablocks.IDataBlockOutputFormat
 )
 
 var (
 	inputTable  = map[string]InputCreator{}
 	outputTable = map[string]OutputCreator{
-		"Native": func(writer io.Writer) datablocks.IDataBlockOutputFormat {
+		"Native": func(_ *datablocks.DataBlock, writer io.Writer) datablocks.IDataBlockOutputFormat {
 			return &NativeOutputFormat{
 				IDataBlockOutputStream: datastreams.NewNativeBlockOutputStream(writer),
 			}
@@ -26,6 +26,9 @@ var (
 
 		"TSV":         NewTSVOutputFormat,
 		"TabSeparted": NewTSVOutputFormat,
+
+		"TSVWithNames":         NewTSVWithNamesOutputFormat,
+		"TabSepartedWithNames": NewTSVWithNamesOutputFormat,
 	}
 )
 

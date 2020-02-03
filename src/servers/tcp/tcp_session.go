@@ -48,7 +48,7 @@ func (session *TCPSession) sendData(block *datablocks.DataBlock) error {
 	defer expvar.Get(metric_tcp_datablock_send_sec).(metric.Metric).Record(time.Now())
 
 	writer := session.writer
-	output := formats.FactoryGetOutput("Native")(writer)
+	output := formats.FactoryGetOutput("Native")(nil, writer)
 
 	if err := writer.Uvarint(uint64(protocol.ServerData)); err != nil {
 		return errors.Wrapf(err, "Couldn't write query header")

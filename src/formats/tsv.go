@@ -12,15 +12,40 @@ import (
 )
 
 type TSVOutputFormat struct {
-	writer io.Writer
-	mu     sync.RWMutex
 	DataBlockOutputFormatBase
+
+	sampleBlock *datablocks.DataBlock
+	writer      io.Writer
+	withNames   bool
+	mu          sync.RWMutex
 }
 
-func NewTSVOutputFormat(writer io.Writer) datablocks.IDataBlockOutputFormat {
+func NewTSVOutputFormat(sampleBlock *datablocks.DataBlock, writer io.Writer) datablocks.IDataBlockOutputFormat {
 	return &TSVOutputFormat{
-		writer: writer,
+		writer:    writer,
+		withNames: false,
 	}
+}
+
+func NewTSVWithNamesOutputFormat(sampleBlock *datablocks.DataBlock, writer io.Writer) datablocks.IDataBlockOutputFormat {
+	return &TSVOutputFormat{
+		writer:    writer,
+		withNames: true,
+	}
+}
+
+func (f *TSVOutputFormat) FormatPrefix() (b []byte, err error) {
+	if f.withNames {
+		cols := f.sampleBlock.Columns()
+		for i, col := range cols {
+			if i != 0 {
+				f.writer.Write([]byte("\t"))
+			}
+			f.writer.Write([]byte(col.Name))
+		}
+		f.writer.Write([]byte("\n"))
+	}
+	return
 }
 
 func (stream *TSVOutputFormat) Write(block *datablocks.DataBlock) error {
