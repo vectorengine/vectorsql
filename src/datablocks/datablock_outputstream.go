@@ -9,4 +9,5 @@ import ()
 type IDataBlockOutputStream interface {
 	Name() string
 	Write(*DataBlock) error
+	Finalize() error
 }

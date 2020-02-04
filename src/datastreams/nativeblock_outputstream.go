@@ -20,7 +20,9 @@ type NativeBlockOutputStream struct {
 }
 
 func NewNativeBlockOutputStream(writer io.Writer) datablocks.IDataBlockOutputStream {
-	return &NativeBlockOutputStream{writer: writer}
+	return &NativeBlockOutputStream{
+		writer: writer,
+	}
 }
 
 func (stream *NativeBlockOutputStream) Name() string {
@@ -69,5 +71,9 @@ func (stream *NativeBlockOutputStream) Write(block *datablocks.DataBlock) error 
 			}
 		}
 	}
+	return nil
+}
+
+func (stream *NativeBlockOutputStream) Finalize() error {
 	return nil
 }

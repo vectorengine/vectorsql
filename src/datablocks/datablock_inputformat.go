@@ -5,5 +5,4 @@
 package datablocks
 
 type IDataBlockInputFormat interface {
-	IDataBlockInputStream
 }

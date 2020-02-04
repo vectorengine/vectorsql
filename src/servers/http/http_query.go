@@ -9,8 +9,10 @@ import (
 	"io"
 
 	"datablocks"
+	"datastreams"
 	"executors"
-	"formats"
+	"optimizers"
+	"planners"
 	"processors"
 	"sessions"
 )
@@ -26,9 +28,27 @@ func (s *HTTPHandler) processQuery(query string, rw io.Writer) (err error) {
 	defer cancel()
 
 	log.Debug("HTTPHandler-Query->Enter:%+v", query)
-	sink, err := executors.ExecuteQuery(ctx, query, log, conf, session)
+
+	// Logical plans.
+	plan, err := planners.PlanFactory(query)
 	if err != nil {
-		return
+		log.Error("%+v", err)
+		return err
+	}
+	plan = optimizers.Optimize(plan, optimizers.DefaultOptimizers)
+
+	// Executors.
+	ectx := executors.NewExecutorContext(ctx, log, conf, session)
+	executor, err := executors.ExecutorFactory(ectx, plan)
+	if err != nil {
+		log.Error("%+v", err)
+		return err
+	}
+
+	sink, err := executor.Execute()
+	if err != nil {
+		log.Error("%+v", err)
+		return err
 	}
 
 	if err = s.processOrdinaryQuery(rw, session, sink); err != nil {
@@ -60,11 +80,14 @@ func (s *HTTPHandler) processOrdinaryQuery(rw io.Writer, session *sessions.Sessi
 }
 
 func (s *HTTPHandler) sendData(writer io.Writer, block *datablocks.DataBlock) error {
-	output := formats.FactoryGetOutput("TSV")(block, writer)
-	output.FormatPrefix()
+	// TODO Get the format from AST
+	output := datastreams.NewCustomFormatBlockOutputStream(block, writer, "TSV")
+
 	if err := output.Write(block); err != nil {
 		return err
 	}
-	output.FormatSuffix()
+	if err := output.Finalize(); err != nil {
+		return err
+	}
 	return nil
 }

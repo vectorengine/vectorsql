@@ -2,11 +2,10 @@
 //
 // Code is licensed under Apache License, Version 2.0.
 
-package formats
+package dataformats
 
 import (
 	"datablocks"
-	"datastreams"
 	"io"
 )
 
@@ -18,12 +17,6 @@ type (
 var (
 	inputTable  = map[string]InputCreator{}
 	outputTable = map[string]OutputCreator{
-		"Native": func(_ *datablocks.DataBlock, writer io.Writer) datablocks.IDataBlockOutputFormat {
-			return &NativeOutputFormat{
-				IDataBlockOutputStream: datastreams.NewNativeBlockOutputStream(writer),
-			}
-		},
-
 		"TSV":         NewTSVOutputFormat,
 		"TabSeparted": NewTSVOutputFormat,
 

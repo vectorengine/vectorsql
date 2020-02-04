@@ -74,3 +74,6 @@ func (stream *NativeBlockOutputStream) Write(block *datablocks.DataBlock) error 
 	stream.blocks = append(stream.blocks, block)
 	return nil
 }
+func (stream *NativeBlockOutputStream) Finalize() error {
+	return nil
+}
