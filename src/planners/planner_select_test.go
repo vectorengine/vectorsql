@@ -299,20 +299,42 @@ func TestSelectPlan(t *testing.T) {
                     "Name": "MapPlan",
                     "SubPlans": [
                         {
-                            "Name": "VariablePlan",
-                            "Value": "a"
+                            "Name": "FunctionExpressionPlan",
+                            "FuncName": "MAX",
+                            "Args": [
+                                {
+                                    "Name": "VariablePlan",
+                                    "Value": "a"
+                                }
+                            ]
                         },
                         {
-                            "Name": "VariablePlan",
-                            "Value": "b"
+                            "Name": "FunctionExpressionPlan",
+                            "FuncName": "SUM",
+                            "Args": [
+                                {
+                                    "Name": "VariablePlan",
+                                    "Value": "b"
+                                }
+                            ]
                         },
                         {
                             "Name": "VariablePlan",
                             "Value": "c"
                         },
                         {
-                            "Name": "VariablePlan",
-                            "Value": "id"
+                            "Name": "FunctionExpressionPlan",
+                            "FuncName": "+",
+                            "Args": [
+                                {
+                                    "Name": "VariablePlan",
+                                    "Value": "id"
+                                },
+                                {
+                                    "Name": "ConstantPlan",
+                                    "Value": 1
+                                }
+                            ]
                         }
                     ]
                 }
@@ -346,20 +368,7 @@ func TestSelectPlan(t *testing.T) {
             },
             {
                 "Name": "GroupByPlan",
-                "GroupBys": {
-                    "Name": "MapPlan",
-                    "SubPlans": [
-                        {
-                            "Name": "VariablePlan",
-                            "Value": "d"
-                        },
-                        {
-                            "Name": "VariablePlan",
-                            "Value": "e"
-                        }
-                    ]
-                },
-                "Aggregators": {
+                "Projects": {
                     "Name": "MapPlan",
                     "SubPlans": [
                         {
@@ -383,6 +392,10 @@ func TestSelectPlan(t *testing.T) {
                             ]
                         },
                         {
+                            "Name": "VariablePlan",
+                            "Value": "c"
+                        },
+                        {
                             "Name": "FunctionExpressionPlan",
                             "FuncName": "+",
                             "Args": [
@@ -395,6 +408,19 @@ func TestSelectPlan(t *testing.T) {
                                     "Value": 1
                                 }
                             ]
+                        }
+                    ]
+                },
+                "GroupBys": {
+                    "Name": "MapPlan",
+                    "SubPlans": [
+                        {
+                            "Name": "VariablePlan",
+                            "Value": "d"
+                        },
+                        {
+                            "Name": "VariablePlan",
+                            "Value": "e"
                         }
                     ]
                 }

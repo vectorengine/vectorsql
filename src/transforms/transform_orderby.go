@@ -74,5 +74,5 @@ func (t *OrderByTransform) orderby(x *datablocks.DataBlock) error {
 		direction := order.Direction
 		sorters = append(sorters, datablocks.NewSorter(field, direction))
 	}
-	return x.Sort(sorters...)
+	return x.OrderBy(sorters...)
 }

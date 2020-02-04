@@ -9,16 +9,16 @@ import (
 )
 
 type GroupByPlan struct {
-	Name        string
-	GroupBys    *MapPlan `json:",omitempty"`
-	Aggregators *MapPlan `json:",omitempty"`
+	Name     string
+	Projects *MapPlan `json:",omitempty"`
+	GroupBys *MapPlan `json:",omitempty"`
 }
 
-func NewGroupByPlan(aggregators *MapPlan, groupbys *MapPlan) *GroupByPlan {
+func NewGroupByPlan(projects *MapPlan, groupbys *MapPlan) *GroupByPlan {
 	return &GroupByPlan{
-		Name:        "GroupByPlan",
-		GroupBys:    groupbys,
-		Aggregators: aggregators,
+		Name:     "GroupByPlan",
+		Projects: projects,
+		GroupBys: groupbys,
 	}
 }
 
@@ -27,7 +27,7 @@ func (plan *GroupByPlan) Build() error {
 }
 
 func (plan *GroupByPlan) Walk(visit Visit) error {
-	return Walk(visit, plan.GroupBys, plan.Aggregators)
+	return Walk(visit, plan.Projects, plan.GroupBys)
 }
 
 func (plan *GroupByPlan) String() string {

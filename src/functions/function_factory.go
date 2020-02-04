@@ -12,7 +12,7 @@ import (
 
 var (
 	table = map[string]*Function{
-		// Compare.
+		// Compares.
 		FuncCompareEqual.Name:        FuncCompareEqual,
 		FuncCompareNotEqual.Name:     FuncCompareNotEqual,
 		FuncCompareLessThan.Name:     FuncCompareLessThan,
@@ -21,11 +21,16 @@ var (
 		FuncCompareGreaterEqual.Name: FuncCompareGreaterEqual,
 		FuncCompareLike.Name:         FuncCompareLike,
 
-		// Logic.
+		// Logics.
 		FuncLogicAnd.Name: FuncLogicAnd,
 		FuncLogicOr.Name:  FuncLogicOr,
 
-		// Table valued function.
+		// Aggregators.
+		FuncAggregatorMin.Name:   FuncAggregatorMin,
+		FuncAggregatorMax.Name:   FuncAggregatorMax,
+		FuncAggregatorCount.Name: FuncAggregatorCount,
+
+		// Table valued functions.
 		FuncTableValuedFunctionRange.Name:      FuncTableValuedFunctionRange,
 		FuncTableValuedFunctionRangeTable.Name: FuncTableValuedFunctionRangeTable,
 		FuncTableValuedFunctionRandTable.Name:  FuncTableValuedFunctionRandTable,

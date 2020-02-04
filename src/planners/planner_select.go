@@ -59,7 +59,7 @@ func (plan *SelectPlan) Build() error {
 		if err != nil {
 			return err
 		}
-		groupByPlan := NewGroupByPlan(aggregators, groupbys)
+		groupByPlan := NewGroupByPlan(projects, groupbys)
 		tree.Add(groupByPlan)
 	}
 

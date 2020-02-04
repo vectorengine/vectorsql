@@ -22,7 +22,7 @@ func fillDatabasesFunc(block *datablocks.DataBlock) error {
 			return err
 		}
 	}
-	return block.Write(batcher)
+	return block.WriteBatch(batcher)
 }
 
 func fillTablesFunc(block *datablocks.DataBlock) error {
@@ -39,5 +39,5 @@ func fillTablesFunc(block *datablocks.DataBlock) error {
 			}
 		}
 	}
-	return block.Write(batcher)
+	return block.WriteBatch(batcher)
 }
