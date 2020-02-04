@@ -5,4 +5,5 @@
 package datablocks
 
 type IDataBlockInputFormat interface {
+	Name() string
 }
