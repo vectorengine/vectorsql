@@ -2,7 +2,7 @@
 //
 // Code is licensed under Apache License, Version 2.0.
 
-package formats
+package dataformats
 
 import (
 	"io"
@@ -12,8 +12,6 @@ import (
 )
 
 type TSVOutputFormat struct {
-	DataBlockOutputFormatBase
-
 	sampleBlock *datablocks.DataBlock
 	writer      io.Writer
 	withNames   bool
@@ -74,6 +72,13 @@ func (stream *TSVOutputFormat) Write(block *datablocks.DataBlock) error {
 	return nil
 }
 
+func (f *TSVOutputFormat) FormatSuffix() (b []byte, err error) {
+	return
+}
+
 func (stream *TSVOutputFormat) Name() string {
+	if stream.withNames {
+		return "TSVWithNames"
+	}
 	return "TSV"
 }
