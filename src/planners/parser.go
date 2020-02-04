@@ -139,12 +139,9 @@ func parseProject(sel sqlparser.SelectExprs) (*MapPlan, *MapPlan, error) {
 		}
 	}
 
-	projects := NewMapPlan()
 	aggregators := NewMapPlan()
 	if err := all.Walk(func(plan IPlan) (bool, error) {
 		switch plan := plan.(type) {
-		case *VariablePlan:
-			projects.Add(plan)
 		case *FunctionExpressionPlan:
 			aggregators.Add(plan)
 		}
@@ -152,7 +149,7 @@ func parseProject(sel sqlparser.SelectExprs) (*MapPlan, *MapPlan, error) {
 	}); err != nil {
 		return nil, nil, err
 	}
-	return projects, aggregators, nil
+	return all, aggregators, nil
 }
 
 func parseGroupBy(groupby sqlparser.GroupBy) (*MapPlan, error) {

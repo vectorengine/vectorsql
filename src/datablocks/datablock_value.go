@@ -24,3 +24,7 @@ func NewDataBlockValue(col columns.Column) *DataBlockValue {
 func (v *DataBlockValue) NumRows() int {
 	return len(v.values)
 }
+
+func (v *DataBlockValue) ColumnName() string {
+	return v.column.Name
+}

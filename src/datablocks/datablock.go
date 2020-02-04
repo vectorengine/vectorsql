@@ -5,36 +5,36 @@
 package datablocks
 
 import (
-	"expvar"
-	"time"
-
 	"columns"
 	"datavalues"
 
 	"base/errors"
-	"base/metric"
 )
 
 type DataBlock struct {
 	info      *DataBlockInfo
 	seqs      []*datavalues.Value
 	values    []*DataBlockValue
-	immutable bool
+	indexmap  map[string]int
 	valuesmap map[string]*DataBlockValue
+	immutable bool
 }
 
 func NewDataBlock(cols []columns.Column) *DataBlock {
 	var values []*DataBlockValue
+	indexmap := make(map[string]int)
 	valuesmap := make(map[string]*DataBlockValue)
 
-	for _, col := range cols {
+	for i, col := range cols {
 		cv := NewDataBlockValue(col)
+		indexmap[col.Name] = i
 		valuesmap[col.Name] = cv
 		values = append(values, cv)
 	}
 	return &DataBlock{
 		info:      &DataBlockInfo{},
 		values:    values,
+		indexmap:  indexmap,
 		valuesmap: valuesmap,
 	}
 }
@@ -42,6 +42,10 @@ func NewDataBlock(cols []columns.Column) *DataBlock {
 func (block *DataBlock) setSeqs(seqs []*datavalues.Value) {
 	block.seqs = seqs
 	block.immutable = true
+}
+
+func (block *DataBlock) Seqs() []*datavalues.Value {
+	return block.seqs
 }
 
 func (block *DataBlock) Info() *DataBlockInfo {
@@ -69,25 +73,48 @@ func (block *DataBlock) Columns() []columns.Column {
 	return cols
 }
 
-func (block *DataBlock) Iterator(name string) (*DataBlockIterator, error) {
+func (block *DataBlock) Column(name string) (columns.Column, error) {
 	cv, ok := block.valuesmap[name]
+	if !ok {
+		return columns.Column{}, errors.Errorf("Can't find column:%v", name)
+	}
+	return cv.column, nil
+}
+
+func (block *DataBlock) Iterator(name string) (*DataBlockColumnIterator, error) {
+	idx := 0
+	if _, ok := block.valuesmap[name]; !ok {
+		return nil, errors.Errorf("Can't find column:%v", name)
+	}
+	idx, ok := block.indexmap[name]
 	if !ok {
 		return nil, errors.Errorf("Can't find column:%v", name)
 	}
-	return newDataBlockIterator(block.seqs, cv), nil
+	return newDataBlockColumnIterator(block, idx), nil
 }
 
-func (block *DataBlock) Iterators() []*DataBlockIterator {
-	var iterators []*DataBlockIterator
+func (block *DataBlock) Iterators() []*DataBlockColumnIterator {
+	var iterators []*DataBlockColumnIterator
 
-	for _, cv := range block.values {
-		iter := newDataBlockIterator(block.seqs, cv)
+	for i := range block.values {
+		iter := newDataBlockColumnIterator(block, i)
 		iterators = append(iterators, iter)
 	}
 	return iterators
 }
 
-func (block *DataBlock) Write(batcher *BatchWriter) error {
+func (block *DataBlock) First(name string) (*datavalues.Value, error) {
+	it, err := block.Iterator(name)
+	if err != nil {
+		return nil, errors.Errorf("Can't find column:%v", name)
+	}
+	if it.Next() {
+		return it.Value(), nil
+	}
+	return nil, nil
+}
+
+func (block *DataBlock) WriteBatch(batcher *BatchWriter) error {
 	if block.immutable {
 		return errors.New("Block is immutable")
 	}
@@ -106,31 +133,14 @@ func (block *DataBlock) Write(batcher *BatchWriter) error {
 	return nil
 }
 
-func (block *DataBlock) Split(chunksize int) []*DataBlock {
-	defer expvar.Get(metric_datablock_split_sec).(metric.Metric).Record(time.Now())
-
-	cols := block.Columns()
-	nums := block.NumRows()
-	chunks := (nums / chunksize) + 1
-	blocks := make([]*DataBlock, chunks)
-	for i := range blocks {
-		blocks[i] = NewDataBlock(cols)
+func (block *DataBlock) WriteRow(values []*datavalues.Value) error {
+	cols := block.NumColumns()
+	if len(values) != cols {
+		return errors.Errorf("Can't append row, expect column length:%v", cols)
 	}
 
-	for i := range cols {
-		it := newDataBlockIterator(block.seqs, block.values[i])
-		for j := 0; j < len(blocks); j++ {
-			begin := j * chunksize
-			end := (j + 1) * chunksize
-			if end > nums {
-				end = nums
-			}
-			blocks[j].values[i].values = make([]*datavalues.Value, (end - begin))
-			for k := begin; k < end; k++ {
-				it.Next()
-				blocks[j].values[i].values[k-begin] = it.Value()
-			}
-		}
+	for i := 0; i < cols; i++ {
+		block.values[i].values = append(block.values[i].values, values[i])
 	}
-	return blocks
+	return nil
 }

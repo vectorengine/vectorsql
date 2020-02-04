@@ -103,7 +103,7 @@ func (executor *TableValuedFunctionExecutor) Execute() (processors.IProcessor, e
 				return nil, err
 			}
 		}
-		if err := block.Write(batcher); err != nil {
+		if err := block.WriteBatch(batcher); err != nil {
 			return nil, err
 		}
 		blocks = append(blocks, block)

@@ -45,6 +45,9 @@ func (executor *SelectExecutor) Execute() (processors.IProcessor, error) {
 		case *planners.FilterPlan:
 			executor := NewFilterExecutor(ectx, plan)
 			tree.Add(executor)
+		case *planners.GroupByPlan:
+			executor := NewGroupByExecutor(ectx, plan)
+			tree.Add(executor)
 		case *planners.OrderByPlan:
 			executor := NewOrderByExecutor(ectx, plan)
 			tree.Add(executor)

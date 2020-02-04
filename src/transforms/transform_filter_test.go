@@ -18,7 +18,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestFilterTransfrom(t *testing.T) {
+func TestFilterTransform(t *testing.T) {
 	tests := []struct {
 		name   string
 		plan   planners.IPlan

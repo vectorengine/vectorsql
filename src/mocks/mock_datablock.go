@@ -24,7 +24,7 @@ func NewBlockFromSlice(cols []columns.Column, datas ...[]interface{}) *datablock
 			_ = batcher.WriteRow(row...)
 		}
 	}
-	_ = block.Write(batcher)
+	_ = block.WriteBatch(batcher)
 	return block
 }
 

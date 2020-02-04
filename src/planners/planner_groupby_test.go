@@ -11,16 +11,20 @@ import (
 )
 
 func TestGroupByPlan(t *testing.T) {
-	groupbys := NewMapPlan(
-		NewVariablePlan("x"),
-		NewVariablePlan("y"),
+	projects := NewMapPlan(
+		NewFunctionExpressionPlan(
+			"COUNT",
+			NewVariablePlan("c"),
+		),
+		NewVariablePlan("d"),
 	)
-	aggregators := NewMapPlan(
+
+	groupbys := NewMapPlan(
 		NewVariablePlan("c"),
 		NewVariablePlan("d"),
 	)
 
-	plan := NewGroupByPlan(aggregators, groupbys)
+	plan := NewGroupByPlan(projects, groupbys)
 	err := plan.Build()
 	assert.Nil(t, err)
 
@@ -31,20 +35,26 @@ func TestGroupByPlan(t *testing.T) {
 
 	expect := `{
     "Name": "GroupByPlan",
-    "GroupBys": {
+    "Projects": {
         "Name": "MapPlan",
         "SubPlans": [
             {
-                "Name": "VariablePlan",
-                "Value": "x"
+                "Name": "FunctionExpressionPlan",
+                "FuncName": "COUNT",
+                "Args": [
+                    {
+                        "Name": "VariablePlan",
+                        "Value": "c"
+                    }
+                ]
             },
             {
                 "Name": "VariablePlan",
-                "Value": "y"
+                "Value": "d"
             }
         ]
     },
-    "Aggregators": {
+    "GroupBys": {
         "Name": "MapPlan",
         "SubPlans": [
             {
