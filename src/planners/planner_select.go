@@ -55,7 +55,7 @@ func (plan *SelectPlan) Build() error {
 
 	// GroupBy.
 	if aggregators.Length() > 0 {
-		groupbys, err := parseGroupBy(ast.GroupBy)
+		groupbys, err := parseGroupBy(projects, ast.GroupBy)
 		if err != nil {
 			return err
 		}
