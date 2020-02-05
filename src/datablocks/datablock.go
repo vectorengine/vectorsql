@@ -21,22 +21,31 @@ type DataBlock struct {
 }
 
 func NewDataBlock(cols []columns.Column) *DataBlock {
-	var values []*DataBlockValue
-	indexmap := make(map[string]int)
-	valuesmap := make(map[string]*DataBlockValue)
-
-	for i, col := range cols {
-		cv := NewDataBlockValue(col)
-		indexmap[col.Name] = i
-		valuesmap[col.Name] = cv
-		values = append(values, cv)
-	}
-	return &DataBlock{
+	block := &DataBlock{
 		info:      &DataBlockInfo{},
-		values:    values,
-		indexmap:  indexmap,
-		valuesmap: valuesmap,
+		values:    []*DataBlockValue{},
+		indexmap:  make(map[string]int),
+		valuesmap: make(map[string]*DataBlockValue),
 	}
+
+	for _, col := range cols {
+		block.Insert(col)
+	}
+	return block
+}
+
+// Clone a sample block
+func (block *DataBlock) Clone() *DataBlock {
+	return NewDataBlock(block.Columns())
+}
+
+func (block *DataBlock) Insert(col columns.Column) {
+	cv := NewDataBlockValue(col)
+	idx := len(block.indexmap)
+	block.indexmap[col.Name] = idx
+	block.valuesmap[col.Name] = cv
+
+	block.values = append(block.values, cv)
 }
 
 func (block *DataBlock) setSeqs(seqs []*datavalues.Value) {
@@ -55,9 +64,10 @@ func (block *DataBlock) Info() *DataBlockInfo {
 func (block *DataBlock) NumRows() int {
 	if block.seqs != nil {
 		return len(block.seqs)
-	} else {
+	} else if len(block.values) > 0 {
 		return block.values[0].NumRows()
 	}
+	return 0
 }
 
 func (block *DataBlock) NumColumns() int {

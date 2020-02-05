@@ -36,10 +36,8 @@ func (t *DataSourceTransform) Execute() {
 			log.Error("Transform->Input error:%+v", err)
 			out.Send(err)
 			return
-		} else {
-			if data == nil {
-				return
-			}
+		} else if data == nil {
+			return
 		}
 		out.Send(data)
 	}

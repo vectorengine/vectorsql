@@ -17,6 +17,7 @@ var (
 		DataTypeStringName: NewStringDataType,
 		DataTypeInt32Name:  NewInt32DataType,
 		DataTypeUInt32Name: NewUInt32DataType,
+		DataTypeUInt64Name: NewUInt64DataType,
 	}
 )
 
