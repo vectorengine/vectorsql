@@ -444,6 +444,145 @@ func TestSelectPlan(t *testing.T) {
     }
 }`,
 		},
+		{
+			name:  "select-test",
+			query: "SELECT max(a+1), (id+1) as b FROM t1 group by a, b",
+			expect: `{
+    "Name": "SelectPlan",
+    "SubPlan": {
+        "Name": "MapPlan",
+        "SubPlans": [
+            {
+                "Name": "ScanPlan",
+                "Table": "t1",
+                "Schema": ""
+            },
+            {
+                "Name": "ProjectPlan",
+                "SubPlan": {
+                    "Name": "MapPlan",
+                    "SubPlans": [
+                        {
+                            "Name": "FunctionExpressionPlan",
+                            "FuncName": "MAX",
+                            "Args": [
+                                {
+                                    "Name": "FunctionExpressionPlan",
+                                    "FuncName": "+",
+                                    "Args": [
+                                        {
+                                            "Name": "VariablePlan",
+                                            "Value": "a"
+                                        },
+                                        {
+                                            "Name": "ConstantPlan",
+                                            "Value": 1
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "Name": "AliasedExpressionPlan",
+                            "As": "b",
+                            "Expr": {
+                                "Name": "FunctionExpressionPlan",
+                                "FuncName": "+",
+                                "Args": [
+                                    {
+                                        "Name": "VariablePlan",
+                                        "Value": "id"
+                                    },
+                                    {
+                                        "Name": "ConstantPlan",
+                                        "Value": 1
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                "Name": "GroupByPlan",
+                "Projects": {
+                    "Name": "MapPlan",
+                    "SubPlans": [
+                        {
+                            "Name": "FunctionExpressionPlan",
+                            "FuncName": "MAX",
+                            "Args": [
+                                {
+                                    "Name": "FunctionExpressionPlan",
+                                    "FuncName": "+",
+                                    "Args": [
+                                        {
+                                            "Name": "VariablePlan",
+                                            "Value": "a"
+                                        },
+                                        {
+                                            "Name": "ConstantPlan",
+                                            "Value": 1
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "Name": "AliasedExpressionPlan",
+                            "As": "b",
+                            "Expr": {
+                                "Name": "FunctionExpressionPlan",
+                                "FuncName": "+",
+                                "Args": [
+                                    {
+                                        "Name": "VariablePlan",
+                                        "Value": "id"
+                                    },
+                                    {
+                                        "Name": "ConstantPlan",
+                                        "Value": 1
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                },
+                "GroupBys": {
+                    "Name": "MapPlan",
+                    "SubPlans": [
+                        {
+                            "Name": "VariablePlan",
+                            "Value": "a"
+                        },
+                        {
+                            "Name": "AliasedExpressionPlan",
+                            "As": "b",
+                            "Expr": {
+                                "Name": "FunctionExpressionPlan",
+                                "FuncName": "+",
+                                "Args": [
+                                    {
+                                        "Name": "VariablePlan",
+                                        "Value": "id"
+                                    },
+                                    {
+                                        "Name": "ConstantPlan",
+                                        "Value": 1
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                "Name": "SinkPlan"
+            }
+        ]
+    }
+}`,
+		},
 	}
 
 	for _, test := range tests {

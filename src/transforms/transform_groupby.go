@@ -69,16 +69,32 @@ func (t *GroupByTransform) Execute() {
 	wg.Wait()
 }
 
+type col struct {
+	name     string
+	aggrFunc string
+	column   columns.Column
+}
+
+func (t *GroupByTransform) getColumn(plan *planners.FunctionExpressionPlan, x *datablocks.DataBlock) (*col, error) {
+	column, err := x.Column(string(plan.Args[0].(*planners.VariablePlan).Value))
+	if err != nil {
+		return nil, err
+	}
+
+	oldName := column.Name
+	newName := fmt.Sprintf("%s(%s)", plan.FuncName, column.Name)
+	column.Name = newName
+	return &col{
+		name:     oldName,
+		column:   column,
+		aggrFunc: plan.FuncName,
+	}, nil
+}
+
 func (t *GroupByTransform) groupby(x *datablocks.DataBlock) ([]*datablocks.DataBlock, error) {
 	log := t.ctx.log
 	projects := t.plan.Projects
 	groupbys := t.plan.GroupBys
-
-	type col struct {
-		name     string
-		aggrFunc string
-		column   columns.Column
-	}
 
 	plans := projects.AsPlans()
 	cols := make([]col, len(plans))
@@ -94,20 +110,19 @@ func (t *GroupByTransform) groupby(x *datablocks.DataBlock) ([]*datablocks.DataB
 				name:   column.Name,
 				column: column,
 			}
-		case *planners.FunctionExpressionPlan:
-			column, err := x.Column(string(plan.Args[0].(*planners.VariablePlan).Value))
+		case *planners.AliasedExpressionPlan:
+			planx := plan.Expr.(*planners.FunctionExpressionPlan)
+			col, err := t.getColumn(planx, x)
 			if err != nil {
 				return nil, err
 			}
-
-			oldName := column.Name
-			newName := fmt.Sprintf("%s(%s)", plan.FuncName, column.Name)
-			column.Name = newName
-			cols[i] = col{
-				name:     oldName,
-				column:   column,
-				aggrFunc: plan.FuncName,
+			cols[i] = *col
+		case *planners.FunctionExpressionPlan:
+			col, err := t.getColumn(plan, x)
+			if err != nil {
+				return nil, err
 			}
+			cols[i] = *col
 		}
 	}
 	log.Debug("Transform->GroupBy->Projects: %+s", projects)

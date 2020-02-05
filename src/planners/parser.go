@@ -135,6 +135,9 @@ func parseProject(sel sqlparser.SelectExprs) (*MapPlan, *MapPlan, error) {
 			if err != nil {
 				return nil, nil, err
 			}
+			if aliasedExpression.As.String() != "" {
+				child = NewAliasedExpressionPlan(aliasedExpression.As.String(), child)
+			}
 			all.Add(child)
 		}
 	}
@@ -152,17 +155,36 @@ func parseProject(sel sqlparser.SelectExprs) (*MapPlan, *MapPlan, error) {
 	return all, aggregators, nil
 }
 
-func parseGroupBy(groupby sqlparser.GroupBy) (*MapPlan, error) {
-	tree := NewMapPlan()
+func parseGroupBy(projects *MapPlan, groupby sqlparser.GroupBy) (*MapPlan, error) {
+	asmap := make(map[string]IPlan)
+	if err := projects.Walk(func(plan IPlan) (bool, error) {
+		switch plan := plan.(type) {
+		case *AliasedExpressionPlan:
+			asmap[plan.As] = plan
+		}
+		return true, nil
+	}); err != nil {
+		return nil, err
+	}
 
+	all := NewMapPlan()
 	for i := range groupby {
 		sub, err := parseExpression(groupby[i])
 		if err != nil {
 			return nil, err
 		}
-		tree.Add(sub)
+		switch xsub := sub.(type) {
+		case *VariablePlan:
+			if as, ok := asmap[string(xsub.Value)]; ok {
+				all.Add(as)
+			} else {
+				all.Add(sub)
+			}
+		default:
+			return nil, errors.Errorf("Unsupported function in group by:%+v", xsub)
+		}
 	}
-	return tree, nil
+	return all, nil
 }
 
 func parseLogic(expr sqlparser.Expr) (IPlan, error) {
