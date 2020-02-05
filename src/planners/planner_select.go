@@ -73,6 +73,15 @@ func (plan *SelectPlan) Build() error {
 		tree.Add(orderByPlan)
 	}
 
+	// Limit
+	if ast.Limit != nil {
+		limitPlan, err := parseLimitExpressions(ast.Limit)
+		if err != nil {
+			return err
+		}
+		tree.Add(limitPlan)
+	}
+
 	// Sink.
 	tree.Add(NewSinkPlan())
 	return tree.Build()

@@ -234,3 +234,18 @@ func parseOrderByExpressions(orderBy sqlparser.OrderBy) ([]Order, error) {
 	}
 	return orders, nil
 }
+
+func parseLimitExpressions(limit *sqlparser.Limit) (IPlan, error) {
+	if limit.Offset == nil {
+		limit.Offset = sqlparser.NewIntVal([]byte("0"))
+	}
+	offsetPlan, err := parseExpression(limit.Offset)
+	if err != nil {
+		return nil, errors.Wrapf(err, "Couldn't parse offset")
+	}
+	rowcountPlan, err := parseExpression(limit.Rowcount)
+	if err != nil {
+		return nil, errors.Wrapf(err, "Couldn't parse limit")
+	}
+	return NewLimitPlan(offsetPlan, rowcountPlan), nil
+}

@@ -19,6 +19,7 @@ var (
 		MemoryStorageEngineName:          NewMemoryStorage,
 		SystemDatabasesStorageEngineName: NewSystemDatabasesStorage,
 		SystemTablesStorageEngineName:    NewSystemTablesStorage,
+		SystemNumbersStorageEngineName:   NewSystemNumbersStorage,
 	}
 )
 

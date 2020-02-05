@@ -48,8 +48,29 @@ func (writer *Writer) UInt32(v uint32) error {
 	return nil
 }
 
+func (writer *Writer) UInt64(v uint64) error {
+	writer.datas[0] = byte(v)
+	writer.datas[1] = byte(v >> 8)
+	writer.datas[2] = byte(v >> 16)
+	writer.datas[3] = byte(v >> 24)
+
+	writer.datas[4] = byte(v >> 32)
+	writer.datas[5] = byte(v >> 40)
+	writer.datas[6] = byte(v >> 48)
+	writer.datas[7] = byte(v >> 56)
+
+	if _, err := writer.output.Write(writer.datas[:8]); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (writer *Writer) Int32(v int32) error {
 	return writer.UInt32(uint32(v))
+}
+
+func (writer *Writer) Int64(v int64) error {
+	return writer.UInt64(uint64(v))
 }
 
 func (writer *Writer) Uvarint(v uint64) error {

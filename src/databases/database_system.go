@@ -5,14 +5,12 @@
 package databases
 
 import (
-	"sync"
-
-	"storages"
-
 	"path/filepath"
+	"sync"
 
 	"base/errors"
 	"parsers/sqlparser"
+	"storages"
 )
 
 const (
@@ -55,6 +53,9 @@ func (database *SystemDatabase) Load() error {
 		return err
 	}
 	if err := database.attachTable("databases", storages.SystemDatabasesStorageEngineName); err != nil {
+		return err
+	}
+	if err := database.attachTable("numbers", storages.SystemNumbersStorageEngineName); err != nil {
 		return err
 	}
 	return nil

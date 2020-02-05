@@ -6,5 +6,8 @@ package datablocks
 
 type IDataBlockInputStream interface {
 	Name() string
+
+	// Read next block.
+	// If there are no more blocks, return nil.
 	Read() (*DataBlock, error)
 }

@@ -51,6 +51,9 @@ func (executor *SelectExecutor) Execute() (processors.IProcessor, error) {
 		case *planners.OrderByPlan:
 			executor := NewOrderByExecutor(ectx, plan)
 			tree.Add(executor)
+		case *planners.LimitPlan:
+			executor := NewLimitExecutor(ectx, plan)
+			tree.Add(executor)
 		case *planners.SinkPlan:
 			executor := NewSinkExecutor(ectx, plan)
 			tree.Add(executor)
