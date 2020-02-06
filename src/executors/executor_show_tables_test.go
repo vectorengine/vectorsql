@@ -34,6 +34,7 @@ func TestShowTablessExecutor(t *testing.T) {
 					{Name: "engine", DataType: datatypes.NewStringDataType()},
 				},
 				[]interface{}{"databases", "system", "SYSTEM_DATABASES"},
+				[]interface{}{"numbers", "system", "SYSTEM_NUMBERS"},
 				[]interface{}{"tables", "system", "SYSTEM_TABLES"},
 			),
 		},
