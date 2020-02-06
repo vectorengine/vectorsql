@@ -50,17 +50,10 @@ func (t *Limitransform) Execute() {
 					x = nil
 					break
 				}
-
-				z, err := y.Limit(offset, limit)
-				if err != nil {
-					x = err
-					break
-				}
-				if z.NumRows() == 0 {
-					offset -= y.NumRows()
-				}
-				limit -= y.NumRows()
-				x = z
+				cutOffset, cutLimit := y.Limit(offset, limit)
+				offset -= cutOffset
+				limit -= cutLimit
+				x = y
 			}
 		}
 		out.Send(x)

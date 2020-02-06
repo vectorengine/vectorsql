@@ -4,20 +4,19 @@
 
 package datablocks
 
-func (block *DataBlock) Limit(offset, limit int) (*DataBlock, error) {
-	result := block.Clone()
-
-	rows := block.NumRows()
-	if rows <= offset {
-		return result, nil
-	}
-	end := limit + offset
-	if end > rows {
-		end = rows
+func (block *DataBlock) Limit(offset, limit int) (cutOffset, cutLimit int) {
+	preRows := block.NumRows()
+	if block.start+offset < block.end {
+		block.start += offset
+		cutOffset += offset
+	} else {
+		block.start = block.end
+		cutOffset += preRows
 	}
 
-	for i := range block.values {
-		result.values[i].values = block.values[i].values[offset:end]
+	if block.end-block.start > limit {
+		block.end = block.start + limit
 	}
-	return result, nil
+	cutLimit += block.NumRows()
+	return
 }

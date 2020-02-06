@@ -11,6 +11,7 @@ import (
 
 type BatchWriter struct {
 	values []*DataBlockValue
+	rows   int
 }
 
 func NewBatchWriter(cols []columns.Column) *BatchWriter {
@@ -29,5 +30,6 @@ func (bw *BatchWriter) WriteRow(row ...*datavalues.Value) error {
 	for i, val := range bw.values {
 		val.values = append(val.values, row[i])
 	}
+	bw.rows++
 	return nil
 }
