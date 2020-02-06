@@ -27,7 +27,7 @@ func (plan *LimitPlan) Build() error {
 }
 
 func (plan *LimitPlan) Walk(visit Visit) error {
-	return nil
+	return Walk(visit, plan.OffsetPlan, plan.RowcountPlan)
 }
 
 func (plan *LimitPlan) String() string {

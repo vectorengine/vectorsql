@@ -35,7 +35,7 @@ func (t *Limitransform) Execute() {
 		offset int
 	)
 
-	//Todo support variable
+	//Todo support eval(variable)
 	offset = t.plan.OffsetPlan.(*planners.ConstantPlan).Value.(int)
 	limit = t.plan.RowcountPlan.(*planners.ConstantPlan).Value.(int)
 

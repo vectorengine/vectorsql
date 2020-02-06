@@ -29,7 +29,7 @@ func NewDataBlock(cols []columns.Column) *DataBlock {
 	}
 
 	for _, col := range cols {
-		block.Insert(col)
+		block.InsertColumn(col)
 	}
 	return block
 }
@@ -39,7 +39,7 @@ func (block *DataBlock) Clone() *DataBlock {
 	return NewDataBlock(block.Columns())
 }
 
-func (block *DataBlock) Insert(col columns.Column) {
+func (block *DataBlock) InsertColumn(col columns.Column) {
 	cv := NewDataBlockValue(col)
 	idx := len(block.indexmap)
 	block.indexmap[col.Name] = idx
