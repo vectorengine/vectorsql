@@ -48,7 +48,6 @@ func Split(block *DataBlock, chunksize int) []*DataBlock {
 				it.Next()
 				blocks[j].values[i].values[k-begin] = it.Value()
 			}
-			blocks[j].end = end - begin
 		}
 	}
 	return blocks

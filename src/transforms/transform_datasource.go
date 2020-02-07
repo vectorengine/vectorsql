@@ -31,14 +31,23 @@ func (t *DataSourceTransform) Execute() {
 
 	defer out.Close()
 	for {
-		data, err := input.Read()
-		if err != nil {
-			log.Error("Transform->Input error:%+v", err)
-			out.Send(err)
+		select {
+		case <-ctx.ctx.Done():
 			return
-		} else if data == nil {
-			return
+		default:
+			if out.IsClose() {
+				return
+			}
+			data, err := input.Read()
+			if err != nil {
+				log.Error("Transform->Input error:%+v", err)
+				out.Send(err)
+				return
+			} else if data == nil {
+				return
+			}
+			out.Send(data)
 		}
-		out.Send(data)
+
 	}
 }

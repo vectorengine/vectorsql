@@ -27,7 +27,7 @@ func (executor *FilterExecutor) Execute() (processors.IProcessor, error) {
 	conf := executor.ctx.conf
 
 	log.Debug("Executor->Enter->LogicalPlan:%s", executor.plan)
-	transformCtx := transforms.NewTransformContext(log, conf)
+	transformCtx := transforms.NewTransformContext(executor.ctx.ctx, log, conf)
 	transform := transforms.NewFilterTransform(transformCtx, executor.plan)
 	log.Debug("Executor->Return->Pipeline:%v", transform)
 	return transform, nil

@@ -4,19 +4,29 @@
 
 package datablocks
 
+import "datavalues"
+
 func (block *DataBlock) Limit(offset, limit int) (cutOffset, cutLimit int) {
 	preRows := block.NumRows()
-	if block.start+offset < block.end {
-		block.start += offset
-		cutOffset += offset
-	} else {
-		block.start = block.end
-		cutOffset += preRows
-	}
 
-	if block.end-block.start > limit {
-		block.end = block.start + limit
+	st := offset
+	ed := limit + offset
+
+	if ed > preRows {
+		ed = preRows
 	}
-	cutLimit += block.NumRows()
+	if st > preRows {
+		st = preRows
+	}
+	if block.seqs == nil {
+		block.seqs = make([]*datavalues.Value, preRows)
+		for i := 0; i < len(block.seqs); i++ {
+			block.seqs[i] = datavalues.MakeInt(i)
+		}
+	}
+	block.seqs = block.seqs[st:ed]
+
+	cutOffset += st
+	cutLimit += preRows - (ed - st)
 	return
 }

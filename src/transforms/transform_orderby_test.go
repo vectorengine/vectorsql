@@ -63,7 +63,7 @@ func TestOrderByTransfrom(t *testing.T) {
 	for _, test := range tests {
 		mock, cleanup := mocks.NewMock()
 		defer cleanup()
-		ctx := NewTransformContext(mock.Log, mock.Conf)
+		ctx := NewTransformContext(mock.Ctx, mock.Log, mock.Conf)
 
 		stream := mocks.NewMockBlockInputStream(test.source)
 		datasource := NewDataSourceTransform(ctx, stream)

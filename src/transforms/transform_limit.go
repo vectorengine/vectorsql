@@ -16,8 +16,6 @@ type Limitransform struct {
 	ctx  *TransformContext
 	plan *planners.LimitPlan
 	processors.BaseProcessor
-
-	current int
 }
 
 func NewLimitransform(ctx *TransformContext, plan *planners.LimitPlan) processors.IProcessor {
@@ -46,10 +44,6 @@ func (t *Limitransform) Execute() {
 		switch y := x.(type) {
 		case *datablocks.DataBlock:
 			if x != nil {
-				if offset < 0 || limit <= 0 {
-					x = nil
-					break
-				}
 				cutOffset, cutLimit := y.Limit(offset, limit)
 				offset -= cutOffset
 				limit -= cutLimit
@@ -57,6 +51,11 @@ func (t *Limitransform) Execute() {
 			}
 		}
 		out.Send(x)
+
+		if offset < 0 || limit <= 0 {
+			t.Finish()
+			return
+		}
 	}
 	wg.Add(1)
 	t.Subscribe(onNext)
