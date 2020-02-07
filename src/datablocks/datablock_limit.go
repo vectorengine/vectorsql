@@ -27,6 +27,6 @@ func (block *DataBlock) Limit(offset, limit int) (cutOffset, cutLimit int) {
 	block.seqs = block.seqs[st:ed]
 
 	cutOffset += st
-	cutLimit += preRows - (ed - st)
+	cutLimit += ed - st
 	return
 }
