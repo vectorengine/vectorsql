@@ -18,9 +18,6 @@ type DataBlock struct {
 	indexmap  map[string]int
 	valuesmap map[string]*DataBlockValue
 
-	// start, end for block slice
-	start     int
-	end       int
 	immutable bool
 }
 
@@ -66,7 +63,12 @@ func (block *DataBlock) Info() *DataBlockInfo {
 }
 
 func (block *DataBlock) NumRows() int {
-	return block.end - block.start
+	if block.seqs != nil {
+		return len(block.seqs)
+	} else if len(block.values) == 0 {
+		return 0
+	}
+	return block.values[0].NumRows()
 }
 
 func (block *DataBlock) NumColumns() int {
@@ -139,7 +141,6 @@ func (block *DataBlock) WriteBatch(batcher *BatchWriter) error {
 		cv := block.valuesmap[col.column.Name]
 		cv.values = append(cv.values, col.values...)
 	}
-	block.end += batcher.rows
 	return nil
 }
 
@@ -152,6 +153,5 @@ func (block *DataBlock) WriteRow(values []*datavalues.Value) error {
 	for i := 0; i < cols; i++ {
 		block.values[i].values = append(block.values[i].values, values[i])
 	}
-	block.end++
 	return nil
 }

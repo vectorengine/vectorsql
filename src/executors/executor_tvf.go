@@ -111,7 +111,7 @@ func (executor *TableValuedFunctionExecutor) Execute() (processors.IProcessor, e
 
 	// Stream.
 	stream := datastreams.NewOneBlockInputStream(blocks...)
-	transformCtx := transforms.NewTransformContext(executor.ctx.log, executor.ctx.conf)
+	transformCtx := transforms.NewTransformContext(executor.ctx.ctx, executor.ctx.log, executor.ctx.conf)
 	transform := transforms.NewDataSourceTransform(transformCtx, stream)
 	log.Debug("Executor->Return->Pipeline:%s", transform.Name())
 	return transform, nil

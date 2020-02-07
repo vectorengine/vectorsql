@@ -5,18 +5,20 @@
 package transforms
 
 import (
-	"config"
-
 	"base/xlog"
+	"config"
+	"context"
 )
 
 type TransformContext struct {
+	ctx  context.Context
 	log  *xlog.Log
 	conf *config.Config
 }
 
-func NewTransformContext(log *xlog.Log, conf *config.Config) *TransformContext {
+func NewTransformContext(ctx context.Context, log *xlog.Log, conf *config.Config) *TransformContext {
 	return &TransformContext{
+		ctx:  ctx,
 		log:  log,
 		conf: conf,
 	}

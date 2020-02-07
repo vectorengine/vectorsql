@@ -19,6 +19,7 @@ type (
 		name        string
 		ctx         context.Context
 		pauseChan   chan struct{}
+		finishChan  chan struct{}
 		resumeChan  chan struct{}
 		nextHandler NextFunc
 		doneHandler DoneFunc
@@ -32,6 +33,7 @@ func NewBaseProcessor(name string) BaseProcessor {
 		ctx:        context.Background(),
 		name:       name,
 		pauseChan:  make(chan struct{}),
+		finishChan: make(chan struct{}),
 		resumeChan: make(chan struct{}),
 	}
 }
@@ -69,6 +71,10 @@ func (p *BaseProcessor) Pause() {
 	p.pauseChan <- struct{}{}
 }
 
+func (p *BaseProcessor) Finish() {
+	close(p.finishChan)
+}
+
 func (p *BaseProcessor) Resume() {
 	p.resumeChan <- struct{}{}
 }
@@ -104,6 +110,11 @@ func (p *BaseProcessor) Subscribe(eventHandlers ...EventHandler) {
 			for range p.resumeChan {
 				goto Loop
 			}
+		case <-p.finishChan:
+			in.Close()
+			out.Close()
+			return
+
 		case <-ctx.Done():
 			if p.nextHandler != nil {
 				p.nextHandler(ctx.Err())

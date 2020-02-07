@@ -37,6 +37,9 @@ func (pt *OutPort) To(rpt *InPort) {
 func (pt *OutPort) Send(v interface{}) {
 	pt.mu.Lock()
 	defer pt.mu.Unlock()
+	if pt.closed {
+		return
+	}
 	for _, rpt := range pt.edges {
 		rpt.Send(v)
 	}
@@ -51,4 +54,10 @@ func (pt *OutPort) Close() {
 		}
 		pt.closed = true
 	}
+}
+
+func (pt *OutPort) IsClose() bool {
+	pt.mu.Lock()
+	defer pt.mu.Unlock()
+	return pt.closed
 }

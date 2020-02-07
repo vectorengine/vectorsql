@@ -10,22 +10,24 @@ import (
 )
 
 type DataBlockColumnIterator struct {
-	cv   *DataBlockValue
-	seqs []*datavalues.Value
-
+	cv      *DataBlockValue
+	seqs    []*datavalues.Value
+	rows    int
 	current int
-	end     int
 }
 
 func newDataBlockColumnIterator(block *DataBlock, idx int) *DataBlockColumnIterator {
 	cv := block.values[idx]
 	seqs := block.Seqs()
-
+	rows := cv.NumRows()
+	if seqs != nil {
+		rows = len(seqs)
+	}
 	return &DataBlockColumnIterator{
 		cv:      cv,
+		rows:    rows,
 		seqs:    seqs,
-		current: block.start - 1,
-		end:     block.end,
+		current: -1,
 	}
 }
 
@@ -35,7 +37,7 @@ func (it *DataBlockColumnIterator) Column() columns.Column {
 
 func (it *DataBlockColumnIterator) Next() bool {
 	it.current++
-	return it.current < it.end
+	return it.current < it.rows
 }
 
 func (it *DataBlockColumnIterator) Value() *datavalues.Value {

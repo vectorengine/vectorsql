@@ -40,6 +40,12 @@ func (pt *InPort) From(rpt *OutPort) {
 }
 
 func (pt *InPort) Send(v interface{}) {
+	pt.mu.Lock()
+	defer pt.mu.Unlock()
+
+	if pt.closed {
+		return
+	}
 	pt.ch <- v
 }
 

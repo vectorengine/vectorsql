@@ -60,7 +60,7 @@ func TestFilterExecutor(t *testing.T) {
 
 		stream := mocks.NewMockBlockInputStream(test.source)
 
-		tctx := transforms.NewTransformContext(mock.Log, mock.Conf)
+		tctx := transforms.NewTransformContext(mock.Ctx, mock.Log, mock.Conf)
 		datasource := transforms.NewDataSourceTransform(tctx, stream)
 
 		filter := NewFilterExecutor(ctx, test.plan.(*planners.FilterPlan))

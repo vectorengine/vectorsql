@@ -68,7 +68,7 @@ func TestOrderByExecutor(t *testing.T) {
 
 		stream := mocks.NewMockBlockInputStream(test.source)
 
-		tctx := transforms.NewTransformContext(mock.Log, mock.Conf)
+		tctx := transforms.NewTransformContext(mock.Ctx, mock.Log, mock.Conf)
 		datasource := transforms.NewDataSourceTransform(tctx, stream)
 
 		orderby := NewOrderByExecutor(ctx, test.plan.(*planners.OrderByPlan))

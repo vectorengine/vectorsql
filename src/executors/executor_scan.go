@@ -44,7 +44,7 @@ func (executor *ScanExecutor) Execute() (processors.IProcessor, error) {
 	if err != nil {
 		return nil, err
 	}
-	transformCtx := transforms.NewTransformContext(log, conf)
+	transformCtx := transforms.NewTransformContext(executor.ctx.ctx, log, conf)
 	transform := transforms.NewDataSourceTransform(transformCtx, input)
 	log.Debug("Executor->Return->Pipeline:%v", transform)
 	return transform, nil
