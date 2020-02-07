@@ -22,6 +22,7 @@ test:
 	@$(MAKE) testconfig
 	@$(MAKE) testsessions
 	@$(MAKE) testfunctions
+	@$(MAKE) testexpressions
 	@$(MAKE) testprocessors
 	@$(MAKE) testdatastreams
 	@$(MAKE) testparsers
@@ -48,6 +49,9 @@ testdatastreams:
 
 testfunctions:
 	go test -v -race functions
+
+testexpressions:
+	go test -v -race expressions
 
 testparsers:
 	go test -v -race parsers/...
