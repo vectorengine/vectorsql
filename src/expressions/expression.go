@@ -62,10 +62,10 @@ func expressionFor(expr interface{}) IExpression {
 		return CONST(float64(e))
 	case byte:
 		return CONST(float64(e))
-	case float32:
-		return CONST(float64(e))
 	case float64:
 		return CONST(e)
+	case float32:
+		return CONST(float64(e))
 	}
 	return nil
 }

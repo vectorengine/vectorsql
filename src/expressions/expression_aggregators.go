@@ -11,8 +11,9 @@ import (
 func SUM(arg interface{}) IExpression {
 	exprs := expressionsFor(arg)
 	return &AggregateExpression{
-		name: "SUM",
-		expr: exprs[0],
+		name:     "SUM",
+		expr:     exprs[0],
+		exprtype: datavalues.ZeroFloat(),
 		update: func(current *datavalues.Value, next *datavalues.Value) *datavalues.Value {
 			if current == nil {
 				return next
@@ -26,8 +27,9 @@ func SUM(arg interface{}) IExpression {
 func MIN(arg interface{}) IExpression {
 	exprs := expressionsFor(arg)
 	return &AggregateExpression{
-		name: "MIN",
-		expr: exprs[0],
+		name:     "MIN",
+		expr:     exprs[0],
+		exprtype: datavalues.ZeroFloat(),
 		update: func(current *datavalues.Value, next *datavalues.Value) *datavalues.Value {
 			if current == nil || current.AsFloat() > next.AsFloat() {
 				return next
@@ -40,8 +42,9 @@ func MIN(arg interface{}) IExpression {
 func MAX(arg interface{}) IExpression {
 	exprs := expressionsFor(arg)
 	return &AggregateExpression{
-		name: "MAX",
-		expr: exprs[0],
+		name:     "MAX",
+		expr:     exprs[0],
+		exprtype: datavalues.ZeroFloat(),
 		update: func(current *datavalues.Value, next *datavalues.Value) *datavalues.Value {
 			if current == nil || current.AsFloat() < next.AsFloat() {
 				return next
@@ -55,8 +58,9 @@ func MAX(arg interface{}) IExpression {
 func COUNT(arg interface{}) IExpression {
 	exprs := expressionsFor(arg)
 	return &AggregateExpression{
-		name: "COUNT",
-		expr: exprs[0],
+		name:     "COUNT",
+		expr:     exprs[0],
+		exprtype: datavalues.ZeroFloat(),
 		update: func(current *datavalues.Value, next *datavalues.Value) *datavalues.Value {
 			if current == nil {
 				return datavalues.ToValue(1)

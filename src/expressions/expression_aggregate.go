@@ -11,10 +11,11 @@ import (
 type updateFunc func(current, next *datavalues.Value) *datavalues.Value
 
 type AggregateExpression struct {
-	name   string
-	expr   IExpression
-	update updateFunc
-	saved  *datavalues.Value
+	name     string
+	expr     IExpression
+	update   updateFunc
+	saved    *datavalues.Value
+	exprtype *datavalues.Value
 }
 
 func (e *AggregateExpression) Get() *datavalues.Value {
@@ -32,5 +33,5 @@ func (e *AggregateExpression) Walk(visit Visit) error {
 }
 
 func (e *AggregateExpression) ReturnType() *datavalues.Value {
-	return datavalues.ZeroFloat()
+	return e.exprtype
 }
