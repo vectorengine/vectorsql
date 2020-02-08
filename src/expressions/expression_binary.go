@@ -11,10 +11,11 @@ import (
 type evalFunc func(left, right *datavalues.Value) *datavalues.Value
 
 type BinaryExpression struct {
-	name  string
-	eval  evalFunc
-	left  IExpression
-	right IExpression
+	name     string
+	eval     evalFunc
+	left     IExpression
+	right    IExpression
+	exprtype *datavalues.Value
 }
 
 func (e *BinaryExpression) Get() *datavalues.Value {
@@ -34,5 +35,5 @@ func (e *BinaryExpression) Walk(visit Visit) error {
 }
 
 func (e *BinaryExpression) ReturnType() *datavalues.Value {
-	return datavalues.ZeroFloat()
+	return e.exprtype
 }

@@ -5,6 +5,7 @@
 package expressions
 
 import (
+	"math"
 	"testing"
 
 	"datavalues"
@@ -19,24 +20,49 @@ func TestOperatorsExpression(t *testing.T) {
 		expect *datavalues.Value
 	}{
 		{
-			name:   "simple",
+			name:   "(a+b)",
 			expr:   ADD("a", "b"),
 			expect: datavalues.ToValue(3.0),
 		},
 		{
-			name:   "simple",
+			name:   "(a+3)",
 			expr:   ADD("a", 3),
 			expect: datavalues.ToValue(4.0),
 		},
 		{
-			name:   "simple",
+			name:   "(a+3)",
 			expr:   ADD("a", CONST(3)),
 			expect: datavalues.ToValue(4.0),
 		},
 		{
-			name:   "const",
+			name:   "(1+3)",
 			expr:   ADD(CONST(1), CONST(3)),
 			expect: datavalues.ToValue(4.0),
+		},
+		{
+			name:   "(1-3)",
+			expr:   SUB(CONST(1), CONST(3)),
+			expect: datavalues.ToValue(-2),
+		},
+		{
+			name:   "a+(1-3)",
+			expr:   ADD("a", SUB(CONST(1), CONST(3))),
+			expect: datavalues.ToValue(-1),
+		},
+		{
+			name:   "a+(b*3)",
+			expr:   ADD("a", MUL("b", 3)),
+			expect: datavalues.ToValue(7),
+		},
+		{
+			name:   "a/b",
+			expr:   DIV("a", "b"),
+			expect: datavalues.ToValue(0.5),
+		},
+		{
+			name:   "a/0",
+			expr:   DIV("a", 0),
+			expect: datavalues.ToValue(math.MaxFloat64),
 		},
 	}
 
@@ -45,7 +71,17 @@ func TestOperatorsExpression(t *testing.T) {
 			"a": datavalues.ToValue(1),
 			"b": datavalues.ToValue(2),
 		}
+		_ = test.expr.Get()
 		actual := test.expr.Update(params)
-		assert.Equal(t, test.expect, actual)
+		assert.Equal(t, test.expect.AsFloat(), actual.AsFloat())
+
+		expecttyp := datavalues.ZeroFloat()
+		actualtyp := test.expr.ReturnType()
+		assert.Equal(t, expecttyp, actualtyp)
+
+		err := test.expr.Walk(func(e IExpression) (bool, error) {
+			return true, nil
+		})
+		assert.Nil(t, err)
 	}
 }

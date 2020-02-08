@@ -92,5 +92,16 @@ func TestAggregatorsExpression(t *testing.T) {
 		test.expr.Update(params1)
 		actual := test.expr.Update(params2)
 		assert.Equal(t, test.expect.AsFloat(), actual.AsFloat())
+
+		expecttyp := datavalues.ZeroFloat()
+		actualtyp := test.expr.ReturnType()
+		assert.Equal(t, expecttyp, actualtyp)
+
+		_ = test.expr.Get()
+
+		err := test.expr.Walk(func(e IExpression) (bool, error) {
+			return true, nil
+		})
+		assert.Nil(t, err)
 	}
 }
