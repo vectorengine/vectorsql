@@ -5,7 +5,6 @@
 package expressions
 
 import (
-	"math"
 	"testing"
 
 	"datavalues"
@@ -15,9 +14,10 @@ import (
 
 func TestOperatorsExpression(t *testing.T) {
 	tests := []struct {
-		name   string
-		expr   IExpression
-		expect *datavalues.Value
+		name      string
+		expr      IExpression
+		expect    *datavalues.Value
+		errstring string
 	}{
 		{
 			name:   "(a+b)",
@@ -57,12 +57,12 @@ func TestOperatorsExpression(t *testing.T) {
 		{
 			name:   "a/b",
 			expr:   DIV("a", "b"),
-			expect: datavalues.ToValue(0.5),
+			expect: datavalues.ToValue(0),
 		},
 		{
-			name:   "a/0",
-			expr:   DIV("a", 0),
-			expect: datavalues.ToValue(math.MaxFloat64),
+			name:      "a+c",
+			expr:      ADD("a", "c"),
+			errstring: "not-ok",
 		},
 	}
 
@@ -70,18 +70,20 @@ func TestOperatorsExpression(t *testing.T) {
 		params := Map{
 			"a": datavalues.ToValue(1),
 			"b": datavalues.ToValue(2),
+			"c": datavalues.ToValue("c"),
 		}
-		_ = test.expr.Get()
-		actual := test.expr.Update(params)
-		assert.Equal(t, test.expect.AsFloat(), actual.AsFloat())
+		actual, err := test.expr.Update(params)
+		if test.errstring != "" {
+			assert.NotNil(t, err)
+		} else {
+			assert.Nil(t, err)
+			assert.Equal(t, test.expect.AsFloat(), actual.AsFloat())
 
-		expecttyp := datavalues.ZeroFloat()
-		actualtyp := test.expr.ReturnType()
-		assert.Equal(t, expecttyp, actualtyp)
-
-		err := test.expr.Walk(func(e IExpression) (bool, error) {
-			return true, nil
-		})
-		assert.Nil(t, err)
+			_, _ = test.expr.Get()
+			err = test.expr.Walk(func(e IExpression) (bool, error) {
+				return true, nil
+			})
+			assert.Nil(t, err)
+		}
 	}
 }

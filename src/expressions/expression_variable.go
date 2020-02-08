@@ -22,19 +22,15 @@ func NewVariableExpression(v string) *VariableExpression {
 	}
 }
 
-func (e *VariableExpression) Get() *datavalues.Value {
-	return datavalues.ToValue(e.value)
+func (e *VariableExpression) Get() (*datavalues.Value, error) {
+	return datavalues.ToValue(e.value), nil
 }
 
-func (e *VariableExpression) Update(params IParams) *datavalues.Value {
+func (e *VariableExpression) Update(params IParams) (*datavalues.Value, error) {
 	v, _ := params.Get(e.value)
-	return v
+	return v, nil
 }
 
 func (e *VariableExpression) Walk(visit Visit) error {
 	return nil
-}
-
-func (e *VariableExpression) ReturnType() *datavalues.Value {
-	return datavalues.ZeroString()
 }

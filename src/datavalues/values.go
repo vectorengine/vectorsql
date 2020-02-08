@@ -118,6 +118,8 @@ func ToValue(value interface{}) *Value {
 		return MakeInt(value)
 	case int8:
 		return MakeInt(int(value))
+	case int16:
+		return MakeInt(int(value))
 	case int32:
 		return MakeInt(int(value))
 	case int64:

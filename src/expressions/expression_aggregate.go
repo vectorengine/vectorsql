@@ -8,30 +8,43 @@ import (
 	"datavalues"
 )
 
-type updateFunc func(current, next *datavalues.Value) *datavalues.Value
+type updateFunc func(current, next *datavalues.Value) (*datavalues.Value, error)
 
 type AggregateExpression struct {
 	name     string
 	expr     IExpression
 	update   updateFunc
 	saved    *datavalues.Value
-	exprtype *datavalues.Value
+	validate IValidator
 }
 
-func (e *AggregateExpression) Get() *datavalues.Value {
-	return e.saved
+func (e *AggregateExpression) Get() (*datavalues.Value, error) {
+	if e.validate != nil {
+		if err := e.validate.Validate(e.saved); err != nil {
+			return nil, err
+		}
+	}
+	return e.saved, nil
 }
 
-func (e *AggregateExpression) Update(params IParams) *datavalues.Value {
-	updated := e.expr.Update(params)
-	e.saved = e.update(e.saved, updated)
-	return e.saved
+func (e *AggregateExpression) Update(params IParams) (*datavalues.Value, error) {
+	var err error
+	var updated *datavalues.Value
+
+	if updated, err = e.expr.Update(params); err != nil {
+		return nil, err
+	}
+	if e.validate != nil {
+		if err := e.validate.Validate(updated); err != nil {
+			return nil, err
+		}
+	}
+	if e.saved, err = e.update(e.saved, updated); err != nil {
+		return nil, err
+	}
+	return e.saved, nil
 }
 
 func (e *AggregateExpression) Walk(visit Visit) error {
 	return Walk(visit, e.expr)
-}
-
-func (e *AggregateExpression) ReturnType() *datavalues.Value {
-	return e.exprtype
 }

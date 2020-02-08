@@ -9,10 +9,9 @@ import (
 )
 
 type IExpression interface {
-	Get() *datavalues.Value
+	Get() (*datavalues.Value, error)
 	Walk(visit Visit) error
-	Update(params IParams) *datavalues.Value
-	ReturnType() *datavalues.Value
+	Update(params IParams) (*datavalues.Value, error)
 }
 
 type Visit func(e IExpression) (kontinue bool, err error)
@@ -53,19 +52,19 @@ func expressionFor(expr interface{}) IExpression {
 	case *datavalues.Value:
 		return CONST(e)
 	case int:
-		return CONST(float64(e))
+		return CONST(e)
 	case int64:
-		return CONST(float64(e))
+		return CONST(e)
 	case int32:
-		return CONST(float64(e))
+		return CONST(e)
 	case int16:
-		return CONST(float64(e))
+		return CONST(e)
 	case byte:
-		return CONST(float64(e))
+		return CONST(e)
 	case float64:
 		return CONST(e)
 	case float32:
-		return CONST(float64(e))
+		return CONST(e)
 	}
 	return nil
 }

@@ -5,20 +5,32 @@
 package expressions
 
 import (
-	"math"
-
 	"datavalues"
+
+	"base/errors"
 )
 
 func ADD(left interface{}, right interface{}) IExpression {
 	exprs := expressionsFor(left, right)
 	return &BinaryExpression{
-		name:     "+",
-		left:     exprs[0],
-		right:    exprs[1],
-		exprtype: datavalues.ZeroFloat(),
-		eval: func(left *datavalues.Value, right *datavalues.Value) *datavalues.Value {
-			return datavalues.ToValue(left.AsFloat() + right.AsFloat())
+		name:  "+",
+		left:  exprs[0],
+		right: exprs[1],
+		validate: All(
+			OneOf(
+				AllArgs(TypeOf(datavalues.ZeroInt())),
+				AllArgs(TypeOf(datavalues.ZeroFloat())),
+			),
+		),
+		eval: func(left *datavalues.Value, right *datavalues.Value) (*datavalues.Value, error) {
+			switch left.GetType() {
+			case datavalues.TypeInt:
+				return datavalues.ToValue(left.AsInt() + right.AsInt()), nil
+			case datavalues.TypeFloat:
+				return datavalues.ToValue(left.AsFloat() + right.AsFloat()), nil
+			default:
+				return nil, errors.Errorf("unsupported type:%+v", left)
+			}
 		},
 	}
 }
@@ -26,12 +38,24 @@ func ADD(left interface{}, right interface{}) IExpression {
 func SUB(left interface{}, right interface{}) IExpression {
 	exprs := expressionsFor(left, right)
 	return &BinaryExpression{
-		name:     "-",
-		left:     exprs[0],
-		right:    exprs[1],
-		exprtype: datavalues.ZeroFloat(),
-		eval: func(left *datavalues.Value, right *datavalues.Value) *datavalues.Value {
-			return datavalues.ToValue(left.AsFloat() - right.AsFloat())
+		name:  "-",
+		left:  exprs[0],
+		right: exprs[1],
+		validate: All(
+			OneOf(
+				AllArgs(TypeOf(datavalues.ZeroInt())),
+				AllArgs(TypeOf(datavalues.ZeroFloat())),
+			),
+		),
+		eval: func(left *datavalues.Value, right *datavalues.Value) (*datavalues.Value, error) {
+			switch left.GetType() {
+			case datavalues.TypeInt:
+				return datavalues.ToValue(left.AsInt() - right.AsInt()), nil
+			case datavalues.TypeFloat:
+				return datavalues.ToValue(left.AsFloat() - right.AsFloat()), nil
+			default:
+				return nil, errors.Errorf("unsupported type:%+v", left)
+			}
 		},
 	}
 }
@@ -39,12 +63,24 @@ func SUB(left interface{}, right interface{}) IExpression {
 func MUL(left interface{}, right interface{}) IExpression {
 	exprs := expressionsFor(left, right)
 	return &BinaryExpression{
-		name:     "*",
-		left:     exprs[0],
-		right:    exprs[1],
-		exprtype: datavalues.ZeroFloat(),
-		eval: func(left *datavalues.Value, right *datavalues.Value) *datavalues.Value {
-			return datavalues.ToValue(left.AsFloat() * right.AsFloat())
+		name:  "*",
+		left:  exprs[0],
+		right: exprs[1],
+		validate: All(
+			OneOf(
+				AllArgs(TypeOf(datavalues.ZeroInt())),
+				AllArgs(TypeOf(datavalues.ZeroFloat())),
+			),
+		),
+		eval: func(left *datavalues.Value, right *datavalues.Value) (*datavalues.Value, error) {
+			switch left.GetType() {
+			case datavalues.TypeInt:
+				return datavalues.ToValue(left.AsInt() * right.AsInt()), nil
+			case datavalues.TypeFloat:
+				return datavalues.ToValue(left.AsFloat() * right.AsFloat()), nil
+			default:
+				return nil, errors.Errorf("unsupported type:%+v", left)
+			}
 		},
 	}
 }
@@ -52,15 +88,24 @@ func MUL(left interface{}, right interface{}) IExpression {
 func DIV(left interface{}, right interface{}) IExpression {
 	exprs := expressionsFor(left, right)
 	return &BinaryExpression{
-		name:     "/",
-		left:     exprs[0],
-		right:    exprs[1],
-		exprtype: datavalues.ZeroFloat(),
-		eval: func(left *datavalues.Value, right *datavalues.Value) *datavalues.Value {
-			if right == nil || right.AsFloat() == 0 {
-				return datavalues.MakeFloat(math.MaxFloat64)
+		name:  "/",
+		left:  exprs[0],
+		right: exprs[1],
+		validate: All(
+			OneOf(
+				AllArgs(TypeOf(datavalues.ZeroInt())),
+				AllArgs(TypeOf(datavalues.ZeroFloat())),
+			),
+		),
+		eval: func(left *datavalues.Value, right *datavalues.Value) (*datavalues.Value, error) {
+			switch left.GetType() {
+			case datavalues.TypeInt:
+				return datavalues.ToValue(left.AsInt() / right.AsInt()), nil
+			case datavalues.TypeFloat:
+				return datavalues.ToValue(left.AsFloat() / right.AsFloat()), nil
+			default:
+				return nil, errors.Errorf("unsupported type:%+v", left)
 			}
-			return datavalues.ToValue(left.AsFloat() / right.AsFloat())
 		},
 	}
 }

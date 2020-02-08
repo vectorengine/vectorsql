@@ -22,18 +22,14 @@ func NewConstantExpression(v *datavalues.Value) *ConstantExpression {
 	}
 }
 
-func (e *ConstantExpression) Get() *datavalues.Value {
-	return e.value
+func (e *ConstantExpression) Get() (*datavalues.Value, error) {
+	return e.value, nil
 }
 
-func (e *ConstantExpression) Update(params IParams) *datavalues.Value {
-	return e.value
+func (e *ConstantExpression) Update(params IParams) (*datavalues.Value, error) {
+	return e.value, nil
 }
 
 func (e *ConstantExpression) Walk(visit Visit) error {
 	return nil
-}
-
-func (e *ConstantExpression) ReturnType() *datavalues.Value {
-	return datavalues.ZeroFloat()
 }
