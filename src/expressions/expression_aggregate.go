@@ -26,3 +26,11 @@ func (e *AggregateExpression) Update(params IParams) *datavalues.Value {
 	e.saved = e.update(e.saved, updated)
 	return e.saved
 }
+
+func (e *AggregateExpression) Walk(visit Visit) error {
+	return Walk(visit, e.expr)
+}
+
+func (e *AggregateExpression) ReturnType() *datavalues.Value {
+	return datavalues.ZeroFloat()
+}

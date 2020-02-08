@@ -10,7 +10,38 @@ import (
 
 type IExpression interface {
 	Get() *datavalues.Value
+	Walk(visit Visit) error
 	Update(params IParams) *datavalues.Value
+	ReturnType() *datavalues.Value
+}
+
+type Visit func(e IExpression) (kontinue bool, err error)
+
+func Walk(visit Visit, exprs ...IExpression) error {
+	for _, expr := range exprs {
+		if expr == nil {
+			continue
+		}
+		kontinue, err := visit(expr)
+		if err != nil {
+			return err
+		}
+		if kontinue {
+			err = expr.Walk(visit)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+func expressionsFor(exprs ...interface{}) []IExpression {
+	results := make([]IExpression, len(exprs))
+	for i, expr := range exprs {
+		results[i] = expressionFor(expr)
+	}
+	return results
 }
 
 func expressionFor(expr interface{}) IExpression {
@@ -37,12 +68,4 @@ func expressionFor(expr interface{}) IExpression {
 		return CONST(e)
 	}
 	return nil
-}
-
-func expressionsFor(exprs ...interface{}) []IExpression {
-	results := make([]IExpression, len(exprs))
-	for i, expr := range exprs {
-		results[i] = expressionFor(expr)
-	}
-	return results
 }

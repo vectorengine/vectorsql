@@ -29,3 +29,11 @@ func (e *ConstantExpression) Get() *datavalues.Value {
 func (e *ConstantExpression) Update(params IParams) *datavalues.Value {
 	return e.value
 }
+
+func (e *ConstantExpression) Walk(visit Visit) error {
+	return nil
+}
+
+func (e *ConstantExpression) ReturnType() *datavalues.Value {
+	return datavalues.ZeroFloat()
+}

@@ -30,3 +30,11 @@ func (e *VariableExpression) Update(params IParams) *datavalues.Value {
 	v, _ := params.Get(e.value)
 	return v
 }
+
+func (e *VariableExpression) Walk(visit Visit) error {
+	return nil
+}
+
+func (e *VariableExpression) ReturnType() *datavalues.Value {
+	return datavalues.ZeroString()
+}

@@ -28,3 +28,11 @@ func (e *BinaryExpression) Update(params IParams) *datavalues.Value {
 	right := e.right.Update(params)
 	return e.eval(left, right)
 }
+
+func (e *BinaryExpression) Walk(visit Visit) error {
+	return Walk(visit, e.left, e.right)
+}
+
+func (e *BinaryExpression) ReturnType() *datavalues.Value {
+	return datavalues.ZeroFloat()
+}
