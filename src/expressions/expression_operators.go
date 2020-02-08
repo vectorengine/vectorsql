@@ -8,28 +8,26 @@ import (
 	"datavalues"
 )
 
-func ADD(args ...interface{}) *Expression {
-	exprs := expressionsFor(args...)
-	return &Expression{
+func ADD(left interface{}, right interface{}) IExpression {
+	exprs := expressionsFor(left, right)
+	return &BinaryExpression{
 		name:  "+",
-		exprs: exprs,
-		eval: func(args ...*datavalues.Value) *datavalues.Value {
-			left := args[0].AsInt()
-			right := args[1].AsInt()
-			return datavalues.ToValue(left + right)
+		left:  exprs[0],
+		right: exprs[1],
+		eval: func(left *datavalues.Value, right *datavalues.Value) *datavalues.Value {
+			return datavalues.ToValue(left.AsFloat() + right.AsFloat())
 		},
 	}
 }
 
-func SUB(args ...interface{}) *Expression {
-	exprs := expressionsFor(args...)
-	return &Expression{
+func SUB(left interface{}, right interface{}) IExpression {
+	exprs := expressionsFor(left, right)
+	return &BinaryExpression{
 		name:  "-",
-		exprs: exprs,
-		eval: func(args ...*datavalues.Value) *datavalues.Value {
-			left := args[0].AsInt()
-			right := args[1].AsInt()
-			return datavalues.ToValue(left - right)
+		left:  exprs[0],
+		right: exprs[1],
+		eval: func(left *datavalues.Value, right *datavalues.Value) *datavalues.Value {
+			return datavalues.ToValue(left.AsFloat() - right.AsFloat())
 		},
 	}
 }

@@ -12,8 +12,8 @@ type ConstantExpression struct {
 	value *datavalues.Value
 }
 
-func CONST(v *datavalues.Value) IExpression {
-	return NewConstantExpression(v)
+func CONST(v interface{}) IExpression {
+	return NewConstantExpression(datavalues.ToValue(v))
 }
 
 func NewConstantExpression(v *datavalues.Value) *ConstantExpression {
@@ -26,6 +26,6 @@ func (e *ConstantExpression) Get() *datavalues.Value {
 	return e.value
 }
 
-func (e *ConstantExpression) Update(next IExpression) *datavalues.Value {
+func (e *ConstantExpression) Update(params IParams) *datavalues.Value {
 	return e.value
 }

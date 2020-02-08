@@ -73,6 +73,7 @@ pkgs =	config		\
 		sessions	\
 		processors	\
 		datastreams	\
+		expressions	\
 		functions	\
 		planners	\
 		optimizers	\
