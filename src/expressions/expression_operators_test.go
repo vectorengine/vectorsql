@@ -13,10 +13,6 @@ import (
 )
 
 func TestOperatorsExpression(t *testing.T) {
-	p1 := datavalues.ToValue(1)
-	p2 := datavalues.ToValue(2)
-	p3 := datavalues.ToValue(3)
-
 	tests := []struct {
 		name   string
 		expr   IExpression
@@ -24,18 +20,32 @@ func TestOperatorsExpression(t *testing.T) {
 	}{
 		{
 			name:   "simple",
-			expr:   ADD(p1, p2),
-			expect: datavalues.ToValue(3),
+			expr:   ADD("a", "b"),
+			expect: datavalues.ToValue(3.0),
 		},
 		{
-			name:   "complex",
-			expr:   ADD(SUB(ADD(p1, p2), SUB(p3, p1)), CONST(p2)),
-			expect: datavalues.ToValue(3),
+			name:   "simple",
+			expr:   ADD("a", 3),
+			expect: datavalues.ToValue(4.0),
+		},
+		{
+			name:   "simple",
+			expr:   ADD("a", CONST(3)),
+			expect: datavalues.ToValue(4.0),
+		},
+		{
+			name:   "const",
+			expr:   ADD(CONST(1), CONST(3)),
+			expect: datavalues.ToValue(4.0),
 		},
 	}
 
 	for _, test := range tests {
-		actual := test.expr.Get()
+		params := Map{
+			"a": datavalues.ToValue(1),
+			"b": datavalues.ToValue(2),
+		}
+		actual := test.expr.Update(params)
 		assert.Equal(t, test.expect, actual)
 	}
 }
