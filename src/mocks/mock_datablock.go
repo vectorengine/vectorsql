@@ -35,8 +35,8 @@ func DataBlockEqual(a *datablocks.DataBlock, b *datablocks.DataBlock) bool {
 		return false
 	}
 
-	aiters := a.Iterators()
-	biters := b.Iterators()
+	aiters := a.ColumnIterators()
+	biters := b.ColumnIterators()
 	for i := range aiters {
 		aiter := aiters[i]
 		biter := biters[i]

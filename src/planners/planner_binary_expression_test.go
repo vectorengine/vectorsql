@@ -10,8 +10,8 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestBooleanExpressionPlan(t *testing.T) {
-	plan := NewBooleanExpressionPlan(">",
+func TestBinaryExpressionPlan(t *testing.T) {
+	plan := NewBinaryExpressionPlan("+",
 		NewVariablePlan("a"),
 		NewConstantPlan(2),
 	)
@@ -23,18 +23,16 @@ func TestBooleanExpressionPlan(t *testing.T) {
 	})
 
 	expect := `{
-    "Name": "BooleanExpressionPlan",
-    "Args": [
-        {
-            "Name": "VariablePlan",
-            "Value": "a"
-        },
-        {
-            "Name": "ConstantPlan",
-            "Value": 2
-        }
-    ],
-    "FuncName": "\u003e"
+    "Name": "BinaryExpressionPlan",
+    "FuncName": "+",
+    "Left": {
+        "Name": "VariablePlan",
+        "Value": "a"
+    },
+    "Right": {
+        "Name": "ConstantPlan",
+        "Value": 2
+    }
 }`
 	actual := plan.String()
 	assert.Equal(t, expect, actual)

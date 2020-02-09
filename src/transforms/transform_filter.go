@@ -7,11 +7,9 @@ package transforms
 import (
 	"datablocks"
 	"datavalues"
-	"functions"
+	"expressions"
 	"planners"
 	"processors"
-
-	"base/errors"
 )
 
 type FilterTransform struct {
@@ -55,79 +53,46 @@ func (t *FilterTransform) filter(x *datablocks.DataBlock) error {
 }
 
 func (t *FilterTransform) check(x *datablocks.DataBlock, plan planners.IPlan) ([]*datavalues.Value, error) {
-	switch plan := plan.(type) {
-	case *planners.BooleanExpressionPlan:
-		checks := make([]*datavalues.Value, x.NumRows())
-		right := datavalues.ToValue(plan.Args[1].(*planners.ConstantPlan).Value)
-		colName := plan.Args[0].(*planners.VariablePlan).Value
-		iter, err := x.Iterator(colName)
-		if err != nil {
-			return nil, err
-		}
-
-		function, err := functions.FunctionFactory(plan.FuncName)
-		if err != nil {
-			return nil, err
-		}
-
-		i := 0
-		for iter.Next() {
-			left := iter.Value()
-			if err := function.Validator.Validate(left, right); err != nil {
-				return nil, err
-			}
-			result, err := function.Logic(left, right)
-			if err != nil {
-				return nil, err
-			}
-			checks[i] = result
-			i++
-		}
-		return checks, nil
-	case *planners.AndPlan:
-		checksLeft, err := t.check(x, plan.Left)
-		if err != nil {
-			return nil, err
-		}
-		checksRight, err := t.check(x, plan.Right)
-		if err != nil {
-			return nil, err
-		}
-
-		function, err := functions.FunctionFactory(plan.FuncName)
-		if err != nil {
-			return nil, err
-		}
-		for i := range checksLeft {
-			r, err := function.Logic(checksLeft[i], checksRight[i])
-			if err != nil {
-				return nil, err
-			}
-			checksLeft[i] = r
-		}
-		return checksLeft, nil
-	case *planners.OrPlan:
-		checksLeft, err := t.check(x, plan.Left)
-		if err != nil {
-			return nil, err
-		}
-		checksRight, err := t.check(x, plan.Right)
-		if err != nil {
-			return nil, err
-		}
-
-		function, err := functions.FunctionFactory(plan.FuncName)
-		if err != nil {
-			return nil, err
-		}
-		for i := range checksLeft {
-			r, err := function.Logic(checksLeft[i], checksRight[i])
-			if err != nil {
-				return nil, err
-			}
-			checksLeft[i] = r
-		}
-		return checksLeft, nil
+	type field struct {
+		name string
+		idx  int
 	}
-	return nil, errors.Errorf("unknow plan:%T", plan)
+	var fields []field
+
+	expr, err := planners.BuildExpressions(plan)
+	if err != nil {
+		return nil, err
+	}
+	if err := plan.Walk(func(p planners.IPlan) (bool, error) {
+		switch p := p.(type) {
+		case *planners.VariablePlan:
+			name := string(p.Value)
+			idx, err := x.ColumnIndex(name)
+			if err != nil {
+				return false, err
+			}
+			fields = append(fields, field{name: name, idx: idx})
+		}
+		return true, nil
+	}); err != nil {
+		return nil, err
+	}
+
+	i := 0
+	checks := make([]*datavalues.Value, x.NumRows())
+	params := make(expressions.Map, len(fields))
+	rowiter := x.RowIterator()
+	for rowiter.Next() {
+		row := rowiter.Value()
+		for _, field := range fields {
+			params[field.name] = row[field.idx]
+		}
+		v, err := expr.Update(params)
+		if err != nil {
+			return nil, err
+		}
+		checks[i] = v
+		i++
+	}
+	return checks, nil
 }

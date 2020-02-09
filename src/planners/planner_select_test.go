@@ -68,89 +68,79 @@ func TestSelectPlan(t *testing.T) {
             {
                 "Name": "FilterPlan",
                 "SubPlan": {
-                    "Name": "OrPlan",
+                    "Name": "BinaryExpressionPlan",
                     "FuncName": "OR",
                     "Left": {
-                        "Name": "OrPlan",
+                        "Name": "BinaryExpressionPlan",
                         "FuncName": "OR",
                         "Left": {
-                            "Name": "AndPlan",
+                            "Name": "BinaryExpressionPlan",
                             "FuncName": "AND",
                             "Left": {
-                                "Name": "BooleanExpressionPlan",
-                                "Args": [
-                                    {
-                                        "Name": "VariablePlan",
-                                        "Value": "id"
-                                    },
-                                    {
-                                        "Name": "ConstantPlan",
-                                        "Value": 1
-                                    }
-                                ],
-                                "FuncName": "\u003e"
+                                "Name": "BinaryExpressionPlan",
+                                "FuncName": "\u003e",
+                                "Left": {
+                                    "Name": "VariablePlan",
+                                    "Value": "id"
+                                },
+                                "Right": {
+                                    "Name": "ConstantPlan",
+                                    "Value": 1
+                                }
                             },
                             "Right": {
-                                "Name": "BooleanExpressionPlan",
-                                "Args": [
-                                    {
-                                        "Name": "VariablePlan",
-                                        "Value": "id"
-                                    },
-                                    {
-                                        "Name": "ConstantPlan",
-                                        "Value": 8
-                                    }
-                                ],
-                                "FuncName": "\u003c"
+                                "Name": "BinaryExpressionPlan",
+                                "FuncName": "\u003c",
+                                "Left": {
+                                    "Name": "VariablePlan",
+                                    "Value": "id"
+                                },
+                                "Right": {
+                                    "Name": "ConstantPlan",
+                                    "Value": 8
+                                }
                             }
                         },
                         "Right": {
-                            "Name": "AndPlan",
+                            "Name": "BinaryExpressionPlan",
                             "FuncName": "AND",
                             "Left": {
-                                "Name": "BooleanExpressionPlan",
-                                "Args": [
-                                    {
-                                        "Name": "VariablePlan",
-                                        "Value": "id"
-                                    },
-                                    {
-                                        "Name": "ConstantPlan",
-                                        "Value": 9
-                                    }
-                                ],
-                                "FuncName": "="
+                                "Name": "BinaryExpressionPlan",
+                                "FuncName": "=",
+                                "Left": {
+                                    "Name": "VariablePlan",
+                                    "Value": "id"
+                                },
+                                "Right": {
+                                    "Name": "ConstantPlan",
+                                    "Value": 9
+                                }
                             },
                             "Right": {
-                                "Name": "BooleanExpressionPlan",
-                                "Args": [
-                                    {
-                                        "Name": "VariablePlan",
-                                        "Value": "c"
-                                    },
-                                    {
-                                        "Name": "ConstantPlan",
-                                        "Value": 2019.12
-                                    }
-                                ],
-                                "FuncName": "\u003e"
+                                "Name": "BinaryExpressionPlan",
+                                "FuncName": "\u003e",
+                                "Left": {
+                                    "Name": "VariablePlan",
+                                    "Value": "c"
+                                },
+                                "Right": {
+                                    "Name": "ConstantPlan",
+                                    "Value": 2019.12
+                                }
                             }
                         }
                     },
                     "Right": {
-                        "Name": "BooleanExpressionPlan",
-                        "Args": [
-                            {
-                                "Name": "VariablePlan",
-                                "Value": "d"
-                            },
-                            {
-                                "Name": "ConstantPlan",
-                                "Value": "name"
-                            }
-                        ],
-                        "FuncName": "="
+                        "Name": "BinaryExpressionPlan",
+                        "FuncName": "=",
+                        "Left": {
+                            "Name": "VariablePlan",
+                            "Value": "d"
+                        },
+                        "Right": {
+                            "Name": "ConstantPlan",
+                            "Value": "name"
+                        }
                     }
                 }
             },
@@ -232,36 +222,32 @@ func TestSelectPlan(t *testing.T) {
                             "Name": "TableValuedFunctionExpressionPlan",
                             "FuncName": "",
                             "SubPlan": {
-                                "Name": "FunctionExpressionPlan",
+                                "Name": "BinaryExpressionPlan",
                                 "FuncName": "-\u003e",
-                                "Args": [
-                                    {
-                                        "Name": "VariablePlan",
-                                        "Value": "range_start"
-                                    },
-                                    {
-                                        "Name": "ConstantPlan",
-                                        "Value": 1
-                                    }
-                                ]
+                                "Left": {
+                                    "Name": "VariablePlan",
+                                    "Value": "range_start"
+                                },
+                                "Right": {
+                                    "Name": "ConstantPlan",
+                                    "Value": 1
+                                }
                             }
                         },
                         {
                             "Name": "TableValuedFunctionExpressionPlan",
                             "FuncName": "",
                             "SubPlan": {
-                                "Name": "FunctionExpressionPlan",
+                                "Name": "BinaryExpressionPlan",
                                 "FuncName": "-\u003e",
-                                "Args": [
-                                    {
-                                        "Name": "VariablePlan",
-                                        "Value": "range_end"
-                                    },
-                                    {
-                                        "Name": "ConstantPlan",
-                                        "Value": 5
-                                    }
-                                ]
+                                "Left": {
+                                    "Name": "VariablePlan",
+                                    "Value": "range_end"
+                                },
+                                "Right": {
+                                    "Name": "ConstantPlan",
+                                    "Value": 5
+                                }
                             }
                         }
                     ]
@@ -299,42 +285,36 @@ func TestSelectPlan(t *testing.T) {
                     "Name": "MapPlan",
                     "SubPlans": [
                         {
-                            "Name": "FunctionExpressionPlan",
+                            "Name": "UnaryExpressionPlan",
                             "FuncName": "MAX",
-                            "Args": [
-                                {
-                                    "Name": "VariablePlan",
-                                    "Value": "a"
-                                }
-                            ]
+                            "Expr": {
+                                "Name": "VariablePlan",
+                                "Value": "a"
+                            }
                         },
                         {
-                            "Name": "FunctionExpressionPlan",
+                            "Name": "UnaryExpressionPlan",
                             "FuncName": "SUM",
-                            "Args": [
-                                {
-                                    "Name": "VariablePlan",
-                                    "Value": "b"
-                                }
-                            ]
+                            "Expr": {
+                                "Name": "VariablePlan",
+                                "Value": "b"
+                            }
                         },
                         {
                             "Name": "VariablePlan",
                             "Value": "c"
                         },
                         {
-                            "Name": "FunctionExpressionPlan",
+                            "Name": "BinaryExpressionPlan",
                             "FuncName": "+",
-                            "Args": [
-                                {
-                                    "Name": "VariablePlan",
-                                    "Value": "id"
-                                },
-                                {
-                                    "Name": "ConstantPlan",
-                                    "Value": 1
-                                }
-                            ]
+                            "Left": {
+                                "Name": "VariablePlan",
+                                "Value": "id"
+                            },
+                            "Right": {
+                                "Name": "ConstantPlan",
+                                "Value": 1
+                            }
                         }
                     ]
                 }
@@ -342,87 +322,24 @@ func TestSelectPlan(t *testing.T) {
             {
                 "Name": "FilterPlan",
                 "SubPlan": {
-                    "Name": "BooleanExpressionPlan",
-                    "Args": [
-                        {
-                            "Name": "FunctionExpressionPlan",
-                            "FuncName": "+",
-                            "Args": [
-                                {
-                                    "Name": "VariablePlan",
-                                    "Value": "id"
-                                },
-                                {
-                                    "Name": "ConstantPlan",
-                                    "Value": 1
-                                }
-                            ]
+                    "Name": "BinaryExpressionPlan",
+                    "FuncName": "!=",
+                    "Left": {
+                        "Name": "BinaryExpressionPlan",
+                        "FuncName": "+",
+                        "Left": {
+                            "Name": "VariablePlan",
+                            "Value": "id"
                         },
-                        {
+                        "Right": {
                             "Name": "ConstantPlan",
-                            "Value": 2
+                            "Value": 1
                         }
-                    ],
-                    "FuncName": "!="
-                }
-            },
-            {
-                "Name": "GroupByPlan",
-                "Projects": {
-                    "Name": "MapPlan",
-                    "SubPlans": [
-                        {
-                            "Name": "FunctionExpressionPlan",
-                            "FuncName": "MAX",
-                            "Args": [
-                                {
-                                    "Name": "VariablePlan",
-                                    "Value": "a"
-                                }
-                            ]
-                        },
-                        {
-                            "Name": "FunctionExpressionPlan",
-                            "FuncName": "SUM",
-                            "Args": [
-                                {
-                                    "Name": "VariablePlan",
-                                    "Value": "b"
-                                }
-                            ]
-                        },
-                        {
-                            "Name": "VariablePlan",
-                            "Value": "c"
-                        },
-                        {
-                            "Name": "FunctionExpressionPlan",
-                            "FuncName": "+",
-                            "Args": [
-                                {
-                                    "Name": "VariablePlan",
-                                    "Value": "id"
-                                },
-                                {
-                                    "Name": "ConstantPlan",
-                                    "Value": 1
-                                }
-                            ]
-                        }
-                    ]
-                },
-                "GroupBys": {
-                    "Name": "MapPlan",
-                    "SubPlans": [
-                        {
-                            "Name": "VariablePlan",
-                            "Value": "d"
-                        },
-                        {
-                            "Name": "VariablePlan",
-                            "Value": "e"
-                        }
-                    ]
+                    },
+                    "Right": {
+                        "Name": "ConstantPlan",
+                        "Value": 2
+                    }
                 }
             },
             {
@@ -463,114 +380,35 @@ func TestSelectPlan(t *testing.T) {
                     "Name": "MapPlan",
                     "SubPlans": [
                         {
-                            "Name": "FunctionExpressionPlan",
+                            "Name": "UnaryExpressionPlan",
                             "FuncName": "MAX",
-                            "Args": [
-                                {
-                                    "Name": "FunctionExpressionPlan",
-                                    "FuncName": "+",
-                                    "Args": [
-                                        {
-                                            "Name": "VariablePlan",
-                                            "Value": "a"
-                                        },
-                                        {
-                                            "Name": "ConstantPlan",
-                                            "Value": 1
-                                        }
-                                    ]
+                            "Expr": {
+                                "Name": "BinaryExpressionPlan",
+                                "FuncName": "+",
+                                "Left": {
+                                    "Name": "VariablePlan",
+                                    "Value": "a"
+                                },
+                                "Right": {
+                                    "Name": "ConstantPlan",
+                                    "Value": 1
                                 }
-                            ]
+                            }
                         },
                         {
                             "Name": "AliasedExpressionPlan",
                             "As": "b",
                             "Expr": {
-                                "Name": "FunctionExpressionPlan",
+                                "Name": "BinaryExpressionPlan",
                                 "FuncName": "+",
-                                "Args": [
-                                    {
-                                        "Name": "VariablePlan",
-                                        "Value": "id"
-                                    },
-                                    {
-                                        "Name": "ConstantPlan",
-                                        "Value": 1
-                                    }
-                                ]
-                            }
-                        }
-                    ]
-                }
-            },
-            {
-                "Name": "GroupByPlan",
-                "Projects": {
-                    "Name": "MapPlan",
-                    "SubPlans": [
-                        {
-                            "Name": "FunctionExpressionPlan",
-                            "FuncName": "MAX",
-                            "Args": [
-                                {
-                                    "Name": "FunctionExpressionPlan",
-                                    "FuncName": "+",
-                                    "Args": [
-                                        {
-                                            "Name": "VariablePlan",
-                                            "Value": "a"
-                                        },
-                                        {
-                                            "Name": "ConstantPlan",
-                                            "Value": 1
-                                        }
-                                    ]
+                                "Left": {
+                                    "Name": "VariablePlan",
+                                    "Value": "id"
+                                },
+                                "Right": {
+                                    "Name": "ConstantPlan",
+                                    "Value": 1
                                 }
-                            ]
-                        },
-                        {
-                            "Name": "AliasedExpressionPlan",
-                            "As": "b",
-                            "Expr": {
-                                "Name": "FunctionExpressionPlan",
-                                "FuncName": "+",
-                                "Args": [
-                                    {
-                                        "Name": "VariablePlan",
-                                        "Value": "id"
-                                    },
-                                    {
-                                        "Name": "ConstantPlan",
-                                        "Value": 1
-                                    }
-                                ]
-                            }
-                        }
-                    ]
-                },
-                "GroupBys": {
-                    "Name": "MapPlan",
-                    "SubPlans": [
-                        {
-                            "Name": "VariablePlan",
-                            "Value": "a"
-                        },
-                        {
-                            "Name": "AliasedExpressionPlan",
-                            "As": "b",
-                            "Expr": {
-                                "Name": "FunctionExpressionPlan",
-                                "FuncName": "+",
-                                "Args": [
-                                    {
-                                        "Name": "VariablePlan",
-                                        "Value": "id"
-                                    },
-                                    {
-                                        "Name": "ConstantPlan",
-                                        "Value": 1
-                                    }
-                                ]
                             }
                         }
                     ]

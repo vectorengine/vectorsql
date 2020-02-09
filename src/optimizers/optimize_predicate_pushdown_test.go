@@ -21,7 +21,7 @@ func TestOptimizePredicatePushDown(t *testing.T) {
 			),
 		),
 		planners.NewFilterPlan(
-			planners.NewBooleanExpressionPlan(
+			planners.NewBinaryExpressionPlan(
 				"=",
 				planners.NewVariablePlan("name"),
 				planners.NewConstantPlan("db2"),

@@ -18,24 +18,6 @@ type BinaryExpression struct {
 	validate IValidator
 }
 
-func (e *BinaryExpression) Get() (*datavalues.Value, error) {
-	var err error
-	var left, right *datavalues.Value
-
-	if left, err = e.left.Get(); err != nil {
-		return nil, err
-	}
-	if right, err = e.right.Get(); err != nil {
-		return nil, err
-	}
-	if e.validate != nil {
-		if err := e.validate.Validate(left, right); err != nil {
-			return nil, err
-		}
-	}
-	return e.eval(left, right)
-}
-
 func (e *BinaryExpression) Update(params IParams) (*datavalues.Value, error) {
 	var err error
 	var left, right *datavalues.Value

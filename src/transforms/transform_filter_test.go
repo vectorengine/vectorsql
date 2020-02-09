@@ -27,7 +27,7 @@ func TestFilterTransform(t *testing.T) {
 	}{
 		{
 			name: "simple",
-			plan: planners.NewBooleanExpressionPlan(
+			plan: planners.NewBinaryExpressionPlan(
 				"=",
 				planners.NewVariablePlan("name"),
 				planners.NewConstantPlan("y"),
@@ -51,7 +51,7 @@ func TestFilterTransform(t *testing.T) {
 		},
 		{
 			name: "like",
-			plan: planners.NewBooleanExpressionPlan(
+			plan: planners.NewBinaryExpressionPlan(
 				"like",
 				planners.NewVariablePlan("name"),
 				planners.NewConstantPlan("y%"),
@@ -76,13 +76,14 @@ func TestFilterTransform(t *testing.T) {
 		},
 		{
 			name: "and",
-			plan: planners.NewAndPlan(
-				planners.NewBooleanExpressionPlan(
+			plan: planners.NewBinaryExpressionPlan(
+				"AND",
+				planners.NewBinaryExpressionPlan(
 					"like",
 					planners.NewVariablePlan("name"),
 					planners.NewConstantPlan("y%"),
 				),
-				planners.NewBooleanExpressionPlan(
+				planners.NewBinaryExpressionPlan(
 					">",
 					planners.NewVariablePlan("age"),
 					planners.NewConstantPlan(11),
@@ -107,20 +108,22 @@ func TestFilterTransform(t *testing.T) {
 		},
 		{
 			name: "and",
-			plan: planners.NewAndPlan(
-				planners.NewOrPlan(
-					planners.NewBooleanExpressionPlan(
+			plan: planners.NewBinaryExpressionPlan(
+				"AND",
+				planners.NewBinaryExpressionPlan(
+					"OR",
+					planners.NewBinaryExpressionPlan(
 						"=",
 						planners.NewVariablePlan("name"),
 						planners.NewConstantPlan("x"),
 					),
-					planners.NewBooleanExpressionPlan(
+					planners.NewBinaryExpressionPlan(
 						"=",
 						planners.NewVariablePlan("name"),
 						planners.NewConstantPlan("y"),
 					),
 				),
-				planners.NewBooleanExpressionPlan(
+				planners.NewBinaryExpressionPlan(
 					">",
 					planners.NewVariablePlan("age"),
 					planners.NewConstantPlan(10),

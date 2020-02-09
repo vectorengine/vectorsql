@@ -110,7 +110,6 @@ func TestConditionsExpression(t *testing.T) {
 			assert.Nil(t, err)
 			assert.Equal(t, test.expect, actual)
 
-			_, _ = test.expr.Get()
 			err = test.expr.Walk(func(e IExpression) (bool, error) {
 				return true, nil
 			})

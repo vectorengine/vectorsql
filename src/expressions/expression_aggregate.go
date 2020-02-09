@@ -18,15 +18,6 @@ type AggregateExpression struct {
 	validate IValidator
 }
 
-func (e *AggregateExpression) Get() (*datavalues.Value, error) {
-	if e.validate != nil {
-		if err := e.validate.Validate(e.saved); err != nil {
-			return nil, err
-		}
-	}
-	return e.saved, nil
-}
-
 func (e *AggregateExpression) Update(params IParams) (*datavalues.Value, error) {
 	var err error
 	var updated *datavalues.Value

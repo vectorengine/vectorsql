@@ -92,7 +92,19 @@ func (block *DataBlock) Column(name string) (columns.Column, error) {
 	return cv.column, nil
 }
 
-func (block *DataBlock) Iterator(name string) (*DataBlockColumnIterator, error) {
+func (block *DataBlock) ColumnIndex(name string) (int, error) {
+	idx, ok := block.indexmap[name]
+	if !ok {
+		return 0, errors.Errorf("Can't find column:%v", name)
+	}
+	return idx, nil
+}
+
+func (block *DataBlock) RowIterator() *DataBlockRowIterator {
+	return newDataBlockRowIterator(block)
+}
+
+func (block *DataBlock) ColumnIterator(name string) (*DataBlockColumnIterator, error) {
 	idx := 0
 	if _, ok := block.valuesmap[name]; !ok {
 		return nil, errors.Errorf("Can't find column:%v", name)
@@ -104,7 +116,7 @@ func (block *DataBlock) Iterator(name string) (*DataBlockColumnIterator, error) 
 	return newDataBlockColumnIterator(block, idx), nil
 }
 
-func (block *DataBlock) Iterators() []*DataBlockColumnIterator {
+func (block *DataBlock) ColumnIterators() []*DataBlockColumnIterator {
 	var iterators []*DataBlockColumnIterator
 
 	for i := range block.values {
@@ -115,7 +127,7 @@ func (block *DataBlock) Iterators() []*DataBlockColumnIterator {
 }
 
 func (block *DataBlock) First(name string) (*datavalues.Value, error) {
-	it, err := block.Iterator(name)
+	it, err := block.ColumnIterator(name)
 	if err != nil {
 		return nil, errors.Errorf("Can't find column:%v", name)
 	}

@@ -135,3 +135,16 @@ func OR(left interface{}, right interface{}) IExpression {
 		},
 	}
 }
+
+func LIKE(left interface{}, right interface{}) IExpression {
+	exprs := expressionsFor(left, right)
+	return &BinaryExpression{
+		name:     "LIKE",
+		left:     exprs[0],
+		right:    exprs[1],
+		validate: All(),
+		eval: func(left *datavalues.Value, right *datavalues.Value) (*datavalues.Value, error) {
+			return datavalues.ToValue(datavalues.Like(right.AsString(), left)), nil
+		},
+	}
+}

@@ -41,20 +41,38 @@ func parseExpression(expr sqlparser.Expr) (IPlan, error) {
 		return NewConstantPlan(val), nil
 	case *sqlparser.FuncExpr:
 		funcName := strings.ToUpper(expr.Name.String())
-		arguments := make([]IPlan, 0, 4)
-		for _, arg := range expr.Exprs {
-			switch arg := arg.(type) {
-			case *sqlparser.AliasedExpr:
-				logicArg, err := parseFunctionArgument(arg)
+		switch len(expr.Exprs) {
+		case 1:
+			expr, err := parseFunctionArgument(expr.Exprs[0].(*sqlparser.AliasedExpr))
+			if err != nil {
+				return nil, err
+			}
+			return NewUnaryExpressionPlan(funcName, expr), nil
+		case 2:
+			left, err := parseFunctionArgument(expr.Exprs[0].(*sqlparser.AliasedExpr))
+			if err != nil {
+				return nil, err
+			}
+			right, err := parseFunctionArgument(expr.Exprs[1].(*sqlparser.AliasedExpr))
+			if err != nil {
+				return nil, err
+			}
+			return NewBinaryExpressionPlan(funcName, left, right), nil
+		default:
+			args := make([]IPlan, len(expr.Exprs))
+			for i, expr := range expr.Exprs {
+				aliased, ok := expr.(*sqlparser.AliasedExpr)
+				if !ok {
+					return nil, errors.Errorf("Unsupported argument %v of type %v", expr, reflect.TypeOf(expr))
+				}
+				arg, err := parseFunctionArgument(aliased)
 				if err != nil {
 					return nil, err
 				}
-				arguments = append(arguments, logicArg)
-			default:
-				return nil, errors.Errorf("Unsupported argument %v of type %v", arg, reflect.TypeOf(arg))
+				args[i] = arg
 			}
+			return NewFunctionExpressionPlan(funcName, args...), nil
 		}
-		return NewFunctionExpressionPlan(funcName, arguments...), nil
 	case *sqlparser.BinaryExpr:
 		left, err := parseExpression(expr.Left)
 		if err != nil {
@@ -64,7 +82,7 @@ func parseExpression(expr sqlparser.Expr) (IPlan, error) {
 		if err != nil {
 			return nil, err
 		}
-		return NewFunctionExpressionPlan(expr.Operator, left, right), nil
+		return NewBinaryExpressionPlan(expr.Operator, left, right), nil
 	case *sqlparser.ParenExpr:
 		return parseExpression(expr.Expr)
 	}
@@ -212,7 +230,7 @@ func parseComparison(op string, left, right sqlparser.Expr) (IPlan, error) {
 	if err != nil {
 		return nil, err
 	}
-	return NewBooleanExpressionPlan(op, left1, right1), nil
+	return NewBinaryExpressionPlan(op, left1, right1), nil
 }
 
 func parseOperator(op string, left, right sqlparser.Expr) (IPlan, error) {
@@ -225,14 +243,7 @@ func parseOperator(op string, left, right sqlparser.Expr) (IPlan, error) {
 	if err != nil {
 		return nil, err
 	}
-	switch op {
-	case "AND":
-		return NewAndPlan(left1, right1), nil
-	case "OR":
-		return NewOrPlan(left1, right1), nil
-	default:
-		return NewBooleanExpressionPlan(op, left1, right1), nil
-	}
+	return NewBinaryExpressionPlan(op, left1, right1), nil
 }
 
 func parseFunctionArgument(expr *sqlparser.AliasedExpr) (IPlan, error) {

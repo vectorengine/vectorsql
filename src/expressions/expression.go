@@ -9,7 +9,6 @@ import (
 )
 
 type IExpression interface {
-	Get() (*datavalues.Value, error)
 	Walk(visit Visit) error
 	Update(params IParams) (*datavalues.Value, error)
 }

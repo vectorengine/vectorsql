@@ -4,7 +4,11 @@
 
 package planners
 
-import ()
+import (
+	"expressions"
+
+	"base/errors"
+)
 
 type IPlan interface {
 	Build() error
@@ -31,4 +35,30 @@ func Walk(visit Visit, plans ...IPlan) error {
 		}
 	}
 	return nil
+}
+
+func BuildExpressions(plan IPlan) (expressions.IExpression, error) {
+	var expr expressions.IExpression
+
+	switch t := plan.(type) {
+	case *BinaryExpressionPlan:
+		left, err := BuildExpressions(t.Left)
+		if err != nil {
+			return nil, err
+		}
+		right, err := BuildExpressions(t.Right)
+		if err != nil {
+			return nil, err
+		}
+		if expr, err = expressions.BinaryExpressionFactory(t.FuncName, left, right); err != nil {
+			return nil, err
+		}
+		return expr, nil
+	case *VariablePlan:
+		return expressions.VAR(string(t.Value)), nil
+	case *ConstantPlan:
+		return expressions.CONST(t.Value), nil
+	default:
+		return nil, errors.Errorf("Unsupported plan:%s", t)
+	}
 }

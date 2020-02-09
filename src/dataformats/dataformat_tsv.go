@@ -57,7 +57,7 @@ func (stream *TSVOutputFormat) Write(block *datablocks.DataBlock) error {
 	defer stream.mu.Unlock()
 
 	writer := stream.writer
-	iters := block.Iterators()
+	iters := block.ColumnIterators()
 	for i := 0; i < block.NumRows(); i++ {
 		for i, it := range iters {
 			if i != 0 {

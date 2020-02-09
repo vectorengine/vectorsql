@@ -12,12 +12,12 @@ import (
 
 func TestMapPlan(t *testing.T) {
 	plans := []IPlan{
-		NewBooleanExpressionPlan(
+		NewBinaryExpressionPlan(
 			"=",
 			NewVariablePlan("name"),
 			NewConstantPlan("db1"),
 		),
-		NewBooleanExpressionPlan(
+		NewBinaryExpressionPlan(
 			"=",
 			NewVariablePlan("name"),
 			NewConstantPlan("db2"),
@@ -36,32 +36,28 @@ func TestMapPlan(t *testing.T) {
     "Name": "MapPlan",
     "SubPlans": [
         {
-            "Name": "BooleanExpressionPlan",
-            "Args": [
-                {
-                    "Name": "VariablePlan",
-                    "Value": "name"
-                },
-                {
-                    "Name": "ConstantPlan",
-                    "Value": "db1"
-                }
-            ],
-            "FuncName": "="
+            "Name": "BinaryExpressionPlan",
+            "FuncName": "=",
+            "Left": {
+                "Name": "VariablePlan",
+                "Value": "name"
+            },
+            "Right": {
+                "Name": "ConstantPlan",
+                "Value": "db1"
+            }
         },
         {
-            "Name": "BooleanExpressionPlan",
-            "Args": [
-                {
-                    "Name": "VariablePlan",
-                    "Value": "name"
-                },
-                {
-                    "Name": "ConstantPlan",
-                    "Value": "db2"
-                }
-            ],
-            "FuncName": "="
+            "Name": "BinaryExpressionPlan",
+            "FuncName": "=",
+            "Left": {
+                "Name": "VariablePlan",
+                "Value": "name"
+            },
+            "Right": {
+                "Name": "ConstantPlan",
+                "Value": "db2"
+            }
         }
     ]
 }`

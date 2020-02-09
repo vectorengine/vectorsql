@@ -50,7 +50,7 @@ func (stream *NativeBlockOutputStream) Write(block *datablocks.DataBlock) error 
 	}
 
 	// Values.
-	for _, it := range block.Iterators() {
+	for _, it := range block.ColumnIterators() {
 		column := it.Column()
 		datatype := column.DataType
 

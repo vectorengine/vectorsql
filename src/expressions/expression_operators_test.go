@@ -20,24 +20,29 @@ func TestOperatorsExpression(t *testing.T) {
 		errstring string
 	}{
 		{
+			name:   "(1+2)",
+			expr:   ADD(1, 2),
+			expect: datavalues.ToValue(3),
+		},
+		{
 			name:   "(a+b)",
 			expr:   ADD("a", "b"),
-			expect: datavalues.ToValue(3.0),
+			expect: datavalues.ToValue(3),
 		},
 		{
 			name:   "(a+3)",
 			expr:   ADD("a", 3),
-			expect: datavalues.ToValue(4.0),
+			expect: datavalues.ToValue(4),
 		},
 		{
 			name:   "(a+3)",
 			expr:   ADD("a", CONST(3)),
-			expect: datavalues.ToValue(4.0),
+			expect: datavalues.ToValue(4),
 		},
 		{
 			name:   "(1+3)",
 			expr:   ADD(CONST(1), CONST(3)),
-			expect: datavalues.ToValue(4.0),
+			expect: datavalues.ToValue(4),
 		},
 		{
 			name:   "(1-3)",
@@ -77,13 +82,42 @@ func TestOperatorsExpression(t *testing.T) {
 			assert.NotNil(t, err)
 		} else {
 			assert.Nil(t, err)
-			assert.Equal(t, test.expect.AsFloat(), actual.AsFloat())
+			assert.Equal(t, test.expect, actual)
 
-			_, _ = test.expr.Get()
 			err = test.expr.Walk(func(e IExpression) (bool, error) {
 				return true, nil
 			})
 			assert.Nil(t, err)
+		}
+	}
+}
+
+func TestOperatorsParamsExpression(t *testing.T) {
+	tests := []struct {
+		name      string
+		expr      IExpression
+		expect    *datavalues.Value
+		errstring string
+	}{
+		{
+			name:   "(1+2)",
+			expr:   ADD(1, 2),
+			expect: datavalues.ToValue(3),
+		},
+		{
+			name:      "(a+b)",
+			expr:      ADD("a", "b"),
+			errstring: "params is nil",
+		},
+	}
+
+	for _, test := range tests {
+		actual, err := test.expr.Update(nil)
+		if test.errstring != "" {
+			assert.NotNil(t, err)
+		} else {
+			assert.Nil(t, err)
+			assert.Equal(t, test.expect, actual)
 		}
 	}
 }

@@ -29,7 +29,7 @@ func TestFilterExecutor(t *testing.T) {
 		{
 			name: "simple",
 			plan: planners.NewFilterPlan(
-				planners.NewBooleanExpressionPlan(
+				planners.NewBinaryExpressionPlan(
 					"=",
 					planners.NewVariablePlan("name"),
 					planners.NewConstantPlan("y"),

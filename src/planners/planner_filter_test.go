@@ -18,14 +18,14 @@ func TestFilterPlan(t *testing.T) {
 	}{
 		{
 			name: "simple",
-			plan: NewBooleanExpressionPlan(
+			plan: NewBinaryExpressionPlan(
 				"OR",
-				NewBooleanExpressionPlan(
+				NewBinaryExpressionPlan(
 					"=",
 					NewVariablePlan("name"),
 					NewConstantPlan("db1"),
 				),
-				NewBooleanExpressionPlan(
+				NewBinaryExpressionPlan(
 					"=",
 					NewVariablePlan("name"),
 					NewConstantPlan("db2"),
@@ -34,38 +34,32 @@ func TestFilterPlan(t *testing.T) {
 			expect: `{
     "Name": "FilterPlan",
     "SubPlan": {
-        "Name": "BooleanExpressionPlan",
-        "Args": [
-            {
-                "Name": "BooleanExpressionPlan",
-                "Args": [
-                    {
-                        "Name": "VariablePlan",
-                        "Value": "name"
-                    },
-                    {
-                        "Name": "ConstantPlan",
-                        "Value": "db1"
-                    }
-                ],
-                "FuncName": "="
+        "Name": "BinaryExpressionPlan",
+        "FuncName": "OR",
+        "Left": {
+            "Name": "BinaryExpressionPlan",
+            "FuncName": "=",
+            "Left": {
+                "Name": "VariablePlan",
+                "Value": "name"
             },
-            {
-                "Name": "BooleanExpressionPlan",
-                "Args": [
-                    {
-                        "Name": "VariablePlan",
-                        "Value": "name"
-                    },
-                    {
-                        "Name": "ConstantPlan",
-                        "Value": "db2"
-                    }
-                ],
-                "FuncName": "="
+            "Right": {
+                "Name": "ConstantPlan",
+                "Value": "db1"
             }
-        ],
-        "FuncName": "OR"
+        },
+        "Right": {
+            "Name": "BinaryExpressionPlan",
+            "FuncName": "=",
+            "Left": {
+                "Name": "VariablePlan",
+                "Value": "name"
+            },
+            "Right": {
+                "Name": "ConstantPlan",
+                "Value": "db2"
+            }
+        }
     }
 }`,
 		},

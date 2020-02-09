@@ -20,7 +20,7 @@ func (block *DataBlock) Aggregator(fn string, name string) (*datavalues.Value, e
 	}
 
 	i := 0
-	it, err := block.Iterator(name)
+	it, err := block.ColumnIterator(name)
 	if err != nil {
 		return nil, err
 	}

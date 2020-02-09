@@ -17,7 +17,7 @@ func NewShowTablesExecutor(ctx *ExecutorContext, plan planners.IPlan) IExecutor 
 	mapPlan.Add(planners.NewScanPlan("tables", "system"))
 	//filter plan
 	mapPlan.Add(
-		planners.NewFilterPlan(planners.NewBooleanExpressionPlan(
+		planners.NewFilterPlan(planners.NewBinaryExpressionPlan(
 			"=",
 			planners.NewVariablePlan("database"),
 			planners.NewConstantPlan(ctx.session.GetDatabase()),
