@@ -45,8 +45,6 @@ func (storage *SystemNumbersStorage) GetInputStream(session *sessions.Session, s
 type SystemNumbersBlockIntputStream struct {
 	storage      *SystemNumbersStorage
 	block        *datablocks.DataBlock
-	offset       int
-	limit        int
 	maxBlockSize int
 	current      int
 }
@@ -63,9 +61,9 @@ func (stream *SystemNumbersBlockIntputStream) Name() string {
 	return "SystemNumbersBlockIntputStream"
 }
 
-func (stream *SystemNumbersBlockIntputStream) Read() (block *datablocks.DataBlock, err error) {
-	var rows = 0
-	block = stream.block.Clone()
+func (stream *SystemNumbersBlockIntputStream) Read() (*datablocks.DataBlock, error) {
+	rows := 0
+	block := stream.block.Clone()
 	batcher := datablocks.NewBatchWriter(block.Columns())
 
 	for rows < stream.maxBlockSize {
@@ -79,6 +77,8 @@ func (stream *SystemNumbersBlockIntputStream) Read() (block *datablocks.DataBloc
 	if rows == 0 {
 		return nil, nil
 	}
-	block.WriteBatch(batcher)
-	return
+	if err := block.WriteBatch(batcher); err != nil {
+		return nil, err
+	}
+	return block, nil
 }

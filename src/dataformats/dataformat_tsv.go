@@ -12,10 +12,10 @@ import (
 )
 
 type TSVOutputFormat struct {
-	sampleBlock *datablocks.DataBlock
+	mu          sync.RWMutex
 	writer      io.Writer
 	withNames   bool
-	mu          sync.RWMutex
+	sampleBlock *datablocks.DataBlock
 }
 
 func NewTSVOutputFormat(sampleBlock *datablocks.DataBlock, writer io.Writer) datablocks.IDataBlockOutputFormat {
@@ -32,18 +32,24 @@ func NewTSVWithNamesOutputFormat(sampleBlock *datablocks.DataBlock, writer io.Wr
 	}
 }
 
-func (f *TSVOutputFormat) FormatPrefix() (b []byte, err error) {
+func (f *TSVOutputFormat) FormatPrefix() ([]byte, error) {
 	if f.withNames {
 		cols := f.sampleBlock.Columns()
 		for i, col := range cols {
 			if i != 0 {
-				f.writer.Write([]byte("\t"))
+				if _, err := f.writer.Write([]byte("\t")); err != nil {
+					return nil, err
+				}
 			}
-			f.writer.Write([]byte(col.Name))
+			if _, err := f.writer.Write([]byte(col.Name)); err != nil {
+				return nil, err
+			}
 		}
-		f.writer.Write([]byte("\n"))
+		if _, err := f.writer.Write([]byte("\n")); err != nil {
+			return nil, err
+		}
 	}
-	return
+	return nil, nil
 }
 
 func (stream *TSVOutputFormat) Write(block *datablocks.DataBlock) error {
@@ -55,7 +61,9 @@ func (stream *TSVOutputFormat) Write(block *datablocks.DataBlock) error {
 	for i := 0; i < block.NumRows(); i++ {
 		for i, it := range iters {
 			if i != 0 {
-				writer.Write([]byte("\t"))
+				if _, err := writer.Write([]byte("\t")); err != nil {
+					return err
+				}
 			}
 			column := it.Column()
 			datatype := column.DataType
@@ -67,7 +75,9 @@ func (stream *TSVOutputFormat) Write(block *datablocks.DataBlock) error {
 				}
 			}
 		}
-		writer.Write([]byte("\n"))
+		if _, err := writer.Write([]byte("\n")); err != nil {
+			return err
+		}
 	}
 	return nil
 }
