@@ -10,7 +10,7 @@ import (
 
 type IExpression interface {
 	Walk(visit Visit) error
-	Update(params IParams) (*datavalues.Value, error)
+	Eval(params IParams) (*datavalues.Value, error)
 }
 
 type Visit func(e IExpression) (kontinue bool, err error)

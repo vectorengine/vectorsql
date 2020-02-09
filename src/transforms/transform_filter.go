@@ -87,7 +87,7 @@ func (t *FilterTransform) check(x *datablocks.DataBlock, plan planners.IPlan) ([
 		for _, field := range fields {
 			params[field.name] = row[field.idx]
 		}
-		v, err := expr.Update(params)
+		v, err := expr.Eval(params)
 		if err != nil {
 			return nil, err
 		}

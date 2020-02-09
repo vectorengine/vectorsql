@@ -103,7 +103,7 @@ func TestConditionsExpression(t *testing.T) {
 			"c": datavalues.ToValue("c"),
 			"d": datavalues.ToValue("d"),
 		}
-		actual, err := test.expr.Update(params)
+		actual, err := test.expr.Eval(params)
 		if test.errstring != "" {
 			assert.NotNil(t, err)
 		} else {

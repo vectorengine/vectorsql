@@ -22,7 +22,7 @@ func NewVariableExpression(v string) *VariableExpression {
 	}
 }
 
-func (e *VariableExpression) Update(params IParams) (*datavalues.Value, error) {
+func (e *VariableExpression) Eval(params IParams) (*datavalues.Value, error) {
 	if params != nil {
 		v, _ := params.Get(e.value)
 		return v, nil

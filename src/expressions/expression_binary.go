@@ -18,14 +18,14 @@ type BinaryExpression struct {
 	validate IValidator
 }
 
-func (e *BinaryExpression) Update(params IParams) (*datavalues.Value, error) {
+func (e *BinaryExpression) Eval(params IParams) (*datavalues.Value, error) {
 	var err error
 	var left, right *datavalues.Value
 
-	if left, err = e.left.Update(params); err != nil {
+	if left, err = e.left.Eval(params); err != nil {
 		return nil, err
 	}
-	if right, err = e.right.Update(params); err != nil {
+	if right, err = e.right.Eval(params); err != nil {
 		return nil, err
 	}
 	if e.validate != nil {

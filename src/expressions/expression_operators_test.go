@@ -77,7 +77,7 @@ func TestOperatorsExpression(t *testing.T) {
 			"b": datavalues.ToValue(2),
 			"c": datavalues.ToValue("c"),
 		}
-		actual, err := test.expr.Update(params)
+		actual, err := test.expr.Eval(params)
 		if test.errstring != "" {
 			assert.NotNil(t, err)
 		} else {
@@ -112,7 +112,7 @@ func TestOperatorsParamsExpression(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		actual, err := test.expr.Update(nil)
+		actual, err := test.expr.Eval(nil)
 		if test.errstring != "" {
 			assert.NotNil(t, err)
 		} else {

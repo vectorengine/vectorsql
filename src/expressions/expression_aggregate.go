@@ -18,11 +18,11 @@ type AggregateExpression struct {
 	validate IValidator
 }
 
-func (e *AggregateExpression) Update(params IParams) (*datavalues.Value, error) {
+func (e *AggregateExpression) Eval(params IParams) (*datavalues.Value, error) {
 	var err error
 	var updated *datavalues.Value
 
-	if updated, err = e.expr.Update(params); err != nil {
+	if updated, err = e.expr.Eval(params); err != nil {
 		return nil, err
 	}
 	if e.validate != nil {
