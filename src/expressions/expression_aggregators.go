@@ -5,7 +5,6 @@
 package expressions
 
 import (
-	"base/errors"
 	"datavalues"
 )
 
@@ -24,14 +23,7 @@ func SUM(arg interface{}) IExpression {
 			if current == nil {
 				return next, nil
 			} else {
-				switch current.GetType() {
-				case datavalues.TypeInt:
-					return datavalues.ToValue(current.AsInt() + next.AsInt()), nil
-				case datavalues.TypeFloat:
-					return datavalues.ToValue(current.AsFloat() + next.AsFloat()), nil
-				default:
-					return nil, errors.Errorf("unsupported type:%+v", current)
-				}
+				return datavalues.Add(current, next)
 			}
 		},
 	}
@@ -52,15 +44,7 @@ func MIN(arg interface{}) IExpression {
 			if current == nil {
 				return next, nil
 			}
-			cmp, err := datavalues.Compare(current, next)
-			if err != nil {
-				return nil, err
-			}
-			if cmp == datavalues.GreaterThan {
-				return next, nil
-			} else {
-				return current, nil
-			}
+			return datavalues.Min(current, next)
 		},
 	}
 }
@@ -80,15 +64,7 @@ func MAX(arg interface{}) IExpression {
 			if current == nil {
 				return next, nil
 			}
-			cmp, err := datavalues.Compare(current, next)
-			if err != nil {
-				return nil, err
-			}
-			if cmp == datavalues.LessThan {
-				return next, nil
-			} else {
-				return current, nil
-			}
+			return datavalues.Max(current, next)
 		},
 	}
 }
@@ -102,7 +78,7 @@ func COUNT(arg interface{}) IExpression {
 			if current == nil {
 				return datavalues.ToValue(1), nil
 			} else {
-				return datavalues.ToValue(current.AsFloat() + 1), nil
+				return datavalues.Add(current, datavalues.ToValue(1))
 			}
 		},
 	}

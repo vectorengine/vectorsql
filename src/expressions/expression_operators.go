@@ -6,8 +6,6 @@ package expressions
 
 import (
 	"datavalues"
-
-	"base/errors"
 )
 
 func ADD(left interface{}, right interface{}) IExpression {
@@ -23,14 +21,7 @@ func ADD(left interface{}, right interface{}) IExpression {
 			),
 		),
 		eval: func(left *datavalues.Value, right *datavalues.Value) (*datavalues.Value, error) {
-			switch left.GetType() {
-			case datavalues.TypeInt:
-				return datavalues.ToValue(left.AsInt() + right.AsInt()), nil
-			case datavalues.TypeFloat:
-				return datavalues.ToValue(left.AsFloat() + right.AsFloat()), nil
-			default:
-				return nil, errors.Errorf("unsupported type:%+v", left)
-			}
+			return datavalues.Add(left, right)
 		},
 	}
 }
@@ -48,14 +39,7 @@ func SUB(left interface{}, right interface{}) IExpression {
 			),
 		),
 		eval: func(left *datavalues.Value, right *datavalues.Value) (*datavalues.Value, error) {
-			switch left.GetType() {
-			case datavalues.TypeInt:
-				return datavalues.ToValue(left.AsInt() - right.AsInt()), nil
-			case datavalues.TypeFloat:
-				return datavalues.ToValue(left.AsFloat() - right.AsFloat()), nil
-			default:
-				return nil, errors.Errorf("unsupported type:%+v", left)
-			}
+			return datavalues.Sub(left, right)
 		},
 	}
 }
@@ -73,14 +57,7 @@ func MUL(left interface{}, right interface{}) IExpression {
 			),
 		),
 		eval: func(left *datavalues.Value, right *datavalues.Value) (*datavalues.Value, error) {
-			switch left.GetType() {
-			case datavalues.TypeInt:
-				return datavalues.ToValue(left.AsInt() * right.AsInt()), nil
-			case datavalues.TypeFloat:
-				return datavalues.ToValue(left.AsFloat() * right.AsFloat()), nil
-			default:
-				return nil, errors.Errorf("unsupported type:%+v", left)
-			}
+			return datavalues.Mul(left, right)
 		},
 	}
 }
@@ -98,14 +75,7 @@ func DIV(left interface{}, right interface{}) IExpression {
 			),
 		),
 		eval: func(left *datavalues.Value, right *datavalues.Value) (*datavalues.Value, error) {
-			switch left.GetType() {
-			case datavalues.TypeInt:
-				return datavalues.ToValue(left.AsInt() / right.AsInt()), nil
-			case datavalues.TypeFloat:
-				return datavalues.ToValue(left.AsFloat() / right.AsFloat()), nil
-			default:
-				return nil, errors.Errorf("unsupported type:%+v", left)
-			}
+			return datavalues.Div(left, right)
 		},
 	}
 }
