@@ -50,7 +50,7 @@ func BuildExpressions(plan IPlan) (expressions.IExpression, error) {
 		if err != nil {
 			return nil, err
 		}
-		if expr, err = expressions.BinaryExpressionFactory(t.FuncName, left, right); err != nil {
+		if expr, err = expressions.ExpressionFactory(t.FuncName, left, right); err != nil {
 			return nil, err
 		}
 		return expr, nil

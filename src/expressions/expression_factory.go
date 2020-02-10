@@ -13,6 +13,7 @@ import (
 type (
 	unaryExprCreator  func(arg interface{}) IExpression
 	binaryExprCreator func(left interface{}, right interface{}) IExpression
+	scalarExprCreator func(args ...interface{}) IExpression
 )
 
 var (
@@ -38,22 +39,24 @@ var (
 		"OR":   OR,
 		"LIKE": LIKE,
 	}
+
+	scalarExprTable = map[string]scalarExprCreator{}
 )
 
-func UnaryExpressionFactory(name string, arg interface{}) (IExpression, error) {
+func ExpressionFactory(name string, args ...interface{}) (IExpression, error) {
 	name = strings.ToUpper(name)
-	fn, ok := unaryExprTable[name]
-	if !ok {
-		return nil, errors.Errorf("Unsupported Binary Expression:%v", name)
+	switch len(args) {
+	case 1:
+		if creator, ok := unaryExprTable[name]; ok {
+			return creator(args[0]), nil
+		}
+	case 2:
+		if creator, ok := binaryExprTable[name]; ok {
+			return creator(args[0], args[1]), nil
+		}
 	}
-	return fn(arg), nil
-}
-
-func BinaryExpressionFactory(name string, left interface{}, right interface{}) (IExpression, error) {
-	name = strings.ToUpper(name)
-	fn, ok := binaryExprTable[name]
-	if !ok {
-		return nil, errors.Errorf("Unsupported Binary Expression:%v", name)
+	if creator, ok := scalarExprTable[name]; ok {
+		return creator(args), nil
 	}
-	return fn(left, right), nil
+	return nil, errors.Errorf("Unsupported Expression:%v", name)
 }
