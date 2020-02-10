@@ -83,23 +83,48 @@ func parseExpression(expr sqlparser.Expr) (IPlan, error) {
 			return nil, err
 		}
 		return NewBinaryExpressionPlan(expr.Operator, left, right), nil
+	case *sqlparser.ComparisonExpr:
+		left, err := parseExpression(expr.Left)
+		if err != nil {
+			return nil, err
+		}
+		right, err := parseExpression(expr.Right)
+		if err != nil {
+			return nil, err
+		}
+		return NewBinaryExpressionPlan(expr.Operator, left, right), nil
+	case *sqlparser.OrExpr:
+		left, err := parseExpression(expr.Left)
+		if err != nil {
+			return nil, err
+		}
+		right, err := parseExpression(expr.Right)
+		if err != nil {
+			return nil, err
+		}
+		return NewBinaryExpressionPlan("OR", left, right), nil
+	case *sqlparser.AndExpr:
+		left, err := parseExpression(expr.Left)
+		if err != nil {
+			return nil, err
+		}
+		right, err := parseExpression(expr.Right)
+		if err != nil {
+			return nil, err
+		}
+		return NewBinaryExpressionPlan("AND", left, right), nil
 	case *sqlparser.ParenExpr:
 		return parseExpression(expr.Expr)
 	}
 	return nil, errors.Errorf("Unsupported expression %+v %+v", expr, reflect.TypeOf(expr))
 }
 
-func parseTableExpression(expr sqlparser.TableExpr) (IPlan, error) {
-	switch expr := expr.(type) {
-	case *sqlparser.AliasedTableExpr:
-		return parseAliasedTableExpression(expr)
-	case *sqlparser.ParenTableExpr:
-		return parseTableExpression(expr.Exprs[0])
-	case *sqlparser.TableValuedFunction:
-		return parseTableValuedFunction(expr)
-	default:
-		return nil, errors.Errorf("Unsupported table expression:%+v", expr)
+func parseFunctionArgument(expr *sqlparser.AliasedExpr) (IPlan, error) {
+	subExpr, err := parseExpression(expr.Expr)
+	if err != nil {
+		return nil, errors.Wrapf(err, "Couldn't parse argument")
 	}
+	return subExpr, nil
 }
 
 func parseAliasedTableExpression(expr *sqlparser.AliasedTableExpr) (IPlan, error) {
@@ -140,121 +165,46 @@ func parseTableValuedFunctionArgument(expr *sqlparser.TableValuedFunctionArgumen
 	}
 }
 
-func parseProject(sel sqlparser.SelectExprs) (*MapPlan, *MapPlan, error) {
-	all := NewMapPlan()
+func parseFrom(expr sqlparser.TableExpr) (IPlan, error) {
+	switch expr := expr.(type) {
+	case *sqlparser.AliasedTableExpr:
+		return parseAliasedTableExpression(expr)
+	case *sqlparser.ParenTableExpr:
+		return parseFrom(expr.Exprs[0])
+	case *sqlparser.TableValuedFunction:
+		return parseTableValuedFunction(expr)
+	default:
+		return nil, errors.Errorf("Unsupported table expression:%+v", expr)
+	}
+}
+
+func parseFields(sel sqlparser.SelectExprs) (*MapPlan, error) {
+	fields := NewMapPlan()
 
 	if _, ok := sel[0].(*sqlparser.StarExpr); !ok {
 		for i, expr := range sel {
 			aliasedExpression, ok := expr.(*sqlparser.AliasedExpr)
 			if !ok {
-				return nil, nil, errors.Errorf("Expected aliased expression in select on index:%v, got:%+v %+v", i, expr, reflect.TypeOf(expr))
+				return nil, errors.Errorf("Expected aliased expression in select on index:%v, got:%+v %+v", i, expr, reflect.TypeOf(expr))
 			}
 			child, err := parseExpression(aliasedExpression.Expr)
 			if err != nil {
-				return nil, nil, err
+				return nil, err
 			}
 			if aliasedExpression.As.String() != "" {
 				child = NewAliasedExpressionPlan(aliasedExpression.As.String(), child)
 			}
-			all.Add(child)
+			fields.Add(child)
 		}
 	}
-
-	aggregators := NewMapPlan()
-	if err := all.Walk(func(plan IPlan) (bool, error) {
-		switch plan := plan.(type) {
-		case *FunctionExpressionPlan:
-			aggregators.Add(plan)
-		}
-		return true, nil
-	}); err != nil {
-		return nil, nil, err
-	}
-	return all, aggregators, nil
+	return fields, nil
 }
 
-func parseGroupBy(projects *MapPlan, groupby sqlparser.GroupBy) (*MapPlan, error) {
-	asmap := make(map[string]IPlan)
-	if err := projects.Walk(func(plan IPlan) (bool, error) {
-		switch plan := plan.(type) {
-		case *AliasedExpressionPlan:
-			asmap[plan.As] = plan
-		}
-		return true, nil
-	}); err != nil {
-		return nil, err
-	}
-
-	all := NewMapPlan()
-	for i := range groupby {
-		sub, err := parseExpression(groupby[i])
-		if err != nil {
-			return nil, err
-		}
-		switch xsub := sub.(type) {
-		case *VariablePlan:
-			if as, ok := asmap[string(xsub.Value)]; ok {
-				all.Add(as)
-			} else {
-				all.Add(sub)
-			}
-		default:
-			return nil, errors.Errorf("Unsupported function in group by:%+v", xsub)
-		}
-	}
-	return all, nil
+func parseWhere(expr sqlparser.Expr) (IPlan, error) {
+	return parseExpression(expr)
 }
 
-func parseLogic(expr sqlparser.Expr) (IPlan, error) {
-	switch expr := expr.(type) {
-	case *sqlparser.ComparisonExpr:
-		return parseComparison(expr.Operator, expr.Left, expr.Right)
-	case *sqlparser.AndExpr:
-		return parseOperator("AND", expr.Left, expr.Right)
-	case *sqlparser.OrExpr:
-		return parseOperator("OR", expr.Left, expr.Right)
-	case *sqlparser.ParenExpr:
-		return parseLogic(expr.Expr)
-	default:
-		return nil, errors.Errorf("Unsupported logic expression %+v %+v", expr, reflect.TypeOf(expr))
-	}
-}
-
-func parseComparison(op string, left, right sqlparser.Expr) (IPlan, error) {
-	left1, err := parseExpression(left)
-	if err != nil {
-		return nil, err
-	}
-
-	right1, err := parseExpression(right)
-	if err != nil {
-		return nil, err
-	}
-	return NewBinaryExpressionPlan(op, left1, right1), nil
-}
-
-func parseOperator(op string, left, right sqlparser.Expr) (IPlan, error) {
-	left1, err := parseLogic(left)
-	if err != nil {
-		return nil, err
-	}
-
-	right1, err := parseLogic(right)
-	if err != nil {
-		return nil, err
-	}
-	return NewBinaryExpressionPlan(op, left1, right1), nil
-}
-
-func parseFunctionArgument(expr *sqlparser.AliasedExpr) (IPlan, error) {
-	subExpr, err := parseExpression(expr.Expr)
-	if err != nil {
-		return nil, errors.Wrapf(err, "Couldn't parse argument")
-	}
-	return subExpr, nil
-}
-
-func parseOrderByExpressions(orderBy sqlparser.OrderBy) ([]Order, error) {
+func parseOrderBy(orderBy sqlparser.OrderBy) ([]Order, error) {
 	orders := make([]Order, len(orderBy))
 
 	for i, field := range orderBy {
@@ -268,7 +218,7 @@ func parseOrderByExpressions(orderBy sqlparser.OrderBy) ([]Order, error) {
 	return orders, nil
 }
 
-func parseLimitExpressions(limit *sqlparser.Limit) (IPlan, error) {
+func parseLimit(limit *sqlparser.Limit) (IPlan, error) {
 	if limit.Offset == nil {
 		limit.Offset = sqlparser.NewIntVal([]byte("0"))
 	}

@@ -29,14 +29,14 @@ func (plan *SelectPlan) Build() error {
 	tree := plan.SubPlan
 
 	// Source.
-	source, err := parseTableExpression(ast.From[0])
+	source, err := parseFrom(ast.From[0])
 	if err != nil {
 		return err
 	}
 	tree.Add(source)
 
 	// Project.
-	projects, aggregators, err := parseProject(ast.SelectExprs)
+	projects, err := parseFields(ast.SelectExprs)
 	if err != nil {
 		return err
 	}
@@ -45,7 +45,7 @@ func (plan *SelectPlan) Build() error {
 
 	// Filter.
 	if ast.Where != nil {
-		logic, err := parseLogic(ast.Where.Expr)
+		logic, err := parseWhere(ast.Where.Expr)
 		if err != nil {
 			return err
 		}
@@ -53,19 +53,9 @@ func (plan *SelectPlan) Build() error {
 		tree.Add(filterPlan)
 	}
 
-	// GroupBy.
-	if aggregators.Length() > 0 {
-		groupbys, err := parseGroupBy(projects, ast.GroupBy)
-		if err != nil {
-			return err
-		}
-		groupByPlan := NewGroupByPlan(projects, groupbys)
-		tree.Add(groupByPlan)
-	}
-
 	// OrderBy.
 	if ast.OrderBy != nil {
-		orders, err := parseOrderByExpressions(ast.OrderBy)
+		orders, err := parseOrderBy(ast.OrderBy)
 		if err != nil {
 			return err
 		}
@@ -75,7 +65,7 @@ func (plan *SelectPlan) Build() error {
 
 	// Limit
 	if ast.Limit != nil {
-		limitPlan, err := parseLimitExpressions(ast.Limit)
+		limitPlan, err := parseLimit(ast.Limit)
 		if err != nil {
 			return err
 		}
