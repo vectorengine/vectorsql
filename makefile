@@ -87,6 +87,7 @@ coverage:
 	go tool cover -html=coverage.out
 
 check:
-	golangci-lint run src/...
+	go get -v github.com/golangci/golangci-lint/cmd/golangci-lint
+	bin/golangci-lint --skip-dirs github run src/...
 
 .PHONY: build clean install fmt test coverage
