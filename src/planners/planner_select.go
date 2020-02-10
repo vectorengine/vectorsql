@@ -36,16 +36,22 @@ func (plan *SelectPlan) Build() error {
 	tree.Add(source)
 
 	// Project.
-	projects, err := parseFields(ast.SelectExprs)
+	fields, err := parseFields(ast.SelectExprs)
 	if err != nil {
 		return err
 	}
-	projectPlan := NewProjectPlan(projects)
+	projectPlan := NewProjectPlan(fields)
 	tree.Add(projectPlan)
+
+	// Aliases.
+	aliases, err := parseAliases(fields)
+	if err != nil {
+		return err
+	}
 
 	// Filter.
 	if ast.Where != nil {
-		logic, err := parseWhere(ast.Where.Expr)
+		logic, err := parseWhere(aliases, ast.Where.Expr)
 		if err != nil {
 			return err
 		}
@@ -55,7 +61,7 @@ func (plan *SelectPlan) Build() error {
 
 	// OrderBy.
 	if ast.OrderBy != nil {
-		orders, err := parseOrderBy(ast.OrderBy)
+		orders, err := parseOrderBy(aliases, ast.OrderBy)
 		if err != nil {
 			return err
 		}

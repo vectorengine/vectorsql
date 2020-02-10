@@ -14,10 +14,15 @@ import (
 	"parsers/sqlparser"
 )
 
-func parseExpression(expr sqlparser.Expr) (IPlan, error) {
+func parseExpression(aliases map[string]IPlan, expr sqlparser.Expr) (IPlan, error) {
 	switch expr := expr.(type) {
 	case *sqlparser.ColName:
 		name := expr.Name.String()
+		if aliases != nil {
+			if p, ok := aliases[name]; ok {
+				return p, nil
+			}
+		}
 		return NewVariablePlan(name), nil
 	case *sqlparser.SQLVal:
 		var err error
@@ -43,17 +48,17 @@ func parseExpression(expr sqlparser.Expr) (IPlan, error) {
 		funcName := strings.ToUpper(expr.Name.String())
 		switch len(expr.Exprs) {
 		case 1:
-			expr, err := parseFunctionArgument(expr.Exprs[0].(*sqlparser.AliasedExpr))
+			expr, err := parseFunctionArgument(aliases, expr.Exprs[0].(*sqlparser.AliasedExpr))
 			if err != nil {
 				return nil, err
 			}
 			return NewUnaryExpressionPlan(funcName, expr), nil
 		case 2:
-			left, err := parseFunctionArgument(expr.Exprs[0].(*sqlparser.AliasedExpr))
+			left, err := parseFunctionArgument(aliases, expr.Exprs[0].(*sqlparser.AliasedExpr))
 			if err != nil {
 				return nil, err
 			}
-			right, err := parseFunctionArgument(expr.Exprs[1].(*sqlparser.AliasedExpr))
+			right, err := parseFunctionArgument(aliases, expr.Exprs[1].(*sqlparser.AliasedExpr))
 			if err != nil {
 				return nil, err
 			}
@@ -65,7 +70,7 @@ func parseExpression(expr sqlparser.Expr) (IPlan, error) {
 				if !ok {
 					return nil, errors.Errorf("Unsupported argument %v of type %v", expr, reflect.TypeOf(expr))
 				}
-				arg, err := parseFunctionArgument(aliased)
+				arg, err := parseFunctionArgument(aliases, aliased)
 				if err != nil {
 					return nil, err
 				}
@@ -74,53 +79,53 @@ func parseExpression(expr sqlparser.Expr) (IPlan, error) {
 			return NewFunctionExpressionPlan(funcName, args...), nil
 		}
 	case *sqlparser.BinaryExpr:
-		left, err := parseExpression(expr.Left)
+		left, err := parseExpression(aliases, expr.Left)
 		if err != nil {
 			return nil, err
 		}
-		right, err := parseExpression(expr.Right)
+		right, err := parseExpression(aliases, expr.Right)
 		if err != nil {
 			return nil, err
 		}
 		return NewBinaryExpressionPlan(expr.Operator, left, right), nil
 	case *sqlparser.ComparisonExpr:
-		left, err := parseExpression(expr.Left)
+		left, err := parseExpression(aliases, expr.Left)
 		if err != nil {
 			return nil, err
 		}
-		right, err := parseExpression(expr.Right)
+		right, err := parseExpression(aliases, expr.Right)
 		if err != nil {
 			return nil, err
 		}
 		return NewBinaryExpressionPlan(expr.Operator, left, right), nil
 	case *sqlparser.OrExpr:
-		left, err := parseExpression(expr.Left)
+		left, err := parseExpression(aliases, expr.Left)
 		if err != nil {
 			return nil, err
 		}
-		right, err := parseExpression(expr.Right)
+		right, err := parseExpression(aliases, expr.Right)
 		if err != nil {
 			return nil, err
 		}
 		return NewBinaryExpressionPlan("OR", left, right), nil
 	case *sqlparser.AndExpr:
-		left, err := parseExpression(expr.Left)
+		left, err := parseExpression(aliases, expr.Left)
 		if err != nil {
 			return nil, err
 		}
-		right, err := parseExpression(expr.Right)
+		right, err := parseExpression(aliases, expr.Right)
 		if err != nil {
 			return nil, err
 		}
 		return NewBinaryExpressionPlan("AND", left, right), nil
 	case *sqlparser.ParenExpr:
-		return parseExpression(expr.Expr)
+		return parseExpression(aliases, expr.Expr)
 	}
 	return nil, errors.Errorf("Unsupported expression %+v %+v", expr, reflect.TypeOf(expr))
 }
 
-func parseFunctionArgument(expr *sqlparser.AliasedExpr) (IPlan, error) {
-	subExpr, err := parseExpression(expr.Expr)
+func parseFunctionArgument(aliases map[string]IPlan, expr *sqlparser.AliasedExpr) (IPlan, error) {
+	subExpr, err := parseExpression(aliases, expr.Expr)
 	if err != nil {
 		return nil, errors.Wrapf(err, "Couldn't parse argument")
 	}
@@ -136,12 +141,12 @@ func parseAliasedTableExpression(expr *sqlparser.AliasedTableExpr) (IPlan, error
 	}
 }
 
-func parseTableValuedFunction(expr *sqlparser.TableValuedFunction) (IPlan, error) {
+func parseTableValuedFunction(aliases map[string]IPlan, expr *sqlparser.TableValuedFunction) (IPlan, error) {
 	var arguments []IPlan
 	name := expr.Name.String()
 
 	for i := range expr.Args {
-		argument, err := parseTableValuedFunctionArgument(expr.Args[i])
+		argument, err := parseTableValuedFunctionArgument(aliases, expr.Args[i])
 		if err != nil {
 			return nil, errors.Wrapf(err, "Couldn't parse table valued function argument \"%v\" with index %v", expr.Args[i].Name.String(), i)
 		}
@@ -150,12 +155,12 @@ func parseTableValuedFunction(expr *sqlparser.TableValuedFunction) (IPlan, error
 	return NewTableValuedFunctionPlan(name, NewMapPlan(arguments...)), nil
 }
 
-func parseTableValuedFunctionArgument(expr *sqlparser.TableValuedFunctionArgument) (IPlan, error) {
+func parseTableValuedFunctionArgument(aliases map[string]IPlan, expr *sqlparser.TableValuedFunctionArgument) (IPlan, error) {
 	name := expr.Name.String()
 
 	switch expr := expr.Value.(type) {
 	case *sqlparser.ExprTableValuedFunctionArgumentValue:
-		parsed, err := parseExpression(expr.Expr)
+		parsed, err := parseExpression(aliases, expr.Expr)
 		if err != nil {
 			return nil, errors.Wrapf(err, "Couldn't parse table valued function argument expression \"%v\"", expr.Expr)
 		}
@@ -172,7 +177,7 @@ func parseFrom(expr sqlparser.TableExpr) (IPlan, error) {
 	case *sqlparser.ParenTableExpr:
 		return parseFrom(expr.Exprs[0])
 	case *sqlparser.TableValuedFunction:
-		return parseTableValuedFunction(expr)
+		return parseTableValuedFunction(nil, expr)
 	default:
 		return nil, errors.Errorf("Unsupported table expression:%+v", expr)
 	}
@@ -187,7 +192,7 @@ func parseFields(sel sqlparser.SelectExprs) (*MapPlan, error) {
 			if !ok {
 				return nil, errors.Errorf("Expected aliased expression in select on index:%v, got:%+v %+v", i, expr, reflect.TypeOf(expr))
 			}
-			child, err := parseExpression(aliasedExpression.Expr)
+			child, err := parseExpression(nil, aliasedExpression.Expr)
 			if err != nil {
 				return nil, err
 			}
@@ -200,15 +205,29 @@ func parseFields(sel sqlparser.SelectExprs) (*MapPlan, error) {
 	return fields, nil
 }
 
-func parseWhere(expr sqlparser.Expr) (IPlan, error) {
-	return parseExpression(expr)
+func parseAliases(fields *MapPlan) (map[string]IPlan, error) {
+	aliases := make(map[string]IPlan)
+	if err := fields.Walk(func(plan IPlan) (bool, error) {
+		switch p := plan.(type) {
+		case *AliasedExpressionPlan:
+			aliases[p.As] = p.Expr
+		}
+		return true, nil
+	}); err != nil {
+		return nil, err
+	}
+	return aliases, nil
 }
 
-func parseOrderBy(orderBy sqlparser.OrderBy) ([]Order, error) {
+func parseWhere(aliases map[string]IPlan, expr sqlparser.Expr) (IPlan, error) {
+	return parseExpression(aliases, expr)
+}
+
+func parseOrderBy(aliases map[string]IPlan, orderBy sqlparser.OrderBy) ([]Order, error) {
 	orders := make([]Order, len(orderBy))
 
 	for i, field := range orderBy {
-		expr, err := parseExpression(field.Expr)
+		expr, err := parseExpression(aliases, field.Expr)
 		if err != nil {
 			return nil, errors.Errorf("couldn't parse order by expression with index %v", i)
 		}
@@ -222,11 +241,11 @@ func parseLimit(limit *sqlparser.Limit) (IPlan, error) {
 	if limit.Offset == nil {
 		limit.Offset = sqlparser.NewIntVal([]byte("0"))
 	}
-	offsetPlan, err := parseExpression(limit.Offset)
+	offsetPlan, err := parseExpression(nil, limit.Offset)
 	if err != nil {
 		return nil, errors.Wrapf(err, "Couldn't parse offset")
 	}
-	rowcountPlan, err := parseExpression(limit.Rowcount)
+	rowcountPlan, err := parseExpression(nil, limit.Rowcount)
 	if err != nil {
 		return nil, errors.Wrapf(err, "Couldn't parse limit")
 	}

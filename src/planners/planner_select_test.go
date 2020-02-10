@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"parsers"
+
 	"parsers/sqlparser"
 
 	"github.com/stretchr/testify/assert"
@@ -362,8 +363,8 @@ func TestSelectPlan(t *testing.T) {
 }`,
 		},
 		{
-			name:  "select-test",
-			query: "SELECT max(a+1), (id+1) as b FROM t1 group by a, b",
+			name:  "aliased-select-test",
+			query: "SELECT max(a+1), (id+1) as b, c as c1 FROM t1 where b>5",
 			expect: `{
     "Name": "SelectPlan",
     "SubPlan": {
@@ -410,8 +411,39 @@ func TestSelectPlan(t *testing.T) {
                                     "Value": 1
                                 }
                             }
+                        },
+                        {
+                            "Name": "AliasedExpressionPlan",
+                            "As": "c1",
+                            "Expr": {
+                                "Name": "VariablePlan",
+                                "Value": "c"
+                            }
                         }
                     ]
+                }
+            },
+            {
+                "Name": "FilterPlan",
+                "SubPlan": {
+                    "Name": "BinaryExpressionPlan",
+                    "FuncName": "\u003e",
+                    "Left": {
+                        "Name": "BinaryExpressionPlan",
+                        "FuncName": "+",
+                        "Left": {
+                            "Name": "VariablePlan",
+                            "Value": "id"
+                        },
+                        "Right": {
+                            "Name": "ConstantPlan",
+                            "Value": 1
+                        }
+                    },
+                    "Right": {
+                        "Name": "ConstantPlan",
+                        "Value": 5
+                    }
                 }
             },
             {
