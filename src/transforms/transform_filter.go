@@ -13,15 +13,15 @@ import (
 )
 
 type FilterTransform struct {
-	ctx  *TransformContext
-	plan *planners.FilterPlan
+	ctx    *TransformContext
+	filter *planners.FilterPlan
 	processors.BaseProcessor
 }
 
-func NewFilterTransform(ctx *TransformContext, plan *planners.FilterPlan) processors.IProcessor {
+func NewFilterTransform(ctx *TransformContext, filter *planners.FilterPlan) processors.IProcessor {
 	return &FilterTransform{
 		ctx:           ctx,
-		plan:          plan,
+		filter:        filter,
 		BaseProcessor: processors.NewBaseProcessor("transform_filter"),
 	}
 }
@@ -33,7 +33,7 @@ func (t *FilterTransform) Execute() {
 	onNext := func(x interface{}) {
 		switch y := x.(type) {
 		case *datablocks.DataBlock:
-			if err := t.filter(y); err != nil {
+			if err := t.check(y); err != nil {
 				x = err
 			}
 		}
@@ -42,40 +42,19 @@ func (t *FilterTransform) Execute() {
 	t.Subscribe(onNext)
 }
 
-func (t *FilterTransform) filter(x *datablocks.DataBlock) error {
-	plan := t.plan.SubPlan
+func (t *FilterTransform) check(x *datablocks.DataBlock) error {
+	var fields []string
 
-	checks, err := t.check(x, plan)
+	columns := x.Columns()
+	filterPlan := t.filter
+
+	expr, err := planners.BuildExpressions(filterPlan.SubPlan)
 	if err != nil {
 		return err
 	}
-	return x.Filter(checks)
-}
 
-func (t *FilterTransform) check(x *datablocks.DataBlock, plan planners.IPlan) ([]*datavalues.Value, error) {
-	type field struct {
-		name string
-		idx  int
-	}
-	var fields []field
-
-	expr, err := planners.BuildExpressions(plan)
-	if err != nil {
-		return nil, err
-	}
-	if err := plan.Walk(func(p planners.IPlan) (bool, error) {
-		switch p := p.(type) {
-		case *planners.VariablePlan:
-			name := string(p.Value)
-			idx, err := x.ColumnIndex(name)
-			if err != nil {
-				return false, err
-			}
-			fields = append(fields, field{name: name, idx: idx})
-		}
-		return true, nil
-	}); err != nil {
-		return nil, err
+	for _, col := range columns {
+		fields = append(fields, col.Name)
 	}
 
 	i := 0
@@ -84,15 +63,15 @@ func (t *FilterTransform) check(x *datablocks.DataBlock, plan planners.IPlan) ([
 	rowiter := x.RowIterator()
 	for rowiter.Next() {
 		row := rowiter.Value()
-		for _, field := range fields {
-			params[field.name] = row[field.idx]
+		for j, field := range fields {
+			params[field] = row[j]
 		}
 		v, err := expr.Eval(params)
 		if err != nil {
-			return nil, err
+			return err
 		}
 		checks[i] = v
 		i++
 	}
-	return checks, nil
+	return x.Filter(checks)
 }

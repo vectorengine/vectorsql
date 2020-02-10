@@ -11,14 +11,14 @@ import (
 )
 
 type FilterExecutor struct {
-	ctx  *ExecutorContext
-	plan *planners.FilterPlan
+	ctx    *ExecutorContext
+	filter *planners.FilterPlan
 }
 
-func NewFilterExecutor(ctx *ExecutorContext, plan *planners.FilterPlan) *FilterExecutor {
+func NewFilterExecutor(ctx *ExecutorContext, filter *planners.FilterPlan) *FilterExecutor {
 	return &FilterExecutor{
-		ctx:  ctx,
-		plan: plan,
+		ctx:    ctx,
+		filter: filter,
 	}
 }
 
@@ -26,9 +26,9 @@ func (executor *FilterExecutor) Execute() (processors.IProcessor, error) {
 	log := executor.ctx.log
 	conf := executor.ctx.conf
 
-	log.Debug("Executor->Enter->LogicalPlan:%s", executor.plan)
+	log.Debug("Executor->Enter->LogicalPlan:%s", executor.filter)
 	transformCtx := transforms.NewTransformContext(executor.ctx.ctx, log, conf)
-	transform := transforms.NewFilterTransform(transformCtx, executor.plan)
+	transform := transforms.NewFilterTransform(transformCtx, executor.filter)
 	log.Debug("Executor->Return->Pipeline:%v", transform)
 	return transform, nil
 }
