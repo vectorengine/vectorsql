@@ -43,10 +43,12 @@ func NewShowTablesExecutor(ctx *ExecutorContext, plan planners.IPlan) IExecutor 
 
 	newAst, err := parsers.Parse(buffer.String())
 	if err != nil {
-		ctx.log.Error("Error show tables query %v", err)
+		ctx.log.Error("Excutor->Show Tables %v", err)
 	}
 	planner.SubPlan = planners.NewSelectPlan(newAst)
-	planner.SubPlan.Build()
+	if err := planner.SubPlan.Build(); err != nil {
+		ctx.log.Error("Excutor->Show Tables %v", err)
+	}
 
 	return NewSelectExecutor(ctx, planner.SubPlan)
 }
