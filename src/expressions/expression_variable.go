@@ -6,6 +6,8 @@ package expressions
 
 import (
 	"datavalues"
+
+	"base/errors"
 )
 
 type VariableExpression struct {
@@ -24,7 +26,10 @@ func NewVariableExpression(v string) *VariableExpression {
 
 func (e *VariableExpression) Eval(params IParams) (*datavalues.Value, error) {
 	if params != nil {
-		v, _ := params.Get(e.value)
+		v, ok := params.Get(e.value)
+		if !ok {
+			return nil, errors.Errorf("Can't get the params:%v value", e.value)
+		}
 		return v, nil
 	}
 	return datavalues.MakePhantom(), nil

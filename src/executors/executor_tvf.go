@@ -12,7 +12,7 @@ import (
 	"datastreams"
 	"datatypes"
 	"datavalues"
-	"functions"
+	"expressions"
 	"planners"
 	"processors"
 	"transforms"
@@ -31,7 +31,7 @@ func NewTableValuedFunctionExecutor(ctx *ExecutorContext, plan *planners.TableVa
 }
 
 func (executor *TableValuedFunctionExecutor) Execute() (processors.IProcessor, error) {
-	var constants []*datavalues.Value
+	var constants []interface{}
 	var variables []*datavalues.Value
 
 	plan := executor.plan
@@ -52,27 +52,20 @@ func (executor *TableValuedFunctionExecutor) Execute() (processors.IProcessor, e
 		return nil, err
 	}
 
-	function, err := functions.FunctionFactory(plan.FuncName)
+	function, err := expressions.ExpressionFactory(plan.FuncName, constants)
 	if err != nil {
 		return nil, err
 	}
-	if err := function.Validator.Validate(constants...); err != nil {
-		return nil, err
-	}
-	result, err := function.Logic(constants...)
+	result, err := function.Eval(nil)
 	if err != nil {
 		return nil, err
 	}
 
 	var cols []columns.Column
 	switch strings.ToUpper(plan.FuncName) {
-	case "RANGE":
-		cols = []columns.Column{
-			{Name: "i", DataType: datatypes.NewInt32DataType()},
-		}
 	case "RANGETABLE", "RANDTABLE":
 		for i := 1; i < len(variables); i++ {
-			datatype, err := datatypes.DataTypeFactory(constants[i].AsString())
+			datatype, err := datatypes.DataTypeFactory(constants[i].(*datavalues.Value).AsString())
 			if err != nil {
 				return nil, err
 			}

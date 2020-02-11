@@ -12,9 +12,6 @@ clean:
 	@go clean
 	@rm -f bin/*
 
-fmt:
-	go fmt ./...
-	go vet ./...
 
 test:
 	@echo "--> Testing..."
@@ -71,6 +68,7 @@ testtransforms:
 
 pkgs =	config		\
 		sessions	\
+		parsers/...	\
 		processors	\
 		datastreams	\
 		expressions	\
@@ -89,5 +87,9 @@ coverage:
 check:
 	go get -v github.com/golangci/golangci-lint/cmd/golangci-lint
 	bin/golangci-lint --skip-dirs github run src/...
+
+fmt:
+	go fmt $(pkgs)
+
 
 .PHONY: build clean install fmt test coverage

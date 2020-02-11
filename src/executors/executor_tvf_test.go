@@ -23,25 +23,6 @@ func TestTVFExecutor(t *testing.T) {
 		expect *datablocks.DataBlock
 	}{
 		{
-			name: "TableValuedFunctionExecutor-range",
-			plan: planners.NewTableValuedFunctionPlan("range",
-				planners.NewMapPlan(
-					planners.NewConstantPlan(1),
-					planners.NewConstantPlan(5),
-				),
-			),
-			expect: mocks.NewBlockFromSlice(
-				[]columns.Column{
-					{Name: "i", DataType: datatypes.NewInt32DataType()},
-				},
-				[]interface{}{1},
-				[]interface{}{2},
-				[]interface{}{3},
-				[]interface{}{4},
-			),
-		},
-
-		{
 			name: "TableValuedFunctionExecutor-rangetable",
 			plan: planners.NewTableValuedFunctionPlan("rangetable",
 				planners.NewMapPlan(

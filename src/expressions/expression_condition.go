@@ -15,7 +15,7 @@ func LT(left interface{}, right interface{}) IExpression {
 		left:     exprs[0],
 		right:    exprs[1],
 		validate: All(),
-		eval: func(left *datavalues.Value, right *datavalues.Value) (*datavalues.Value, error) {
+		evalFn: func(left *datavalues.Value, right *datavalues.Value) (*datavalues.Value, error) {
 			cmp, err := datavalues.Compare(left, right)
 			if err != nil {
 				return nil, err
@@ -32,7 +32,7 @@ func LTE(left interface{}, right interface{}) IExpression {
 		left:     exprs[0],
 		right:    exprs[1],
 		validate: All(),
-		eval: func(left *datavalues.Value, right *datavalues.Value) (*datavalues.Value, error) {
+		evalFn: func(left *datavalues.Value, right *datavalues.Value) (*datavalues.Value, error) {
 			cmp, err := datavalues.Compare(left, right)
 			if err != nil {
 				return nil, err
@@ -49,7 +49,7 @@ func EQ(left interface{}, right interface{}) IExpression {
 		left:     exprs[0],
 		right:    exprs[1],
 		validate: All(),
-		eval: func(left *datavalues.Value, right *datavalues.Value) (*datavalues.Value, error) {
+		evalFn: func(left *datavalues.Value, right *datavalues.Value) (*datavalues.Value, error) {
 			cmp, err := datavalues.Compare(left, right)
 			if err != nil {
 				return nil, err
@@ -66,7 +66,7 @@ func NEQ(left interface{}, right interface{}) IExpression {
 		left:     exprs[0],
 		right:    exprs[1],
 		validate: All(),
-		eval: func(left *datavalues.Value, right *datavalues.Value) (*datavalues.Value, error) {
+		evalFn: func(left *datavalues.Value, right *datavalues.Value) (*datavalues.Value, error) {
 			cmp, err := datavalues.Compare(left, right)
 			if err != nil {
 				return nil, err
@@ -83,7 +83,7 @@ func GT(left interface{}, right interface{}) IExpression {
 		left:     exprs[0],
 		right:    exprs[1],
 		validate: All(),
-		eval: func(left *datavalues.Value, right *datavalues.Value) (*datavalues.Value, error) {
+		evalFn: func(left *datavalues.Value, right *datavalues.Value) (*datavalues.Value, error) {
 			cmp, err := datavalues.Compare(left, right)
 			if err != nil {
 				return nil, err
@@ -100,7 +100,7 @@ func GTE(left interface{}, right interface{}) IExpression {
 		left:     exprs[0],
 		right:    exprs[1],
 		validate: All(),
-		eval: func(left *datavalues.Value, right *datavalues.Value) (*datavalues.Value, error) {
+		evalFn: func(left *datavalues.Value, right *datavalues.Value) (*datavalues.Value, error) {
 			cmp, err := datavalues.Compare(left, right)
 			if err != nil {
 				return nil, err
@@ -117,7 +117,7 @@ func AND(left interface{}, right interface{}) IExpression {
 		left:     exprs[0],
 		right:    exprs[1],
 		validate: All(),
-		eval: func(left *datavalues.Value, right *datavalues.Value) (*datavalues.Value, error) {
+		evalFn: func(left *datavalues.Value, right *datavalues.Value) (*datavalues.Value, error) {
 			return datavalues.ToValue(left.AsBool() && right.AsBool()), nil
 		},
 	}
@@ -130,7 +130,7 @@ func OR(left interface{}, right interface{}) IExpression {
 		left:     exprs[0],
 		right:    exprs[1],
 		validate: All(),
-		eval: func(left *datavalues.Value, right *datavalues.Value) (*datavalues.Value, error) {
+		evalFn: func(left *datavalues.Value, right *datavalues.Value) (*datavalues.Value, error) {
 			return datavalues.ToValue(left.AsBool() || right.AsBool()), nil
 		},
 	}
@@ -143,7 +143,7 @@ func LIKE(left interface{}, right interface{}) IExpression {
 		left:     exprs[0],
 		right:    exprs[1],
 		validate: All(),
-		eval: func(left *datavalues.Value, right *datavalues.Value) (*datavalues.Value, error) {
+		evalFn: func(left *datavalues.Value, right *datavalues.Value) (*datavalues.Value, error) {
 			return datavalues.ToValue(datavalues.Like(right.AsString(), left)), nil
 		},
 	}

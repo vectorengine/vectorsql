@@ -38,13 +38,15 @@ func TestSelectExecutor(t *testing.T) {
 				[]interface{}{},
 			),
 		},
+
 		{
-			name:  "tvf-range",
-			query: "SELECT * FROM range(1, 5)",
+			name:  "tvf-rangetable",
+			query: "SELECT * FROM rangetable(rows->5, i->'Int32')",
 			expect: mocks.NewBlockFromSlice(
 				[]columns.Column{
 					{Name: "i", DataType: datatypes.NewInt32DataType()},
 				},
+				[]interface{}{0},
 				[]interface{}{1},
 				[]interface{}{2},
 				[]interface{}{3},
@@ -53,7 +55,7 @@ func TestSelectExecutor(t *testing.T) {
 		},
 		{
 			name:  "filter",
-			query: "SELECT * FROM range(1, 5) WHERE i>2",
+			query: "SELECT * FROM rangetable(rows->5, i->'Int32') WHERE i>2",
 			expect: mocks.NewBlockFromSlice(
 				[]columns.Column{
 					{Name: "i", DataType: datatypes.NewInt32DataType()},
@@ -64,7 +66,7 @@ func TestSelectExecutor(t *testing.T) {
 		},
 		{
 			name:  "orderby",
-			query: "SELECT * FROM range(1, 5) WHERE i>2 order by i desc",
+			query: "SELECT * FROM rangetable(rows->5, i->'Int32') WHERE i>2 order by i desc",
 			expect: mocks.NewBlockFromSlice(
 				[]columns.Column{
 					{Name: "i", DataType: datatypes.NewInt32DataType()},

@@ -20,7 +20,7 @@ func ADD(left interface{}, right interface{}) IExpression {
 				AllArgs(TypeOf(datavalues.ZeroFloat())),
 			),
 		),
-		eval: func(left *datavalues.Value, right *datavalues.Value) (*datavalues.Value, error) {
+		evalFn: func(left *datavalues.Value, right *datavalues.Value) (*datavalues.Value, error) {
 			return datavalues.Add(left, right)
 		},
 	}
@@ -38,7 +38,7 @@ func SUB(left interface{}, right interface{}) IExpression {
 				AllArgs(TypeOf(datavalues.ZeroFloat())),
 			),
 		),
-		eval: func(left *datavalues.Value, right *datavalues.Value) (*datavalues.Value, error) {
+		evalFn: func(left *datavalues.Value, right *datavalues.Value) (*datavalues.Value, error) {
 			return datavalues.Sub(left, right)
 		},
 	}
@@ -56,7 +56,7 @@ func MUL(left interface{}, right interface{}) IExpression {
 				AllArgs(TypeOf(datavalues.ZeroFloat())),
 			),
 		),
-		eval: func(left *datavalues.Value, right *datavalues.Value) (*datavalues.Value, error) {
+		evalFn: func(left *datavalues.Value, right *datavalues.Value) (*datavalues.Value, error) {
 			return datavalues.Mul(left, right)
 		},
 	}
@@ -74,7 +74,7 @@ func DIV(left interface{}, right interface{}) IExpression {
 				AllArgs(TypeOf(datavalues.ZeroFloat())),
 			),
 		),
-		eval: func(left *datavalues.Value, right *datavalues.Value) (*datavalues.Value, error) {
+		evalFn: func(left *datavalues.Value, right *datavalues.Value) (*datavalues.Value, error) {
 			return datavalues.Div(left, right)
 		},
 	}

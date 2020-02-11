@@ -8,13 +8,13 @@ import (
 	"datavalues"
 )
 
-type evalFunc func(left, right *datavalues.Value) (*datavalues.Value, error)
+type binaryEvalFunc func(left, right *datavalues.Value) (*datavalues.Value, error)
 
 type BinaryExpression struct {
 	name     string
-	eval     evalFunc
 	left     IExpression
 	right    IExpression
+	evalFn   binaryEvalFunc
 	validate IValidator
 }
 
@@ -33,7 +33,7 @@ func (e *BinaryExpression) Eval(params IParams) (*datavalues.Value, error) {
 			return nil, err
 		}
 	}
-	return e.eval(left, right)
+	return e.evalFn(left, right)
 }
 
 func (e *BinaryExpression) Walk(visit Visit) error {

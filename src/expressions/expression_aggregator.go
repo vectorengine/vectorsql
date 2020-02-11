@@ -19,7 +19,7 @@ func SUM(arg interface{}) IExpression {
 				AllArgs(TypeOf(datavalues.ZeroFloat())),
 			),
 		),
-		update: func(current *datavalues.Value, next *datavalues.Value) (*datavalues.Value, error) {
+		evalFn: func(current *datavalues.Value, next *datavalues.Value) (*datavalues.Value, error) {
 			if current == nil {
 				return next, nil
 			} else {
@@ -40,7 +40,7 @@ func MIN(arg interface{}) IExpression {
 				AllArgs(TypeOf(datavalues.ZeroFloat())),
 			),
 		),
-		update: func(current *datavalues.Value, next *datavalues.Value) (*datavalues.Value, error) {
+		evalFn: func(current *datavalues.Value, next *datavalues.Value) (*datavalues.Value, error) {
 			if current == nil {
 				return next, nil
 			}
@@ -60,7 +60,7 @@ func MAX(arg interface{}) IExpression {
 				AllArgs(TypeOf(datavalues.ZeroFloat())),
 			),
 		),
-		update: func(current *datavalues.Value, next *datavalues.Value) (*datavalues.Value, error) {
+		evalFn: func(current *datavalues.Value, next *datavalues.Value) (*datavalues.Value, error) {
 			if current == nil {
 				return next, nil
 			}
@@ -74,7 +74,7 @@ func COUNT(arg interface{}) IExpression {
 	return &AggregateExpression{
 		name: "COUNT",
 		expr: exprs[0],
-		update: func(current *datavalues.Value, next *datavalues.Value) (*datavalues.Value, error) {
+		evalFn: func(current *datavalues.Value, next *datavalues.Value) (*datavalues.Value, error) {
 			if current == nil {
 				return datavalues.ToValue(1), nil
 			} else {

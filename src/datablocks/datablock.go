@@ -92,12 +92,16 @@ func (block *DataBlock) Column(name string) (columns.Column, error) {
 	return cv.column, nil
 }
 
-func (block *DataBlock) ColumnIndex(name string) (int, error) {
-	idx, ok := block.indexmap[name]
-	if !ok {
-		return 0, errors.Errorf("Can't find column:%v", name)
+func (block *DataBlock) ColumnIndexes(names ...string) ([]ColumnIndex, error) {
+	cidxs := make([]ColumnIndex, len(names))
+	for i, name := range names {
+		idx, ok := block.indexmap[name]
+		if !ok {
+			return nil, errors.Errorf("Can't find column:%v", name)
+		}
+		cidxs[i] = ColumnIndex{Name: name, Index: idx}
 	}
-	return idx, nil
+	return cidxs, nil
 }
 
 func (block *DataBlock) RowIterator() *DataBlockRowIterator {

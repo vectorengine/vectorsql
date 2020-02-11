@@ -40,10 +40,14 @@ var (
 		"LIKE": LIKE,
 	}
 
-	scalarExprTable = map[string]scalarExprCreator{}
+	scalarExprTable = map[string]scalarExprCreator{
+		"RANGETABLE": RANGETABLE,
+		"RANDTABLE":  RANDTABLE,
+		"ZIP":        ZIP,
+	}
 )
 
-func ExpressionFactory(name string, args ...interface{}) (IExpression, error) {
+func ExpressionFactory(name string, args []interface{}) (IExpression, error) {
 	name = strings.ToUpper(name)
 	switch len(args) {
 	case 1:
@@ -56,7 +60,7 @@ func ExpressionFactory(name string, args ...interface{}) (IExpression, error) {
 		}
 	}
 	if creator, ok := scalarExprTable[name]; ok {
-		return creator(args), nil
+		return creator(args...), nil
 	}
 	return nil, errors.Errorf("Unsupported Expression:%v", name)
 }

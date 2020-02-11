@@ -69,8 +69,8 @@ func TestAggregatorsExpression(t *testing.T) {
 			expect: datavalues.ToValue(2),
 		},
 		{
-			name:   "count(*)",
-			expr:   COUNT("*"),
+			name:   "count(a)",
+			expr:   COUNT("a"),
 			expect: datavalues.ToValue(2),
 		},
 		{

@@ -8,12 +8,12 @@ import (
 	"datavalues"
 )
 
-type updateFunc func(current, next *datavalues.Value) (*datavalues.Value, error)
+type aggregateEvalFunc func(current, next *datavalues.Value) (*datavalues.Value, error)
 
 type AggregateExpression struct {
 	name     string
 	expr     IExpression
-	update   updateFunc
+	evalFn   aggregateEvalFunc
 	saved    *datavalues.Value
 	validate IValidator
 }
@@ -30,7 +30,7 @@ func (e *AggregateExpression) Eval(params IParams) (*datavalues.Value, error) {
 			return nil, err
 		}
 	}
-	if e.saved, err = e.update(e.saved, updated); err != nil {
+	if e.saved, err = e.evalFn(e.saved, updated); err != nil {
 		return nil, err
 	}
 	return e.saved, nil

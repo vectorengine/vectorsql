@@ -9,6 +9,11 @@ import (
 	"datavalues"
 )
 
+type ColumnIndex struct {
+	Name  string
+	Index int
+}
+
 type DataBlockValue struct {
 	column columns.Column
 	values []*datavalues.Value

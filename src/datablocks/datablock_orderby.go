@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"datavalues"
-	"functions"
+	"expressions"
 
 	"base/errors"
 	"base/metric"
@@ -55,11 +55,6 @@ func (block *DataBlock) OrderBy(sorters ...Sorter) error {
 			}
 		})
 	} else {
-		zipFunc, err := functions.FunctionFactory("ZIP")
-		if err != nil {
-			return err
-		}
-
 		// Seqs column.
 		max := block.NumRows()
 		seqs := make([]*datavalues.Value, max)
@@ -68,7 +63,7 @@ func (block *DataBlock) OrderBy(sorters ...Sorter) error {
 		}
 
 		// Sort columns.
-		var tuples []*datavalues.Value
+		var tuples []interface{}
 		for _, sorter := range sorters {
 			cv, ok := block.valuesmap[sorter.column]
 			if !ok {
@@ -78,11 +73,11 @@ func (block *DataBlock) OrderBy(sorters ...Sorter) error {
 		}
 		tuples = append(tuples, datavalues.MakeTuple(seqs...))
 
-		// Zip.
-		if err := zipFunc.Validator.Validate(tuples...); err != nil {
+		zipFunc, err := expressions.ExpressionFactory("ZIP", tuples)
+		if err != nil {
 			return err
 		}
-		result, err := zipFunc.Logic(tuples...)
+		result, err := zipFunc.Eval(nil)
 		if err != nil {
 			return err
 		}

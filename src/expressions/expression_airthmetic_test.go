@@ -12,7 +12,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestOperatorsExpression(t *testing.T) {
+func TestAirthmeticsExpression(t *testing.T) {
 	tests := []struct {
 		name      string
 		expr      IExpression
@@ -92,7 +92,7 @@ func TestOperatorsExpression(t *testing.T) {
 	}
 }
 
-func TestOperatorsParamsExpression(t *testing.T) {
+func TestAirthmeticsParamsExpression(t *testing.T) {
 	tests := []struct {
 		name      string
 		expr      IExpression
