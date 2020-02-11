@@ -25,19 +25,20 @@ var (
 	}
 
 	binaryExprTable = map[string]binaryExprCreator{
-		"+":    ADD,
-		"-":    SUB,
-		"*":    MUL,
-		"/":    DIV,
-		">":    GT,
-		">=":   GTE,
-		"=":    EQ,
-		"<":    LT,
-		"<=":   LTE,
-		"<>":   NEQ,
-		"AND":  AND,
-		"OR":   OR,
-		"LIKE": LIKE,
+		"+":        ADD,
+		"-":        SUB,
+		"*":        MUL,
+		"/":        DIV,
+		">":        GT,
+		">=":       GTE,
+		"=":        EQ,
+		"<":        LT,
+		"<=":       LTE,
+		"<>":       NEQ,
+		"AND":      AND,
+		"OR":       OR,
+		"LIKE":     LIKE,
+		"NOT LIKE": NOT_LIKE,
 	}
 
 	scalarExprTable = map[string]scalarExprCreator{
