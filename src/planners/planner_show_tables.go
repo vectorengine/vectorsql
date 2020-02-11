@@ -6,6 +6,7 @@ package planners
 
 import (
 	"encoding/json"
+	"parsers"
 
 	"parsers/sqlparser"
 )
@@ -13,20 +14,25 @@ import (
 type ShowTablesPlan struct {
 	Name    string
 	SubPlan IPlan
-	Ast     *sqlparser.Show
+	ast     *sqlparser.Show
 }
 
 func NewShowTablesPlan(ast sqlparser.Statement) IPlan {
 	show := ast.(*sqlparser.Show)
 	return &ShowTablesPlan{
 		Name: "ShowTablesPlan",
-		Ast:  show,
+		ast:  show,
 	}
 }
 
 func (plan *ShowTablesPlan) Build() error {
-	opt := plan.Ast.ShowTablesOpt
+	query := "select * from system.tables"
+	ast, err := parsers.Parse(query)
+	if err != nil {
+		return err
+	}
 
+	opt := plan.ast.ShowTablesOpt
 	// check the plan
 	if opt != nil && opt.Filter != nil && opt.Filter.Filter != nil {
 		_, err := parseExpression(nil, opt.Filter.Filter)
@@ -35,13 +41,19 @@ func (plan *ShowTablesPlan) Build() error {
 		}
 	}
 
-	if plan.Ast.Limit != nil {
-		_, err := parseLimit(plan.Ast.Limit)
+	if plan.ast.Limit != nil {
+		_, err := parseLimit(plan.ast.Limit)
 		if err != nil {
 			return err
 		}
 	}
-	return nil
+
+	plan.SubPlan = NewSelectPlan(ast)
+	return plan.SubPlan.Build()
+}
+
+func (plan *ShowTablesPlan) GetAst() *sqlparser.Show {
+	return plan.ast
 }
 
 func (plan *ShowTablesPlan) Walk(visit Visit) error {
