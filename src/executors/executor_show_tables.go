@@ -13,9 +13,10 @@ import (
 func NewShowTablesExecutor(ctx *ExecutorContext, plan planners.IPlan) IExecutor {
 	var (
 		planner = plan.(*planners.ShowTablesPlan)
-		opt     = planner.Ast.ShowTablesOpt
+		opt     = planner.GetAst().ShowTablesOpt
 		db      = ctx.session.GetDatabase()
 		buffer  = sqlparser.NewTrackedBuffer(nil)
+		ast     = planner.GetAst()
 	)
 
 	buffer.Myprintf("%s", "select name from system.tables where")
@@ -36,15 +37,15 @@ func NewShowTablesExecutor(ctx *ExecutorContext, plan planners.IPlan) IExecutor 
 	}
 
 	buffer.Myprintf(" order by name asc")
-	if planner.Ast.Limit != nil {
-		planner.Ast.Limit.Format(buffer)
+	if ast.Limit != nil {
+		ast.Limit.Format(buffer)
 	}
 
-	ast, err := parsers.Parse(buffer.String())
+	newAst, err := parsers.Parse(buffer.String())
 	if err != nil {
 		ctx.log.Error("Error show tables query %v", err)
 	}
-	planner.SubPlan = planners.NewSelectPlan(ast)
+	planner.SubPlan = planners.NewSelectPlan(newAst)
 	planner.SubPlan.Build()
 
 	return NewSelectExecutor(ctx, planner.SubPlan)
