@@ -156,7 +156,7 @@ func NOT_LIKE(left interface{}, right interface{}) IExpression {
 		left:     exprs[0],
 		right:    exprs[1],
 		validate: All(),
-		eval: func(left *datavalues.Value, right *datavalues.Value) (*datavalues.Value, error) {
+		evalFn: func(left *datavalues.Value, right *datavalues.Value) (*datavalues.Value, error) {
 			return datavalues.ToValue(!datavalues.Like(right.AsString(), left)), nil
 		},
 	}
