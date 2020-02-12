@@ -1,3 +1,4 @@
+
 [![Build Status](https://api.travis-ci.org/vectorengine/vectorsql.svg?branch=master)](https://travis-ci.org/vectorengine/vectorsql)
 [![codecov.io](https://codecov.io/gh/vectorengine/vectorsql/branch/master/graph/badge.svg)](https://codecov.io/gh/vectorengine/vectorsql/branch/master)
 
@@ -28,27 +29,43 @@ $./bin/vectorsql-server -c conf/vectorsql-default.toml
 
 ## Client
 
+* clickhouse-client
+
 ```
 $clickhouse-client --compression=0
+VectorSQL :) select c1, c2, (c1+c2) as c12, c3 from randtable(rows->50, c1->'UInt32', c2->'UInt32', c3->'String') where c12>10 and c12<20 order by c12 desc, c3 asc;
 
-VectorSQL :) select * from randtable(rows->10, c1->'UInt32', c2->'String') where c1>3 and c1<8 order by c1 asc, c2 desc;
-
-SELECT *
-FROM randtable(rows -> 10, c1 -> 'UInt32', c2 -> 'String')
-WHERE (c1 > 3) AND (c1 < 8)
+SELECT
+    c1,
+    c2,
+    c1 + c2 AS c12,
+    c3
+FROM randtable(rows -> 50, c1 -> 'UInt32', c2 -> 'UInt32', c3 -> 'String')
+WHERE (c12 > 10) AND (c12 < 20)
 ORDER BY
-    c1 ASC,
-    c2 DESC
+    c12 DESC,
+    c3 ASC
 
-┌─c1─┬─c2───────┐
-│  5 │ string-6 │
-│  6 │ string-8 │
-│  6 │ string-0 │
-│  7 │ string-4 │
-│  7 │ string-3 │
-└────┴──────────┘
-↖ Progress: 0.00 rows, 0.00 B (0.00 rows/s., 0.00 B/s.)
-5 rows in set. Elapsed: 0.007 sec.
+┌─c1─┬─c2─┬─c12─┬─c3────────┐
+│  5 │ 14 │  19 │ string-23 │
+│  0 │ 19 │  19 │ string-34 │
+│  0 │ 17 │  17 │ string-46 │
+│  3 │ 13 │  16 │ string-4  │
+│  3 │  9 │  12 │ string-44 │
+└────┴────┴─────┴───────────┘
+↑ Progress: 0.00 rows, 0.00 B (0.00 rows/s., 0.00 B/s.)
+5 rows in set. Elapsed: 0.006 sec.
+```
+
+* http-client
+
+```
+curl -XPOST http://127.0.0.1:8123 -d "select c1, c2, (c1+c2) as c12, c3 from randtable(rows->50, c1->'UInt32', c2->'UInt32', c3->'String') where c12>10 and c12<20 order by c12 desc, c3 asc"
+14	5	19	string-33
+1	15	16	string-32
+4	12	16	string-7
+11	4	15	string-35
+10	1	11	string-31
 ```
 
 ## Metrics
