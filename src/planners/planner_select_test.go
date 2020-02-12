@@ -35,21 +35,6 @@ func TestSelectPlan(t *testing.T) {
                 "Schema": ""
             },
             {
-                "Name": "ProjectPlan",
-                "SubPlan": {
-                    "Name": "MapPlan"
-                }
-            },
-            {
-                "Name": "GroupByPlan",
-                "Projects": {
-                    "Name": "MapPlan"
-                },
-                "GroupBys": {
-                    "Name": "MapPlan"
-                }
-            },
-            {
                 "Name": "SinkPlan"
             }
         ]
@@ -68,12 +53,6 @@ func TestSelectPlan(t *testing.T) {
                 "Name": "ScanPlan",
                 "Table": "t1",
                 "Schema": ""
-            },
-            {
-                "Name": "ProjectPlan",
-                "SubPlan": {
-                    "Name": "MapPlan"
-                }
             },
             {
                 "Name": "FilterPlan",
@@ -155,15 +134,6 @@ func TestSelectPlan(t *testing.T) {
                 }
             },
             {
-                "Name": "GroupByPlan",
-                "Projects": {
-                    "Name": "MapPlan"
-                },
-                "GroupBys": {
-                    "Name": "MapPlan"
-                }
-            },
-            {
                 "Name": "SinkPlan"
             }
         ]
@@ -182,21 +152,6 @@ func TestSelectPlan(t *testing.T) {
                 "Name": "ScanPlan",
                 "Table": "t1",
                 "Schema": ""
-            },
-            {
-                "Name": "ProjectPlan",
-                "SubPlan": {
-                    "Name": "MapPlan"
-                }
-            },
-            {
-                "Name": "GroupByPlan",
-                "Projects": {
-                    "Name": "MapPlan"
-                },
-                "GroupBys": {
-                    "Name": "MapPlan"
-                }
             },
             {
                 "Name": "OrderByPlan",
@@ -282,159 +237,6 @@ func TestSelectPlan(t *testing.T) {
                 }
             },
             {
-                "Name": "ProjectPlan",
-                "SubPlan": {
-                    "Name": "MapPlan"
-                }
-            },
-            {
-                "Name": "GroupByPlan",
-                "Projects": {
-                    "Name": "MapPlan"
-                },
-                "GroupBys": {
-                    "Name": "MapPlan"
-                }
-            },
-            {
-                "Name": "SinkPlan"
-            }
-        ]
-    }
-}`,
-		},
-		{
-			name:  "select-aggregate",
-			query: "SELECT max(a), sum(b), c, (id+1) FROM t1 where (id+1)!=2 group by d,e order by c desc",
-			expect: `{
-    "Name": "SelectPlan",
-    "SubPlan": {
-        "Name": "MapPlan",
-        "SubPlans": [
-            {
-                "Name": "ScanPlan",
-                "Table": "t1",
-                "Schema": ""
-            },
-            {
-                "Name": "ProjectPlan",
-                "SubPlan": {
-                    "Name": "MapPlan",
-                    "SubPlans": [
-                        {
-                            "Name": "UnaryExpressionPlan",
-                            "FuncName": "MAX",
-                            "Expr": {
-                                "Name": "VariablePlan",
-                                "Value": "a"
-                            }
-                        },
-                        {
-                            "Name": "UnaryExpressionPlan",
-                            "FuncName": "SUM",
-                            "Expr": {
-                                "Name": "VariablePlan",
-                                "Value": "b"
-                            }
-                        },
-                        {
-                            "Name": "VariablePlan",
-                            "Value": "c"
-                        },
-                        {
-                            "Name": "BinaryExpressionPlan",
-                            "FuncName": "+",
-                            "Left": {
-                                "Name": "VariablePlan",
-                                "Value": "id"
-                            },
-                            "Right": {
-                                "Name": "ConstantPlan",
-                                "Value": 1
-                            }
-                        }
-                    ]
-                }
-            },
-            {
-                "Name": "FilterPlan",
-                "SubPlan": {
-                    "Name": "BinaryExpressionPlan",
-                    "FuncName": "!=",
-                    "Left": {
-                        "Name": "BinaryExpressionPlan",
-                        "FuncName": "+",
-                        "Left": {
-                            "Name": "VariablePlan",
-                            "Value": "id"
-                        },
-                        "Right": {
-                            "Name": "ConstantPlan",
-                            "Value": 1
-                        }
-                    },
-                    "Right": {
-                        "Name": "ConstantPlan",
-                        "Value": 2
-                    }
-                }
-            },
-            {
-                "Name": "GroupByPlan",
-                "Projects": {
-                    "Name": "MapPlan",
-                    "SubPlans": [
-                        {
-                            "Name": "UnaryExpressionPlan",
-                            "FuncName": "MAX",
-                            "Expr": {
-                                "Name": "VariablePlan",
-                                "Value": "a"
-                            }
-                        },
-                        {
-                            "Name": "UnaryExpressionPlan",
-                            "FuncName": "SUM",
-                            "Expr": {
-                                "Name": "VariablePlan",
-                                "Value": "b"
-                            }
-                        },
-                        {
-                            "Name": "VariablePlan",
-                            "Value": "c"
-                        },
-                        {
-                            "Name": "BinaryExpressionPlan",
-                            "FuncName": "+",
-                            "Left": {
-                                "Name": "VariablePlan",
-                                "Value": "id"
-                            },
-                            "Right": {
-                                "Name": "ConstantPlan",
-                                "Value": 1
-                            }
-                        }
-                    ]
-                },
-                "GroupBys": {
-                    "Name": "MapPlan"
-                }
-            },
-            {
-                "Name": "OrderByPlan",
-                "Orders": [
-                    {
-                        "Expression": {
-                            "Name": "VariablePlan",
-                            "Value": "c"
-                        },
-                        "Direction": "desc"
-                    }
-                ]
-            },
-            {
                 "Name": "SinkPlan"
             }
         ]
@@ -453,54 +255,6 @@ func TestSelectPlan(t *testing.T) {
                 "Name": "ScanPlan",
                 "Table": "t1",
                 "Schema": ""
-            },
-            {
-                "Name": "ProjectPlan",
-                "SubPlan": {
-                    "Name": "MapPlan",
-                    "SubPlans": [
-                        {
-                            "Name": "UnaryExpressionPlan",
-                            "FuncName": "MAX",
-                            "Expr": {
-                                "Name": "BinaryExpressionPlan",
-                                "FuncName": "+",
-                                "Left": {
-                                    "Name": "VariablePlan",
-                                    "Value": "a"
-                                },
-                                "Right": {
-                                    "Name": "ConstantPlan",
-                                    "Value": 1
-                                }
-                            }
-                        },
-                        {
-                            "Name": "AliasedExpressionPlan",
-                            "As": "b",
-                            "Expr": {
-                                "Name": "BinaryExpressionPlan",
-                                "FuncName": "+",
-                                "Left": {
-                                    "Name": "VariablePlan",
-                                    "Value": "id"
-                                },
-                                "Right": {
-                                    "Name": "ConstantPlan",
-                                    "Value": 1
-                                }
-                            }
-                        },
-                        {
-                            "Name": "AliasedExpressionPlan",
-                            "As": "c1",
-                            "Expr": {
-                                "Name": "VariablePlan",
-                                "Value": "c"
-                            }
-                        }
-                    ]
-                }
             },
             {
                 "Name": "FilterPlan",
@@ -526,8 +280,8 @@ func TestSelectPlan(t *testing.T) {
                 }
             },
             {
-                "Name": "GroupByPlan",
-                "Projects": {
+                "Name": "ProjectionPlan",
+                "Projections": {
                     "Name": "MapPlan",
                     "SubPlans": [
                         {
@@ -571,9 +325,6 @@ func TestSelectPlan(t *testing.T) {
                             }
                         }
                     ]
-                },
-                "GroupBys": {
-                    "Name": "MapPlan"
                 }
             },
             {

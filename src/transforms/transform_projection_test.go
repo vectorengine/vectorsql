@@ -6,33 +6,32 @@ package transforms
 
 import (
 	"context"
-	"mocks"
 	"testing"
 
 	"columns"
 	"datablocks"
 	"datatypes"
+	"mocks"
 	"planners"
 	"processors"
 
 	"github.com/stretchr/testify/assert"
 )
 
-func TestGroupByTransform(t *testing.T) {
+func TestProjectionTransform(t *testing.T) {
 	tests := []struct {
 		name   string
-		plan   *planners.GroupByPlan
+		plan   *planners.ProjectionPlan
 		source *datablocks.DataBlock
 		expect *datablocks.DataBlock
 	}{
 		{
-			name: "simple-(max(age) group by name)",
-			plan: planners.NewGroupByPlan(
+			name: "simple-all)",
+			plan: planners.NewProjectPlan(
 				planners.NewMapPlan(
 					planners.NewVariablePlan("name"),
 					planners.NewVariablePlan("age"),
 				),
-				nil,
 			),
 			source: mocks.NewBlockFromSlice(
 				[]columns.Column{
@@ -55,6 +54,62 @@ func TestGroupByTransform(t *testing.T) {
 				[]interface{}{"z", 20},
 			),
 		},
+		{
+			name: "simple-age",
+			plan: planners.NewProjectPlan(
+				planners.NewMapPlan(
+					planners.NewVariablePlan("age"),
+				),
+			),
+			source: mocks.NewBlockFromSlice(
+				[]columns.Column{
+					{Name: "name", DataType: datatypes.NewStringDataType()},
+					{Name: "age", DataType: datatypes.NewInt32DataType()},
+				},
+				[]interface{}{"x", 11},
+				[]interface{}{"x", 15},
+				[]interface{}{"y", 19},
+				[]interface{}{"z", 20},
+			),
+			expect: mocks.NewBlockFromSlice(
+				[]columns.Column{
+					{Name: "age", DataType: datatypes.NewInt32DataType()},
+				},
+				[]interface{}{11},
+				[]interface{}{15},
+				[]interface{}{19},
+				[]interface{}{20},
+			),
+		},
+		{
+			name: "simple-age-as-xage",
+			plan: planners.NewProjectPlan(
+				planners.NewMapPlan(
+					planners.NewAliasedExpressionPlan("xage",
+						planners.NewVariablePlan("age"),
+					),
+				),
+			),
+			source: mocks.NewBlockFromSlice(
+				[]columns.Column{
+					{Name: "name", DataType: datatypes.NewStringDataType()},
+					{Name: "age", DataType: datatypes.NewInt32DataType()},
+				},
+				[]interface{}{"x", 11},
+				[]interface{}{"x", 15},
+				[]interface{}{"y", 19},
+				[]interface{}{"z", 20},
+			),
+			expect: mocks.NewBlockFromSlice(
+				[]columns.Column{
+					{Name: "xage", DataType: datatypes.NewInt32DataType()},
+				},
+				[]interface{}{11},
+				[]interface{}{15},
+				[]interface{}{19},
+				[]interface{}{20},
+			),
+		},
 	}
 
 	for _, test := range tests {
@@ -65,12 +120,12 @@ func TestGroupByTransform(t *testing.T) {
 		stream := mocks.NewMockBlockInputStream(test.source)
 		datasource := NewDataSourceTransform(ctx, stream)
 
-		groupby := NewGroupByTransform(ctx, test.plan)
+		projection := NewProjectionTransform(ctx, test.plan)
 
 		sink := processors.NewSink("sink")
 		pipeline := processors.NewPipeline(context.Background())
 		pipeline.Add(datasource)
-		pipeline.Add(groupby)
+		pipeline.Add(projection)
 		pipeline.Add(sink)
 		pipeline.Run()
 

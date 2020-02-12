@@ -43,5 +43,5 @@ func (e *BinaryExpression) Walk(visit Visit) error {
 }
 
 func (e *BinaryExpression) String() string {
-	return fmt.Sprintf("(%v %v %v)", e.left, e.name, e.right)
+	return fmt.Sprintf("(%v%v%v)", e.left, e.name, e.right)
 }

@@ -6,74 +6,50 @@ package transforms
 
 import (
 	"columns"
+	"datablocks"
 	"datatypes"
 	"datavalues"
 	"expressions"
-	"sync"
-
-	"datablocks"
 	"planners"
 	"processors"
 )
 
-type GroupByTransform struct {
+type ProjectionTransform struct {
 	ctx  *TransformContext
-	plan *planners.GroupByPlan
+	plan *planners.ProjectionPlan
 	processors.BaseProcessor
 }
 
-func NewGroupByTransform(ctx *TransformContext, plan *planners.GroupByPlan) processors.IProcessor {
-	return &GroupByTransform{
+func NewProjectionTransform(ctx *TransformContext, plan *planners.ProjectionPlan) processors.IProcessor {
+	return &ProjectionTransform{
 		ctx:           ctx,
 		plan:          plan,
-		BaseProcessor: processors.NewBaseProcessor("transform_groupby"),
+		BaseProcessor: processors.NewBaseProcessor("transform_projection"),
 	}
 }
 
-func (t *GroupByTransform) Execute() {
-	var wg sync.WaitGroup
-	var errors []error
-	var blocks []*datablocks.DataBlock
-
+func (t *ProjectionTransform) Execute() {
 	out := t.Out()
-	defer out.Close()
 
+	defer out.Close()
 	onNext := func(x interface{}) {
 		switch y := x.(type) {
 		case *datablocks.DataBlock:
-			blocks = append(blocks, y)
-		case error:
-			errors = append(errors, y)
-		}
-	}
-	onDone := func() {
-		defer wg.Done()
-		if len(errors) > 0 {
-			out.Send(errors[0])
-		} else {
-			block, err := datablocks.Append(blocks...)
-			if err != nil {
+			if block, err := t.project(y); err != nil {
 				out.Send(err)
 			} else {
-				if blocks, err := t.groupby(block); err != nil {
-					out.Send(err)
-				} else {
-					for _, x := range blocks {
-						out.Send(x)
-					}
-				}
+				out.Send(block)
 			}
+		default:
+			out.Send(x)
 		}
 	}
-	wg.Add(1)
-	t.Subscribe(onNext, onDone)
-	wg.Wait()
+	t.Subscribe(onNext)
 }
 
-func (t *GroupByTransform) groupby(x *datablocks.DataBlock) ([]*datablocks.DataBlock, error) {
+func (t *ProjectionTransform) project(x *datablocks.DataBlock) (*datablocks.DataBlock, error) {
 	var fields []string
-	var blocks []*datablocks.DataBlock
-	projects := t.plan.Projects
+	projects := t.plan.Projections
 
 	// Build the fields which used by projects.
 	if err := projects.Walk(func(p planners.IPlan) (bool, error) {
@@ -108,7 +84,6 @@ func (t *GroupByTransform) groupby(x *datablocks.DataBlock) ([]*datablocks.DataB
 	it := x.RowIterator()
 	if it.Next() {
 		rows := it.Value()
-
 		for _, colidx := range colidxs {
 			params[colidx.Name] = rows[colidx.Index]
 		}
@@ -117,31 +92,18 @@ func (t *GroupByTransform) groupby(x *datablocks.DataBlock) ([]*datablocks.DataB
 			if err != nil {
 				return nil, err
 			}
-			switch val.GetType() {
-			case datavalues.TypeInt:
-				cols[i] = columns.Column{
-					Name:     expr.String(),
-					DataType: datatypes.NewInt32DataType(),
-				}
-			case datavalues.TypeFloat:
-				cols[i] = columns.Column{
-					Name:     expr.String(),
-					DataType: datatypes.NewInt32DataType(),
-				}
-			case datavalues.TypeString:
-				cols[i] = columns.Column{
-					Name:     expr.String(),
-					DataType: datatypes.NewStringDataType(),
-				}
+			dataType, err := datatypes.GetDataTypeByValue(val)
+			if err != nil {
+				return nil, err
+			}
+			cols[i] = columns.Column{
+				Name:     expr.String(),
+				DataType: dataType,
 			}
 		}
 	} else {
 		for i, expr := range exprs {
-			column, err := x.Column(expr.String())
-			if err != nil {
-				return nil, err
-			}
-			cols[i] = column
+			cols[i] = columns.Column{Name: expr.String(), DataType: datatypes.NewStringDataType()}
 		}
 	}
 
@@ -164,6 +126,5 @@ func (t *GroupByTransform) groupby(x *datablocks.DataBlock) ([]*datablocks.DataB
 			return nil, err
 		}
 	}
-	blocks = append(blocks, newblock)
-	return blocks, nil
+	return newblock, nil
 }

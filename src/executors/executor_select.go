@@ -38,21 +38,20 @@ func (executor *SelectExecutor) Execute() (processors.IProcessor, error) {
 		case *planners.TableValuedFunctionPlan:
 			executor := NewTableValuedFunctionExecutor(ectx, plan)
 			tree.Add(executor)
-		case *planners.ProjectPlan:
 		case *planners.ScanPlan:
 			executor := NewScanExecutor(ectx, plan)
 			tree.Add(executor)
 		case *planners.FilterPlan:
 			executor := NewFilterExecutor(ectx, plan)
 			tree.Add(executor)
-		case *planners.GroupByPlan:
-			//executor := NewGroupByExecutor(ectx, plan)
-			//tree.Add(executor)
 		case *planners.OrderByPlan:
 			executor := NewOrderByExecutor(ectx, plan)
 			tree.Add(executor)
 		case *planners.LimitPlan:
 			executor := NewLimitExecutor(ectx, plan)
+			tree.Add(executor)
+		case *planners.ProjectionPlan:
+			executor := NewProjectionExecutor(ectx, plan)
 			tree.Add(executor)
 		case *planners.SinkPlan:
 			executor := NewSinkExecutor(ectx, plan)
