@@ -30,7 +30,11 @@ func (plan *OrderByPlan) Build() error {
 }
 
 func (plan *OrderByPlan) Walk(visit Visit) error {
-	return nil
+	plans := make([]IPlan, len(plan.Orders))
+	for _, order := range plan.Orders {
+		plans = append(plans, order.Expression)
+	}
+	return Walk(visit, plans...)
 }
 
 func (plan *OrderByPlan) String() string {

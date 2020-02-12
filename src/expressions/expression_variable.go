@@ -5,9 +5,8 @@
 package expressions
 
 import (
-	"datavalues"
-
 	"base/errors"
+	"datavalues"
 )
 
 type VariableExpression struct {
@@ -37,4 +36,8 @@ func (e *VariableExpression) Eval(params IParams) (*datavalues.Value, error) {
 
 func (e *VariableExpression) Walk(visit Visit) error {
 	return nil
+}
+
+func (e *VariableExpression) String() string {
+	return e.value
 }

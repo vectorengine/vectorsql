@@ -59,6 +59,10 @@ func (plan *SelectPlan) Build() error {
 		tree.Add(filterPlan)
 	}
 
+	// Group By.
+	groupbyPlan := NewGroupByPlan(fields, NewMapPlan())
+	tree.Add(groupbyPlan)
+
 	// OrderBy.
 	if ast.OrderBy != nil {
 		orders, err := parseOrderBy(aliases, ast.OrderBy)

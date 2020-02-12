@@ -51,7 +51,7 @@ func (t *OrderByTransform) Execute() {
 			if err != nil {
 				out.Send(err)
 			} else {
-				if err := t.orderby(block); err != nil {
+				if err := block.OrderByPlan(t.plan); err != nil {
 					out.Send(err)
 				} else {
 					out.Send(block)
@@ -62,17 +62,4 @@ func (t *OrderByTransform) Execute() {
 	wg.Add(1)
 	t.Subscribe(onNext, onDone)
 	wg.Wait()
-}
-
-func (t *OrderByTransform) orderby(x *datablocks.DataBlock) error {
-	plan := t.plan
-
-	var sorters []datablocks.Sorter
-	for _, order := range plan.Orders {
-		expr := order.Expression.(*planners.VariablePlan)
-		field := string(expr.Value)
-		direction := order.Direction
-		sorters = append(sorters, datablocks.NewSorter(field, direction))
-	}
-	return x.OrderBy(sorters...)
 }

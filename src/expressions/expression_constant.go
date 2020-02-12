@@ -5,6 +5,8 @@
 package expressions
 
 import (
+	"fmt"
+
 	"datavalues"
 )
 
@@ -28,4 +30,8 @@ func (e *ConstantExpression) Eval(params IParams) (*datavalues.Value, error) {
 
 func (e *ConstantExpression) Walk(visit Visit) error {
 	return nil
+}
+
+func (e *ConstantExpression) String() string {
+	return fmt.Sprintf("%v", e.value)
 }

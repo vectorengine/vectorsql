@@ -6,6 +6,7 @@ package expressions
 
 import (
 	"datavalues"
+	"fmt"
 )
 
 type scalarEvalFunc func(args ...*datavalues.Value) (*datavalues.Value, error)
@@ -36,4 +37,8 @@ func (e *ScalarExpression) Eval(params IParams) (*datavalues.Value, error) {
 
 func (e *ScalarExpression) Walk(visit Visit) error {
 	return Walk(visit, e.exprs...)
+}
+
+func (e *ScalarExpression) String() string {
+	return fmt.Sprintf("%v(%v)", e.name, e.exprs)
 }

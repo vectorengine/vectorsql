@@ -11,6 +11,7 @@ import (
 type IExpression interface {
 	Walk(visit Visit) error
 	Eval(params IParams) (*datavalues.Value, error)
+	String() string
 }
 
 type Visit func(e IExpression) (kontinue bool, err error)

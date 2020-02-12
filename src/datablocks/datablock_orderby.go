@@ -5,47 +5,98 @@
 package datablocks
 
 import (
-	"expvar"
-	"sort"
-	"strings"
-	"time"
-
 	"datavalues"
 	"expressions"
+	"planners"
+	"sort"
+	"strings"
 
 	"base/errors"
-	"base/metric"
 )
 
-type Sorter struct {
-	column    string
-	direction string
-}
+func (block *DataBlock) OrderByPlan(plan *planners.OrderByPlan) error {
+	var fields []string
 
-func NewSorter(col string, direction string) Sorter {
-	return Sorter{
-		column:    col,
-		direction: direction,
-	}
-}
-
-func (block *DataBlock) OrderBy(sorters ...Sorter) error {
-	defer expvar.Get(metric_datablock_sort_sec).(metric.Metric).Record(time.Now())
-
-	if block.NumColumns() == 1 {
-		cv := block.values[0]
-		matrix := cv.values
-		sorter := sorters[0]
-
-		if cv.column.Name != sorter.column {
-			return errors.Errorf("Can't find column:%v", sorter.column)
+	// Find the column name which all the orderby used.
+	if err := plan.Walk(func(p planners.IPlan) (bool, error) {
+		switch p := p.(type) {
+		case *planners.VariablePlan:
+			fields = append(fields, string(p.Value))
 		}
-		sort.Slice(matrix[:], func(i, j int) bool {
-			cmp, err := datavalues.Compare(matrix[i], matrix[j])
+		return true, nil
+	}); err != nil {
+		return err
+	}
+
+	// Build the orderby to IExpression.
+	exprs := make([]expressions.IExpression, len(plan.Orders))
+	for i, order := range plan.Orders {
+		expr, err := planners.BuildExpressions(order.Expression)
+		if err != nil {
+			return err
+		}
+		exprs[i] = expr
+	}
+
+	// Orderby column value.
+	tuples := make([]interface{}, len(fields))
+	for i, name := range fields {
+		cv, ok := block.valuesmap[name]
+		if !ok {
+			return errors.Errorf("Can't find column:%v", name)
+		}
+		tuples[i] = datavalues.MakeTuple(cv.values...)
+	}
+	// Append the Seqs column.
+	numRows := block.NumRows()
+	seqs := make([]*datavalues.Value, numRows)
+	for i := 0; i < numRows; i++ {
+		seqs[i] = datavalues.ToValue(i)
+	}
+	tuples = append(tuples, datavalues.MakeTuple(seqs...))
+
+	// ZIP to the row format.
+	zipFunc, err := expressions.ExpressionFactory("ZIP", tuples)
+	if err != nil {
+		return err
+	}
+	result, err := zipFunc.Eval(nil)
+	if err != nil {
+		return err
+	}
+
+	// Params.
+	iparams := make(expressions.Map, len(fields))
+	jparams := make(expressions.Map, len(fields))
+
+	// Sort.
+	matrix := result.AsSlice()
+	sort.Slice(matrix[:], func(i, j int) bool {
+		irows := matrix[i].AsSlice()
+		jrows := matrix[j].AsSlice()
+		for k := 0; k < len(fields); k++ {
+			iparams[fields[k]] = irows[k]
+			jparams[fields[k]] = jrows[k]
+		}
+
+		for k, order := range plan.Orders {
+			ival, err := exprs[k].Eval(iparams)
 			if err != nil {
 				return false
 			}
-			switch strings.ToUpper(sorter.direction) {
+			jval, err := exprs[k].Eval(jparams)
+			if err != nil {
+				return false
+			}
+
+			cmp, err := datavalues.Compare(ival, jval)
+			if err != nil {
+				return false
+			}
+			if cmp == datavalues.Equal {
+				continue
+			}
+			switch strings.ToUpper(order.Direction) {
 			case "ASC":
 				return cmp == datavalues.LessThan
 			case "DESC":
@@ -53,66 +104,15 @@ func (block *DataBlock) OrderBy(sorters ...Sorter) error {
 			default:
 				return cmp == datavalues.LessThan
 			}
-		})
-	} else {
-		// Seqs column.
-		max := block.NumRows()
-		seqs := make([]*datavalues.Value, max)
-		for i := 0; i < max; i++ {
-			seqs[i] = datavalues.ToValue(i)
 		}
+		return false
+	})
 
-		// Sort columns.
-		var tuples []interface{}
-		for _, sorter := range sorters {
-			cv, ok := block.valuesmap[sorter.column]
-			if !ok {
-				return errors.Errorf("Can't find column:%v", sorter.column)
-			}
-			tuples = append(tuples, datavalues.MakeTuple(cv.values...))
-		}
-		tuples = append(tuples, datavalues.MakeTuple(seqs...))
-
-		zipFunc, err := expressions.ExpressionFactory("ZIP", tuples)
-		if err != nil {
-			return err
-		}
-		result, err := zipFunc.Eval(nil)
-		if err != nil {
-			return err
-		}
-
-		// Sort.
-		matrix := result.AsSlice()
-		sort.Slice(matrix[:], func(i, j int) bool {
-			irows := matrix[i].AsSlice()
-			jrows := matrix[j].AsSlice()
-			for x := 0; x < len(irows)-1; x++ {
-				cmp, err := datavalues.Compare(irows[x], jrows[x])
-				if err != nil {
-					return false
-				}
-				if cmp == datavalues.Equal {
-					continue
-				}
-				switch strings.ToUpper(sorters[x].direction) {
-				case "ASC":
-					return cmp == datavalues.LessThan
-				case "DESC":
-					return cmp == datavalues.GreaterThan
-				default:
-					return cmp == datavalues.LessThan
-				}
-			}
-			return false
-		})
-
-		// Final.
-		finalSeqs := make([]*datavalues.Value, max)
-		for i, tuple := range matrix {
-			finalSeqs[i] = tuple.AsSlice()[len(sorters)]
-		}
-		block.setSeqs(finalSeqs)
+	// Final.
+	finalSeqs := make([]*datavalues.Value, numRows)
+	for i, tuple := range matrix {
+		finalSeqs[i] = tuple.AsSlice()[len(fields)]
 	}
+	block.setSeqs(finalSeqs)
 	return nil
 }

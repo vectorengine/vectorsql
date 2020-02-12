@@ -18,7 +18,6 @@ test:
 	@$(MAKE) testbase
 	@$(MAKE) testconfig
 	@$(MAKE) testsessions
-	@$(MAKE) testfunctions
 	@$(MAKE) testexpressions
 	@$(MAKE) testprocessors
 	@$(MAKE) testdatastreams
@@ -43,9 +42,6 @@ testprocessors:
 
 testdatastreams:
 	go test -v -race datastreams
-
-testfunctions:
-	go test -v -race functions
 
 testexpressions:
 	go test -v -race expressions
@@ -72,7 +68,6 @@ pkgs =	config		\
 		processors	\
 		datastreams	\
 		expressions	\
-		functions	\
 		planners	\
 		optimizers	\
 		executors	\

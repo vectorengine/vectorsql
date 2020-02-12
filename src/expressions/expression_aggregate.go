@@ -6,6 +6,7 @@ package expressions
 
 import (
 	"datavalues"
+	"fmt"
 )
 
 type aggregateEvalFunc func(current, next *datavalues.Value) (*datavalues.Value, error)
@@ -38,4 +39,8 @@ func (e *AggregateExpression) Eval(params IParams) (*datavalues.Value, error) {
 
 func (e *AggregateExpression) Walk(visit Visit) error {
 	return Walk(visit, e.expr)
+}
+
+func (e *AggregateExpression) String() string {
+	return fmt.Sprintf("%v(%v)", e.name, e.expr)
 }

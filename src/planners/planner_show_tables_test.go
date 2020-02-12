@@ -46,6 +46,15 @@ func TestShowTablesPlan(t *testing.T) {
                     }
                 },
                 {
+                    "Name": "GroupByPlan",
+                    "Projects": {
+                        "Name": "MapPlan"
+                    },
+                    "GroupBys": {
+                        "Name": "MapPlan"
+                    }
+                },
+                {
                     "Name": "SinkPlan"
                 }
             ]

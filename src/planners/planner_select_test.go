@@ -41,6 +41,15 @@ func TestSelectPlan(t *testing.T) {
                 }
             },
             {
+                "Name": "GroupByPlan",
+                "Projects": {
+                    "Name": "MapPlan"
+                },
+                "GroupBys": {
+                    "Name": "MapPlan"
+                }
+            },
+            {
                 "Name": "SinkPlan"
             }
         ]
@@ -146,6 +155,15 @@ func TestSelectPlan(t *testing.T) {
                 }
             },
             {
+                "Name": "GroupByPlan",
+                "Projects": {
+                    "Name": "MapPlan"
+                },
+                "GroupBys": {
+                    "Name": "MapPlan"
+                }
+            },
+            {
                 "Name": "SinkPlan"
             }
         ]
@@ -168,6 +186,15 @@ func TestSelectPlan(t *testing.T) {
             {
                 "Name": "ProjectPlan",
                 "SubPlan": {
+                    "Name": "MapPlan"
+                }
+            },
+            {
+                "Name": "GroupByPlan",
+                "Projects": {
+                    "Name": "MapPlan"
+                },
+                "GroupBys": {
                     "Name": "MapPlan"
                 }
             },
@@ -261,6 +288,15 @@ func TestSelectPlan(t *testing.T) {
                 }
             },
             {
+                "Name": "GroupByPlan",
+                "Projects": {
+                    "Name": "MapPlan"
+                },
+                "GroupBys": {
+                    "Name": "MapPlan"
+                }
+            },
+            {
                 "Name": "SinkPlan"
             }
         ]
@@ -341,6 +377,49 @@ func TestSelectPlan(t *testing.T) {
                         "Name": "ConstantPlan",
                         "Value": 2
                     }
+                }
+            },
+            {
+                "Name": "GroupByPlan",
+                "Projects": {
+                    "Name": "MapPlan",
+                    "SubPlans": [
+                        {
+                            "Name": "UnaryExpressionPlan",
+                            "FuncName": "MAX",
+                            "Expr": {
+                                "Name": "VariablePlan",
+                                "Value": "a"
+                            }
+                        },
+                        {
+                            "Name": "UnaryExpressionPlan",
+                            "FuncName": "SUM",
+                            "Expr": {
+                                "Name": "VariablePlan",
+                                "Value": "b"
+                            }
+                        },
+                        {
+                            "Name": "VariablePlan",
+                            "Value": "c"
+                        },
+                        {
+                            "Name": "BinaryExpressionPlan",
+                            "FuncName": "+",
+                            "Left": {
+                                "Name": "VariablePlan",
+                                "Value": "id"
+                            },
+                            "Right": {
+                                "Name": "ConstantPlan",
+                                "Value": 1
+                            }
+                        }
+                    ]
+                },
+                "GroupBys": {
+                    "Name": "MapPlan"
                 }
             },
             {
@@ -444,6 +523,57 @@ func TestSelectPlan(t *testing.T) {
                         "Name": "ConstantPlan",
                         "Value": 5
                     }
+                }
+            },
+            {
+                "Name": "GroupByPlan",
+                "Projects": {
+                    "Name": "MapPlan",
+                    "SubPlans": [
+                        {
+                            "Name": "UnaryExpressionPlan",
+                            "FuncName": "MAX",
+                            "Expr": {
+                                "Name": "BinaryExpressionPlan",
+                                "FuncName": "+",
+                                "Left": {
+                                    "Name": "VariablePlan",
+                                    "Value": "a"
+                                },
+                                "Right": {
+                                    "Name": "ConstantPlan",
+                                    "Value": 1
+                                }
+                            }
+                        },
+                        {
+                            "Name": "AliasedExpressionPlan",
+                            "As": "b",
+                            "Expr": {
+                                "Name": "BinaryExpressionPlan",
+                                "FuncName": "+",
+                                "Left": {
+                                    "Name": "VariablePlan",
+                                    "Value": "id"
+                                },
+                                "Right": {
+                                    "Name": "ConstantPlan",
+                                    "Value": 1
+                                }
+                            }
+                        },
+                        {
+                            "Name": "AliasedExpressionPlan",
+                            "As": "c1",
+                            "Expr": {
+                                "Name": "VariablePlan",
+                                "Value": "c"
+                            }
+                        }
+                    ]
+                },
+                "GroupBys": {
+                    "Name": "MapPlan"
                 }
             },
             {

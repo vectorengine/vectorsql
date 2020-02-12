@@ -27,7 +27,7 @@ func TestSelectExecutor(t *testing.T) {
 	}{
 		{
 			name:  "simple",
-			query: "select name from system.databases where name='db1'",
+			query: "select name, `engine`,data_path, metadata_path from system.databases where name='db1'",
 			expect: mocks.NewBlockFromSlice(
 				[]columns.Column{
 					{Name: "name", DataType: datatypes.NewStringDataType()},
@@ -36,12 +36,15 @@ func TestSelectExecutor(t *testing.T) {
 					{Name: "metadata_path", DataType: datatypes.NewStringDataType()},
 				},
 				[]interface{}{},
+				[]interface{}{},
+				[]interface{}{},
+				[]interface{}{},
 			),
 		},
 
 		{
 			name:  "tvf-rangetable",
-			query: "SELECT * FROM rangetable(rows->5, i->'Int32')",
+			query: "SELECT i FROM rangetable(rows->5, i->'Int32')",
 			expect: mocks.NewBlockFromSlice(
 				[]columns.Column{
 					{Name: "i", DataType: datatypes.NewInt32DataType()},
@@ -55,7 +58,7 @@ func TestSelectExecutor(t *testing.T) {
 		},
 		{
 			name:  "filter",
-			query: "SELECT * FROM rangetable(rows->5, i->'Int32') WHERE i>2",
+			query: "SELECT i FROM rangetable(rows->5, i->'Int32') WHERE i>2",
 			expect: mocks.NewBlockFromSlice(
 				[]columns.Column{
 					{Name: "i", DataType: datatypes.NewInt32DataType()},
@@ -66,7 +69,7 @@ func TestSelectExecutor(t *testing.T) {
 		},
 		{
 			name:  "orderby",
-			query: "SELECT * FROM rangetable(rows->5, i->'Int32') WHERE i>2 order by i desc",
+			query: "SELECT i FROM rangetable(rows->5, i->'Int32') WHERE i>2 order by i desc",
 			expect: mocks.NewBlockFromSlice(
 				[]columns.Column{
 					{Name: "i", DataType: datatypes.NewInt32DataType()},

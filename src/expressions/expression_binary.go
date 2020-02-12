@@ -5,6 +5,8 @@
 package expressions
 
 import (
+	"fmt"
+
 	"datavalues"
 )
 
@@ -38,4 +40,8 @@ func (e *BinaryExpression) Eval(params IParams) (*datavalues.Value, error) {
 
 func (e *BinaryExpression) Walk(visit Visit) error {
 	return Walk(visit, e.left, e.right)
+}
+
+func (e *BinaryExpression) String() string {
+	return fmt.Sprintf("(%v %v %v)", e.left, e.name, e.right)
 }

@@ -6,12 +6,12 @@ package transforms
 
 import (
 	"context"
+	"mocks"
 	"testing"
 
 	"columns"
 	"datablocks"
 	"datatypes"
-	"mocks"
 	"planners"
 	"processors"
 
@@ -30,14 +30,9 @@ func TestGroupByTransform(t *testing.T) {
 			plan: planners.NewGroupByPlan(
 				planners.NewMapPlan(
 					planners.NewVariablePlan("name"),
-					planners.NewFunctionExpressionPlan(
-						"MAX",
-						planners.NewVariablePlan("age"),
-					),
+					planners.NewVariablePlan("age"),
 				),
-				planners.NewMapPlan(
-					planners.NewVariablePlan("name"),
-				),
+				nil,
 			),
 			source: mocks.NewBlockFromSlice(
 				[]columns.Column{
@@ -52,8 +47,9 @@ func TestGroupByTransform(t *testing.T) {
 			expect: mocks.NewBlockFromSlice(
 				[]columns.Column{
 					{Name: "name", DataType: datatypes.NewStringDataType()},
-					{Name: "MAX(age)", DataType: datatypes.NewInt32DataType()},
+					{Name: "age", DataType: datatypes.NewInt32DataType()},
 				},
+				[]interface{}{"x", 11},
 				[]interface{}{"x", 15},
 				[]interface{}{"y", 19},
 				[]interface{}{"z", 20},

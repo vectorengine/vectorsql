@@ -37,6 +37,9 @@ func TestShowDatabasesExecutor(t *testing.T) {
 					{Name: "data_path", DataType: datatypes.NewStringDataType()},
 					{Name: "metadata_path", DataType: datatypes.NewStringDataType()},
 				},
+				//[]interface{}{"db1", "", "data9000/data/db1", "data9000/metadata/db1"},
+				//[]interface{}{"system", "SYSTEM", "data9000/data/system", "data9000/metadata/system"},
+
 				[]interface{}{"db1", "", "data9000/data/db1", "data9000/metadata/db1"},
 				[]interface{}{"system", "SYSTEM", "data9000/data/system", "data9000/metadata/system"},
 			),
