@@ -30,11 +30,9 @@ func TestShowTablessExecutor(t *testing.T) {
 			expect: mocks.NewBlockFromSlice(
 				[]columns.Column{
 					{Name: "name", DataType: datatypes.NewStringDataType()},
-					{Name: "database", DataType: datatypes.NewStringDataType()},
-					{Name: "engine", DataType: datatypes.NewStringDataType()},
 				},
-				[]interface{}{"databases", "system", "SYSTEM_DATABASES"},
-				[]interface{}{"tables", "system", "SYSTEM_TABLES"},
+				[]interface{}{"databases"},
+				[]interface{}{"tables"},
 			),
 		},
 	}
