@@ -26,7 +26,7 @@ func TestShowTablessExecutor(t *testing.T) {
 
 		{
 			name:  "show tables",
-			query: "show tables",
+			query: "show tables where `engine` like '%SYSTEM_%' and name like '%tab%' limit 2",
 			expect: mocks.NewBlockFromSlice(
 				[]columns.Column{
 					{Name: "name", DataType: datatypes.NewStringDataType()},
@@ -34,7 +34,6 @@ func TestShowTablessExecutor(t *testing.T) {
 					{Name: "engine", DataType: datatypes.NewStringDataType()},
 				},
 				[]interface{}{"databases", "system", "SYSTEM_DATABASES"},
-				[]interface{}{"numbers", "system", "SYSTEM_NUMBERS"},
 				[]interface{}{"tables", "system", "SYSTEM_TABLES"},
 			),
 		},

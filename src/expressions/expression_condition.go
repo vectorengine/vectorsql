@@ -148,3 +148,16 @@ func LIKE(left interface{}, right interface{}) IExpression {
 		},
 	}
 }
+
+func NOT_LIKE(left interface{}, right interface{}) IExpression {
+	exprs := expressionsFor(left, right)
+	return &BinaryExpression{
+		name:     "NOT LIKE",
+		left:     exprs[0],
+		right:    exprs[1],
+		validate: All(),
+		evalFn: func(left *datavalues.Value, right *datavalues.Value) (*datavalues.Value, error) {
+			return datavalues.ToValue(!datavalues.Like(right.AsString(), left)), nil
+		},
+	}
+}

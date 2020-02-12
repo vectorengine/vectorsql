@@ -5,33 +5,50 @@
 package executors
 
 import (
+	"parsers"
+	"parsers/sqlparser"
 	"planners"
 )
 
 func NewShowTablesExecutor(ctx *ExecutorContext, plan planners.IPlan) IExecutor {
-	planner := plan.(*planners.ShowTablesPlan)
-	selectPlan := planner.SubPlan.(*planners.SelectPlan)
-
-	mapPlan := planners.NewMapPlan()
-	//scan plan
-	mapPlan.Add(planners.NewScanPlan("tables", "system"))
-	//filter plan
-	mapPlan.Add(
-		planners.NewFilterPlan(planners.NewBinaryExpressionPlan(
-			"=",
-			planners.NewVariablePlan("database"),
-			planners.NewConstantPlan(ctx.session.GetDatabase()),
-		)),
+	var (
+		planner = plan.(*planners.ShowTablesPlan)
+		opt     = planner.GetAst().ShowTablesOpt
+		db      = ctx.session.GetDatabase()
+		buffer  = sqlparser.NewTrackedBuffer(nil)
+		ast     = planner.GetAst()
 	)
-	//orderBy plan
-	mapPlan.Add(planners.NewOrderByPlan(
-		planners.Order{
-			Expression: planners.NewVariablePlan("name"),
-			Direction:  "asc",
-		},
-	))
-	//sinker plan
-	mapPlan.Add(planners.NewSinkPlan())
-	selectPlan.SubPlan = mapPlan
-	return NewSelectExecutor(ctx, selectPlan)
+
+	buffer.Myprintf("%s", "select name from system.tables where")
+	if opt != nil && opt.DbName != "" {
+		db = opt.DbName
+	}
+	buffer.Myprintf(" `database` = '%s'", db)
+	if opt != nil && opt.Filter != nil {
+		if opt.Filter.Like != "" {
+			not := " "
+			if opt.Filter.Not {
+				not = " not "
+			}
+			buffer.Myprintf(" and name%slike '%s'", not, opt.Filter.Like)
+		} else if opt.Filter.Filter != nil {
+			buffer.Myprintf(" and (%v)", opt.Filter.Filter)
+		}
+	}
+
+	buffer.Myprintf(" order by name asc")
+	if ast.Limit != nil {
+		ast.Limit.Format(buffer)
+	}
+
+	newAst, err := parsers.Parse(buffer.String())
+	if err != nil {
+		ctx.log.Error("Excutor->Show Tables %v", err)
+	}
+	planner.SubPlan = planners.NewSelectPlan(newAst)
+	if err := planner.SubPlan.Build(); err != nil {
+		ctx.log.Error("Excutor->Show Tables %v", err)
+	}
+
+	return NewSelectExecutor(ctx, planner.SubPlan)
 }

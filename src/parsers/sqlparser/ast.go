@@ -1653,6 +1653,7 @@ type Show struct {
 	ShowTablesOpt          *ShowTablesOpt
 	Scope                  string
 	ShowCollationFilterOpt *Expr
+	Limit                  *Limit
 	StatementBase
 }
 
@@ -1699,6 +1700,9 @@ func (node *Show) Format(buf *TrackedBuffer) {
 	if node.HasTable() {
 		buf.Myprintf(" %v", node.Table)
 	}
+	if node.Limit != nil {
+		node.Limit.Format(buf)
+	}
 }
 
 // HasOnTable returns true if the show statement has an "on" clause
@@ -1725,6 +1729,7 @@ type ShowTablesOpt struct {
 
 // ShowFilter is show tables filter
 type ShowFilter struct {
+	Not    bool
 	Like   string
 	Filter Expr
 }
@@ -1735,6 +1740,9 @@ func (node *ShowFilter) Format(buf *TrackedBuffer) {
 		return
 	}
 	if node.Like != "" {
+		if node.Not {
+			buf.Myprintf(" not")
+		}
 		buf.Myprintf(" like '%s'", node.Like)
 	} else {
 		buf.Myprintf(" where %v", node.Filter)

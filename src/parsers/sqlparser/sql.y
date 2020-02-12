@@ -2380,14 +2380,14 @@ show_statement:
 		showTablesOpt := &ShowTablesOpt{Full: $2, DbName: $6, Filter: $7}
 		$$ = &Show{Type: string($3), ShowTablesOpt: showTablesOpt, OnTable: $5}
 	}
-|	SHOW full_opt tables_or_processlist from_database_opt like_or_where_opt
+|	SHOW full_opt tables_or_processlist from_database_opt like_or_where_opt limit_opt
 	{
 		// this is ugly, but I couldn't find a better way for now
 		if $3 == "processlist" {
 			$$ = &Show{Type: $3}
 		} else {
 			showTablesOpt := &ShowTablesOpt{Full: $2, DbName: $4, Filter: $5}
-			$$ = &Show{Type: $3, ShowTablesOpt: showTablesOpt}
+			$$ = &Show{Type: $3, ShowTablesOpt: showTablesOpt, Limit: $6}
 		}
 	}
 |	SHOW show_session_or_global VARIABLES ddl_skip_to_end
@@ -2493,6 +2493,10 @@ like_or_where_opt:
 	{
 		$$ = &ShowFilter{Like: string($2)}
 	}
+|	NOT LIKE STRING
+	{
+		$$ = &ShowFilter{Like: string($2), Not: true}
+	}
 |	WHERE expression
 	{
 		$$ = &ShowFilter{Filter: $2}
@@ -2506,6 +2510,10 @@ like_opt:
 |	LIKE STRING
 	{
 		$$ = &ShowFilter{Like: string($2)}
+	}
+|	NOT LIKE STRING
+	{
+		$$ = &ShowFilter{Like: string($2), Not: true}
 	}
 
 show_session_or_global:
