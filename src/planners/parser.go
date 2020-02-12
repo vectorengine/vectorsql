@@ -183,7 +183,7 @@ func parseFrom(expr sqlparser.TableExpr) (IPlan, error) {
 	}
 }
 
-func parseFields(sel sqlparser.SelectExprs) (*MapPlan, error) {
+func parseFields(aliased map[string]IPlan, sel sqlparser.SelectExprs) (*MapPlan, error) {
 	fields := NewMapPlan()
 
 	if _, ok := sel[0].(*sqlparser.StarExpr); !ok {
@@ -192,7 +192,7 @@ func parseFields(sel sqlparser.SelectExprs) (*MapPlan, error) {
 			if !ok {
 				return nil, errors.Errorf("Expected aliased expression in select on index:%v, got:%+v %+v", i, expr, reflect.TypeOf(expr))
 			}
-			child, err := parseExpression(nil, aliasedExpression.Expr)
+			child, err := parseExpression(aliased, aliasedExpression.Expr)
 			if err != nil {
 				return nil, err
 			}
