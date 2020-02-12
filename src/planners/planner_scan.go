@@ -12,9 +12,9 @@ type ScanPlan struct {
 	Name    string
 	Table   string
 	Schema  string
-	Filter  *FilterPlan  `json:",omitempty"`
-	Project *ProjectPlan `json:",omitempty"`
-	Limit   *LimitPlan   `json:",omitempty"`
+	Filter  *FilterPlan     `json:",omitempty"`
+	Project *ProjectionPlan `json:",omitempty"`
+	Limit   *LimitPlan      `json:",omitempty"`
 }
 
 func NewScanPlan(table string, schema string) *ScanPlan {

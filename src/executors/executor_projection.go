@@ -10,25 +10,25 @@ import (
 	"transforms"
 )
 
-type GroupByExecutor struct {
+type ProjectionExecutor struct {
 	ctx  *ExecutorContext
-	plan *planners.GroupByPlan
+	plan *planners.ProjectionPlan
 }
 
-func NewGroupByExecutor(ctx *ExecutorContext, plan *planners.GroupByPlan) *GroupByExecutor {
-	return &GroupByExecutor{
+func NewProjectionExecutor(ctx *ExecutorContext, plan *planners.ProjectionPlan) *ProjectionExecutor {
+	return &ProjectionExecutor{
 		ctx:  ctx,
 		plan: plan,
 	}
 }
 
-func (executor *GroupByExecutor) Execute() (processors.IProcessor, error) {
+func (executor *ProjectionExecutor) Execute() (processors.IProcessor, error) {
 	log := executor.ctx.log
 	conf := executor.ctx.conf
 
 	log.Debug("Executor->Enter->LogicalPlan:%s", executor.plan)
 	transformCtx := transforms.NewTransformContext(executor.ctx.ctx, log, conf)
-	transform := transforms.NewGroupByTransform(transformCtx, executor.plan)
+	transform := transforms.NewProjectionTransform(transformCtx, executor.plan)
 	log.Debug("Executor->Return->Pipeline:%v", transform)
 	return transform, nil
 }

@@ -13,13 +13,13 @@ var ProjectPushDownOptimizer = Optimizer{
 	Description: "Push projects to scan plan",
 	Reassembler: func(plan planners.IPlan) {
 		var scan *planners.ScanPlan
-		var project *planners.ProjectPlan
+		var project *planners.ProjectionPlan
 
 		visit := func(plan planners.IPlan) (kontinue bool, err error) {
 			switch plan := plan.(type) {
 			case *planners.ScanPlan:
 				scan = plan
-			case *planners.ProjectPlan:
+			case *planners.ProjectionPlan:
 				project = plan
 			}
 			return true, nil

@@ -35,13 +35,11 @@ func (plan *SelectPlan) Build() error {
 	}
 	tree.Add(source)
 
-	// Project.
+	// Fields.
 	fields, err := parseFields(ast.SelectExprs)
 	if err != nil {
 		return err
 	}
-	projectPlan := NewProjectPlan(fields)
-	tree.Add(projectPlan)
 
 	// Aliases.
 	aliases, err := parseAliases(fields)
@@ -58,10 +56,6 @@ func (plan *SelectPlan) Build() error {
 		filterPlan := NewFilterPlan(logic)
 		tree.Add(filterPlan)
 	}
-
-	// Group By.
-	groupbyPlan := NewGroupByPlan(fields, NewMapPlan())
-	tree.Add(groupbyPlan)
 
 	// OrderBy.
 	if ast.OrderBy != nil {
@@ -80,6 +74,12 @@ func (plan *SelectPlan) Build() error {
 			return err
 		}
 		tree.Add(limitPlan)
+	}
+
+	// Projection.
+	if fields.Length() > 0 {
+		projectPlan := NewProjectPlan(fields)
+		tree.Add(projectPlan)
 	}
 
 	// Sink.

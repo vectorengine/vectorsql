@@ -11,6 +11,7 @@ import (
 	"datavalues"
 
 	"base/binary"
+	"base/errors"
 )
 
 type IDataType interface {
@@ -18,4 +19,17 @@ type IDataType interface {
 	Type() reflect.Type
 	Serialize(*binary.Writer, *datavalues.Value) error
 	SerializeText(io.Writer, *datavalues.Value) error
+}
+
+func GetDataTypeByValue(val *datavalues.Value) (IDataType, error) {
+	switch val.GetType() {
+	case datavalues.TypeString:
+		return NewStringDataType(), nil
+	case datavalues.TypeFloat:
+		return NewUInt64DataType(), nil
+	case datavalues.TypeInt:
+		return NewInt32DataType(), nil
+	default:
+		return nil, errors.Errorf("Unsupported value type:%v", val.GetType())
+	}
 }

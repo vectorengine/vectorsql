@@ -41,6 +41,16 @@ func BuildExpressions(plan IPlan) (expressions.IExpression, error) {
 	var expr expressions.IExpression
 
 	switch t := plan.(type) {
+	case *VariablePlan:
+		return expressions.VAR(string(t.Value)), nil
+	case *ConstantPlan:
+		return expressions.CONST(t.Value), nil
+	case *AliasedExpressionPlan:
+		expr, err := BuildExpressions(t.Expr)
+		if err != nil {
+			return nil, err
+		}
+		return expressions.ALIASED(t.As, expr), nil
 	case *BinaryExpressionPlan:
 		left, err := BuildExpressions(t.Left)
 		if err != nil {
@@ -54,11 +64,7 @@ func BuildExpressions(plan IPlan) (expressions.IExpression, error) {
 			return nil, err
 		}
 		return expr, nil
-	case *VariablePlan:
-		return expressions.VAR(string(t.Value)), nil
-	case *ConstantPlan:
-		return expressions.CONST(t.Value), nil
 	default:
-		return nil, errors.Errorf("Unsupported plan:%s", t)
+		return nil, errors.Errorf("Unsupported expression plan:%s", t)
 	}
 }

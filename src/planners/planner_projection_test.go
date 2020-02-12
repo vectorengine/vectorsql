@@ -26,8 +26,8 @@ func TestProjectPlan(t *testing.T) {
 	assert.Nil(t, err)
 
 	expect := `{
-    "Name": "ProjectPlan",
-    "SubPlan": {
+    "Name": "ProjectionPlan",
+    "Projections": {
         "Name": "MapPlan",
         "SubPlans": [
             {
