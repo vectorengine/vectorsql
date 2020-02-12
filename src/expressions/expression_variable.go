@@ -5,6 +5,7 @@
 package expressions
 
 import (
+	"base/docs"
 	"base/errors"
 	"datavalues"
 )
@@ -40,4 +41,8 @@ func (e *VariableExpression) Walk(visit Visit) error {
 
 func (e *VariableExpression) String() string {
 	return e.value
+}
+
+func (e *VariableExpression) Document() docs.Documentation {
+	return nil
 }

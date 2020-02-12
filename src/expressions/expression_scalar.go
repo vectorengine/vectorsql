@@ -5,16 +5,21 @@
 package expressions
 
 import (
-	"datavalues"
 	"fmt"
+	"strings"
+
+	"base/docs"
+	"datavalues"
 )
 
 type scalarEvalFunc func(args ...*datavalues.Value) (*datavalues.Value, error)
 type ScalarExpression struct {
-	name     string
-	exprs    []IExpression
-	evalFn   scalarEvalFunc
-	validate IValidator
+	name          string
+	exprs         []IExpression
+	evalFn        scalarEvalFunc
+	validate      IValidator
+	argumentNames [][]string
+	description   docs.Documentation
 }
 
 func (e *ScalarExpression) Eval(params IParams) (*datavalues.Value, error) {
@@ -41,4 +46,19 @@ func (e *ScalarExpression) Walk(visit Visit) error {
 
 func (e *ScalarExpression) String() string {
 	return fmt.Sprintf("%v(%v)", e.name, e.exprs)
+}
+
+func (e *ScalarExpression) Document() docs.Documentation {
+	callingWays := make([]docs.Documentation, len(e.argumentNames))
+	for i, arguments := range e.argumentNames {
+		callingWays[i] = docs.Text(fmt.Sprintf("%s(%s)", e.name, strings.Join(arguments, ", ")))
+	}
+	return docs.Section(
+		e.name,
+		docs.Body(
+			docs.Section("Calling", docs.List(callingWays...)),
+			docs.Section("Arguments", e.validate.Document()),
+			docs.Section("Description", e.description),
+		),
+	)
 }

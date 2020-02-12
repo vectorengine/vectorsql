@@ -6,19 +6,22 @@ package expressions
 
 import (
 	"datavalues"
+
+	"base/docs"
 )
 
 func SUM(arg interface{}) IExpression {
-	exprs := expressionsFor(arg)
 	return &AggregateExpression{
-		name: "SUM",
-		expr: exprs[0],
+		name:          "SUM",
+		argumentNames: [][]string{},
+		description:   docs.Text("Sums Floats, Ints or Durations in the group. You may not mix types."),
 		validate: All(
 			OneOf(
 				AllArgs(TypeOf(datavalues.ZeroInt())),
 				AllArgs(TypeOf(datavalues.ZeroFloat())),
 			),
 		),
+		expr: expressionsFor(arg)[0],
 		evalFn: func(current *datavalues.Value, next *datavalues.Value) (*datavalues.Value, error) {
 			if current == nil {
 				return next, nil
@@ -30,16 +33,17 @@ func SUM(arg interface{}) IExpression {
 }
 
 func MIN(arg interface{}) IExpression {
-	exprs := expressionsFor(arg)
 	return &AggregateExpression{
-		name: "MIN",
-		expr: exprs[0],
+		name:          "MIN",
+		argumentNames: [][]string{},
+		description:   docs.Text("Takes the minimum element in the group. Works with Ints, Floats, Strings, Booleans, Times, Durations."),
 		validate: All(
 			OneOf(
 				AllArgs(TypeOf(datavalues.ZeroInt())),
 				AllArgs(TypeOf(datavalues.ZeroFloat())),
 			),
 		),
+		expr: expressionsFor(arg)[0],
 		evalFn: func(current *datavalues.Value, next *datavalues.Value) (*datavalues.Value, error) {
 			if current == nil {
 				return next, nil
@@ -50,16 +54,17 @@ func MIN(arg interface{}) IExpression {
 }
 
 func MAX(arg interface{}) IExpression {
-	exprs := expressionsFor(arg)
 	return &AggregateExpression{
-		name: "MAX",
-		expr: exprs[0],
+		name:          "MAX",
+		argumentNames: [][]string{},
+		description:   docs.Text("Takes the maximum element in the group. Works with Ints, Floats, Strings, Booleans, Times, Durations."),
 		validate: All(
 			OneOf(
 				AllArgs(TypeOf(datavalues.ZeroInt())),
 				AllArgs(TypeOf(datavalues.ZeroFloat())),
 			),
 		),
+		expr: expressionsFor(arg)[0],
 		evalFn: func(current *datavalues.Value, next *datavalues.Value) (*datavalues.Value, error) {
 			if current == nil {
 				return next, nil
@@ -70,10 +75,12 @@ func MAX(arg interface{}) IExpression {
 }
 
 func COUNT(arg interface{}) IExpression {
-	exprs := expressionsFor(arg)
 	return &AggregateExpression{
-		name: "COUNT",
-		expr: exprs[0],
+		name:          "COUNT",
+		argumentNames: [][]string{},
+		description:   docs.Text("Averages elements in the group."),
+		validate:      All(),
+		expr:          expressionsFor(arg)[0],
 		evalFn: func(current *datavalues.Value, next *datavalues.Value) (*datavalues.Value, error) {
 			if current == nil {
 				return datavalues.ToValue(1), nil

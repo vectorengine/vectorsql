@@ -5,16 +5,26 @@
 package expressions
 
 import (
-	"base/errors"
-	"datavalues"
+	"base/docs"
 	"fmt"
 	"math/rand"
+
+	"base/errors"
+	"datavalues"
 )
 
 func RANGETABLE(args ...interface{}) IExpression {
 	exprs := expressionsFor(args...)
 	return &ScalarExpression{
-		name:  "RANGETABLE",
+		name:          "RANGETABLE",
+		argumentNames: [][]string{},
+		description:   docs.Text("Returns a list of tuples."),
+		validate: All(
+			AtLeastNArgs(2),
+			Arg(0, TypeOf(datavalues.ZeroInt())),
+			Arg(1, TypeOf(datavalues.ZeroString())),
+			IfArgPresent(2, Arg(2, TypeOf(datavalues.ZeroString()))),
+		),
 		exprs: exprs,
 		evalFn: func(args ...*datavalues.Value) (*datavalues.Value, error) {
 			count := args[0].AsInt()
@@ -36,19 +46,21 @@ func RANGETABLE(args ...interface{}) IExpression {
 			}
 			return datavalues.MakeTuple(values...), nil
 		},
-		validate: All(
-			AtLeastNArgs(2),
-			Arg(0, TypeOf(datavalues.ZeroInt())),
-			Arg(1, TypeOf(datavalues.ZeroString())),
-			IfArgPresent(2, Arg(2, TypeOf(datavalues.ZeroString()))),
-		),
 	}
 }
 
 func RANDTABLE(args ...interface{}) IExpression {
 	exprs := expressionsFor(args...)
 	return &ScalarExpression{
-		name:  "RANDTABLE",
+		name:          "RANDTABLE",
+		argumentNames: [][]string{},
+		description:   docs.Text("Returns a random list of tuples."),
+		validate: All(
+			AtLeastNArgs(2),
+			Arg(0, TypeOf(datavalues.ZeroInt())),
+			Arg(1, TypeOf(datavalues.ZeroString())),
+			IfArgPresent(2, Arg(2, TypeOf(datavalues.ZeroString()))),
+		),
 		exprs: exprs,
 		evalFn: func(args ...*datavalues.Value) (*datavalues.Value, error) {
 			count := args[0].AsInt()
@@ -70,19 +82,21 @@ func RANDTABLE(args ...interface{}) IExpression {
 			}
 			return datavalues.MakeTuple(values...), nil
 		},
-		validate: All(
-			AtLeastNArgs(2),
-			Arg(0, TypeOf(datavalues.ZeroInt())),
-			Arg(1, TypeOf(datavalues.ZeroString())),
-			IfArgPresent(2, Arg(2, TypeOf(datavalues.ZeroString()))),
-		),
 	}
 }
 
 func ZIP(args ...interface{}) IExpression {
 	exprs := expressionsFor(args...)
 	return &ScalarExpression{
-		name:  "ZIP",
+		name:          "ZIP",
+		argumentNames: [][]string{},
+		description:   docs.Text("Returns a zip list of tuples."),
+		validate: All(
+			AtLeastNArgs(2),
+			OneOf(
+				AllArgs(TypeOf(datavalues.ZeroTuple())),
+			),
+		),
 		exprs: exprs,
 		evalFn: func(args ...*datavalues.Value) (*datavalues.Value, error) {
 			argsize := len(args)
@@ -98,11 +112,5 @@ func ZIP(args ...interface{}) IExpression {
 			}
 			return datavalues.MakeTuple(values...), nil
 		},
-		validate: All(
-			AtLeastNArgs(2),
-			OneOf(
-				AllArgs(TypeOf(datavalues.ZeroTuple())),
-			),
-		),
 	}
 }

@@ -7,6 +7,7 @@ package expressions
 import (
 	"fmt"
 
+	"base/docs"
 	"datavalues"
 )
 
@@ -34,4 +35,8 @@ func (e *ConstantExpression) Walk(visit Visit) error {
 
 func (e *ConstantExpression) String() string {
 	return fmt.Sprintf("%v", e.value)
+}
+
+func (e *ConstantExpression) Document() docs.Documentation {
+	return nil
 }

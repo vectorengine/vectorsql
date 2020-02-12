@@ -5,16 +5,21 @@
 package expressions
 
 import (
+	"base/docs"
 	"datavalues"
 )
 
 func LT(left interface{}, right interface{}) IExpression {
 	exprs := expressionsFor(left, right)
 	return &BinaryExpression{
-		name:     "<",
-		left:     exprs[0],
-		right:    exprs[1],
-		validate: All(),
+		name: "<",
+		argumentNames: [][]string{
+			{"left", "right"},
+		},
+		description: docs.Text("Less than."),
+		validate:    All(),
+		left:        exprs[0],
+		right:       exprs[1],
 		evalFn: func(left *datavalues.Value, right *datavalues.Value) (*datavalues.Value, error) {
 			cmp, err := datavalues.Compare(left, right)
 			if err != nil {
@@ -28,10 +33,14 @@ func LT(left interface{}, right interface{}) IExpression {
 func LTE(left interface{}, right interface{}) IExpression {
 	exprs := expressionsFor(left, right)
 	return &BinaryExpression{
-		name:     "<=",
-		left:     exprs[0],
-		right:    exprs[1],
-		validate: All(),
+		name: "<=",
+		argumentNames: [][]string{
+			{"left", "right"},
+		},
+		description: docs.Text("Less than or equal to."),
+		validate:    All(),
+		left:        exprs[0],
+		right:       exprs[1],
 		evalFn: func(left *datavalues.Value, right *datavalues.Value) (*datavalues.Value, error) {
 			cmp, err := datavalues.Compare(left, right)
 			if err != nil {
@@ -45,10 +54,14 @@ func LTE(left interface{}, right interface{}) IExpression {
 func EQ(left interface{}, right interface{}) IExpression {
 	exprs := expressionsFor(left, right)
 	return &BinaryExpression{
-		name:     "=",
-		left:     exprs[0],
-		right:    exprs[1],
-		validate: All(),
+		name: "=",
+		argumentNames: [][]string{
+			{"left", "right"},
+		},
+		description: docs.Text("Equal."),
+		validate:    All(),
+		left:        exprs[0],
+		right:       exprs[1],
 		evalFn: func(left *datavalues.Value, right *datavalues.Value) (*datavalues.Value, error) {
 			cmp, err := datavalues.Compare(left, right)
 			if err != nil {
@@ -62,10 +75,14 @@ func EQ(left interface{}, right interface{}) IExpression {
 func NEQ(left interface{}, right interface{}) IExpression {
 	exprs := expressionsFor(left, right)
 	return &BinaryExpression{
-		name:     "<>",
-		left:     exprs[0],
-		right:    exprs[1],
-		validate: All(),
+		name: "!=",
+		argumentNames: [][]string{
+			{"left", "right"},
+		},
+		description: docs.Text("Not equal."),
+		validate:    All(),
+		left:        exprs[0],
+		right:       exprs[1],
 		evalFn: func(left *datavalues.Value, right *datavalues.Value) (*datavalues.Value, error) {
 			cmp, err := datavalues.Compare(left, right)
 			if err != nil {
@@ -79,10 +96,14 @@ func NEQ(left interface{}, right interface{}) IExpression {
 func GT(left interface{}, right interface{}) IExpression {
 	exprs := expressionsFor(left, right)
 	return &BinaryExpression{
-		name:     ">",
-		left:     exprs[0],
-		right:    exprs[1],
-		validate: All(),
+		name: ">",
+		argumentNames: [][]string{
+			{"left", "right"},
+		},
+		description: docs.Text("Greater than."),
+		validate:    All(),
+		left:        exprs[0],
+		right:       exprs[1],
 		evalFn: func(left *datavalues.Value, right *datavalues.Value) (*datavalues.Value, error) {
 			cmp, err := datavalues.Compare(left, right)
 			if err != nil {
@@ -96,10 +117,14 @@ func GT(left interface{}, right interface{}) IExpression {
 func GTE(left interface{}, right interface{}) IExpression {
 	exprs := expressionsFor(left, right)
 	return &BinaryExpression{
-		name:     ">=",
-		left:     exprs[0],
-		right:    exprs[1],
-		validate: All(),
+		name: ">=",
+		argumentNames: [][]string{
+			{"left", "right"},
+		},
+		description: docs.Text("Greater than or equal to."),
+		validate:    All(),
+		left:        exprs[0],
+		right:       exprs[1],
 		evalFn: func(left *datavalues.Value, right *datavalues.Value) (*datavalues.Value, error) {
 			cmp, err := datavalues.Compare(left, right)
 			if err != nil {
@@ -113,10 +138,14 @@ func GTE(left interface{}, right interface{}) IExpression {
 func AND(left interface{}, right interface{}) IExpression {
 	exprs := expressionsFor(left, right)
 	return &BinaryExpression{
-		name:     "AND",
-		left:     exprs[0],
-		right:    exprs[1],
-		validate: All(),
+		name: "AND",
+		argumentNames: [][]string{
+			{"left", "right"},
+		},
+		description: docs.Text("Logic AND."),
+		validate:    All(),
+		left:        exprs[0],
+		right:       exprs[1],
 		evalFn: func(left *datavalues.Value, right *datavalues.Value) (*datavalues.Value, error) {
 			return datavalues.ToValue(left.AsBool() && right.AsBool()), nil
 		},
@@ -126,10 +155,14 @@ func AND(left interface{}, right interface{}) IExpression {
 func OR(left interface{}, right interface{}) IExpression {
 	exprs := expressionsFor(left, right)
 	return &BinaryExpression{
-		name:     "OR",
-		left:     exprs[0],
-		right:    exprs[1],
-		validate: All(),
+		name: "OR",
+		argumentNames: [][]string{
+			{"left", "right"},
+		},
+		description: docs.Text("Logic OR."),
+		validate:    All(),
+		left:        exprs[0],
+		right:       exprs[1],
 		evalFn: func(left *datavalues.Value, right *datavalues.Value) (*datavalues.Value, error) {
 			return datavalues.ToValue(left.AsBool() || right.AsBool()), nil
 		},
@@ -139,10 +172,14 @@ func OR(left interface{}, right interface{}) IExpression {
 func LIKE(left interface{}, right interface{}) IExpression {
 	exprs := expressionsFor(left, right)
 	return &BinaryExpression{
-		name:     "LIKE",
-		left:     exprs[0],
-		right:    exprs[1],
-		validate: All(),
+		name: "LIKE",
+		argumentNames: [][]string{
+			{"left", "right"},
+		},
+		description: docs.Text("LIKE."),
+		validate:    All(),
+		left:        exprs[0],
+		right:       exprs[1],
 		evalFn: func(left *datavalues.Value, right *datavalues.Value) (*datavalues.Value, error) {
 			return datavalues.ToValue(datavalues.Like(right.AsString(), left)), nil
 		},
@@ -152,10 +189,14 @@ func LIKE(left interface{}, right interface{}) IExpression {
 func NOT_LIKE(left interface{}, right interface{}) IExpression {
 	exprs := expressionsFor(left, right)
 	return &BinaryExpression{
-		name:     "NOT LIKE",
-		left:     exprs[0],
-		right:    exprs[1],
-		validate: All(),
+		name: "NOT LIKE",
+		argumentNames: [][]string{
+			{"left", "right"},
+		},
+		description: docs.Text("NOT LIKE."),
+		validate:    All(),
+		left:        exprs[0],
+		right:       exprs[1],
 		evalFn: func(left *datavalues.Value, right *datavalues.Value) (*datavalues.Value, error) {
 			return datavalues.ToValue(!datavalues.Like(right.AsString(), left)), nil
 		},

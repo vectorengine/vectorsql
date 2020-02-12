@@ -6,12 +6,15 @@ package expressions
 
 import (
 	"datavalues"
+
+	"base/docs"
 )
 
 type IExpression interface {
+	String() string
 	Walk(visit Visit) error
 	Eval(params IParams) (*datavalues.Value, error)
-	String() string
+	Document() docs.Documentation
 }
 
 type Visit func(e IExpression) (kontinue bool, err error)

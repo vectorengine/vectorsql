@@ -10,6 +10,8 @@ import (
 	"strings"
 	"time"
 
+	"base/docs"
+
 	"github.com/golang/protobuf/ptypes"
 	"github.com/golang/protobuf/ptypes/duration"
 	"github.com/golang/protobuf/ptypes/timestamp"
@@ -335,5 +337,34 @@ func (v Value) ToRawValue() interface{} {
 		return out
 	default:
 		return nil
+	}
+}
+
+func (v Value) Document() docs.Documentation {
+	switch v.GetType() {
+	case TypeZero:
+		return docs.Text("Zero Value")
+	case TypeNull:
+		return docs.Text("Null")
+	case TypePhantom:
+		return docs.Text("Phantom")
+	case TypeInt:
+		return docs.Text("Int")
+	case TypeFloat:
+		return docs.Text("Float")
+	case TypeBool:
+		return docs.Text("Bool")
+	case TypeString:
+		return docs.Text("String")
+	case TypeTime:
+		return docs.Text("Time")
+	case TypeDuration:
+		return docs.Text("Duration")
+	case TypeTuple:
+		return docs.Text("Tuple")
+	case TypeObject:
+		return docs.Text("Object")
+	default:
+		panic("invalid type")
 	}
 }

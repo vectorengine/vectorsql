@@ -5,6 +5,7 @@
 package expressions
 
 import (
+	"base/docs"
 	"datavalues"
 )
 
@@ -34,4 +35,8 @@ func (e *AliasedExpression) Walk(visit Visit) error {
 
 func (e *AliasedExpression) String() string {
 	return e.name
+}
+
+func (e *AliasedExpression) Document() docs.Documentation {
+	return nil
 }

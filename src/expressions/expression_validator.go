@@ -8,16 +8,18 @@ package expressions
 import (
 	"fmt"
 
-	"datavalues"
-
+	"base/docs"
 	"base/errors"
+	"datavalues"
 )
 
 type IValidator interface {
+	docs.Documented
 	Validate(args ...*datavalues.Value) error
 }
 
 type ISingleArgumentValidator interface {
+	docs.Documented
 	Validate(arg *datavalues.Value) error
 }
 
@@ -39,6 +41,14 @@ func (v *all) Validate(args ...*datavalues.Value) error {
 	return nil
 }
 
+func (v *all) Document() docs.Documentation {
+	childDocs := make([]docs.Documentation, len(v.validators))
+	for i := range v.validators {
+		childDocs[i] = v.validators[i].Document()
+	}
+	return docs.List(childDocs...)
+}
+
 type oneOf struct {
 	validators []IValidator
 }
@@ -56,6 +66,15 @@ func (v *oneOf) Validate(args ...*datavalues.Value) error {
 		}
 	}
 	return errors.Errorf("none of the conditions have been met: %+v", errs)
+}
+
+func (v *oneOf) Document() docs.Documentation {
+	childDocs := make([]docs.Documentation, len(v.validators))
+	for i := range v.validators {
+		childDocs[i] = v.validators[i].Document()
+	}
+
+	return docs.Paragraph(docs.Text("must satisfy one of"), docs.List(childDocs...))
 }
 
 type singleOneOf struct {
@@ -77,6 +96,15 @@ func (v *singleOneOf) Validate(arg *datavalues.Value) error {
 	return fmt.Errorf("none of the conditions have been met: %+v", errs)
 }
 
+func (v *singleOneOf) Document() docs.Documentation {
+	childDocs := make([]docs.Documentation, len(v.validators))
+	for i := range v.validators {
+		childDocs[i] = v.validators[i].Document()
+	}
+
+	return docs.Paragraph(docs.Text("must satisfy one of the following"), docs.List(childDocs...))
+}
+
 type exactlyNArgs struct {
 	n int
 }
@@ -92,6 +120,10 @@ func (v *exactlyNArgs) Validate(args ...*datavalues.Value) error {
 	return nil
 }
 
+func (v *exactlyNArgs) Document() docs.Documentation {
+	return docs.Text(fmt.Sprintf("exactly %s must be provided", argumentCount(v.n)))
+}
+
 type typeOf struct {
 	wantedType *datavalues.Value
 }
@@ -105,6 +137,10 @@ func (v *typeOf) Validate(arg *datavalues.Value) error {
 		return errors.Errorf("expected type %v but got %v", v.wantedType.GetType(), arg.GetType())
 	}
 	return nil
+}
+
+func (v *typeOf) Document() docs.Documentation {
+	return docs.Paragraph(docs.Text("must be of type"), v.wantedType.Document())
 }
 
 type ifArgPresent struct {
@@ -123,6 +159,13 @@ func (v *ifArgPresent) Validate(args ...*datavalues.Value) error {
 	return v.validator.Validate(args...)
 }
 
+func (v *ifArgPresent) Document() docs.Documentation {
+	return docs.Paragraph(
+		docs.Text(fmt.Sprintf("if the %s argument is provided, then", docs.Ordinal(v.i+1))),
+		v.validator.Document(),
+	)
+}
+
 type atLeastNArgs struct {
 	n int
 }
@@ -138,6 +181,10 @@ func (v *atLeastNArgs) Validate(args ...*datavalues.Value) error {
 	return nil
 }
 
+func (v *atLeastNArgs) Document() docs.Documentation {
+	return docs.Text(fmt.Sprintf("at least %s may be provided", argumentCount(v.n)))
+}
+
 type atMostNArgs struct {
 	n int
 }
@@ -151,6 +198,10 @@ func (v *atMostNArgs) Validate(args ...*datavalues.Value) error {
 		return errors.Errorf("expected at most %s, but got %v", argumentCount(v.n), len(args))
 	}
 	return nil
+}
+
+func (v *atMostNArgs) Document() docs.Documentation {
+	return docs.Text(fmt.Sprintf("at most %s may be provided", argumentCount(v.n)))
 }
 
 type arg struct {
@@ -169,6 +220,13 @@ func (v *arg) Validate(args ...*datavalues.Value) error {
 	return nil
 }
 
+func (v *arg) Document() docs.Documentation {
+	return docs.Paragraph(
+		docs.Text(fmt.Sprintf("the %s argument", docs.Ordinal(v.i+1))),
+		v.validator.Document(),
+	)
+}
+
 type allArgs struct {
 	validator ISingleArgumentValidator
 }
@@ -184,6 +242,13 @@ func (v *allArgs) Validate(args ...*datavalues.Value) error {
 		}
 	}
 	return nil
+}
+
+func (v *allArgs) Document() docs.Documentation {
+	return docs.Paragraph(
+		docs.Text("all arguments"),
+		v.validator.Document(),
+	)
 }
 
 func argumentCount(n int) string {

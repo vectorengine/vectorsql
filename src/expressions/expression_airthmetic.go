@@ -5,21 +5,26 @@
 package expressions
 
 import (
+	"base/docs"
 	"datavalues"
 )
 
 func ADD(left interface{}, right interface{}) IExpression {
 	exprs := expressionsFor(left, right)
 	return &BinaryExpression{
-		name:  "+",
-		left:  exprs[0],
-		right: exprs[1],
+		name: "+",
+		argumentNames: [][]string{
+			{"left", "right"},
+		},
+		description: docs.Text("Returns the sum of the two arguments."),
 		validate: All(
 			OneOf(
 				AllArgs(TypeOf(datavalues.ZeroInt())),
 				AllArgs(TypeOf(datavalues.ZeroFloat())),
 			),
 		),
+		left:  exprs[0],
+		right: exprs[1],
 		evalFn: func(left *datavalues.Value, right *datavalues.Value) (*datavalues.Value, error) {
 			return datavalues.Add(left, right)
 		},
@@ -29,15 +34,19 @@ func ADD(left interface{}, right interface{}) IExpression {
 func SUB(left interface{}, right interface{}) IExpression {
 	exprs := expressionsFor(left, right)
 	return &BinaryExpression{
-		name:  "-",
-		left:  exprs[0],
-		right: exprs[1],
+		name: "-",
+		argumentNames: [][]string{
+			{"left", "right"},
+		},
+		description: docs.Text("Returns the difference between the two arguments."),
 		validate: All(
 			OneOf(
 				AllArgs(TypeOf(datavalues.ZeroInt())),
 				AllArgs(TypeOf(datavalues.ZeroFloat())),
 			),
 		),
+		left:  exprs[0],
+		right: exprs[1],
 		evalFn: func(left *datavalues.Value, right *datavalues.Value) (*datavalues.Value, error) {
 			return datavalues.Sub(left, right)
 		},
@@ -47,15 +56,19 @@ func SUB(left interface{}, right interface{}) IExpression {
 func MUL(left interface{}, right interface{}) IExpression {
 	exprs := expressionsFor(left, right)
 	return &BinaryExpression{
-		name:  "*",
-		left:  exprs[0],
-		right: exprs[1],
+		name: "*",
+		argumentNames: [][]string{
+			{"left", "right"},
+		},
+		description: docs.Text("Returns the dot product of the two arguments."),
 		validate: All(
 			OneOf(
 				AllArgs(TypeOf(datavalues.ZeroInt())),
 				AllArgs(TypeOf(datavalues.ZeroFloat())),
 			),
 		),
+		left:  exprs[0],
+		right: exprs[1],
 		evalFn: func(left *datavalues.Value, right *datavalues.Value) (*datavalues.Value, error) {
 			return datavalues.Mul(left, right)
 		},
@@ -65,15 +78,19 @@ func MUL(left interface{}, right interface{}) IExpression {
 func DIV(left interface{}, right interface{}) IExpression {
 	exprs := expressionsFor(left, right)
 	return &BinaryExpression{
-		name:  "/",
-		left:  exprs[0],
-		right: exprs[1],
+		name: "/",
+		argumentNames: [][]string{
+			{"left", "right"},
+		},
+		description: docs.Text("Returns the division of the two arguments."),
 		validate: All(
 			OneOf(
 				AllArgs(TypeOf(datavalues.ZeroInt())),
 				AllArgs(TypeOf(datavalues.ZeroFloat())),
 			),
 		),
+		left:  exprs[0],
+		right: exprs[1],
 		evalFn: func(left *datavalues.Value, right *datavalues.Value) (*datavalues.Value, error) {
 			return datavalues.Div(left, right)
 		},
