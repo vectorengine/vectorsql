@@ -36,7 +36,7 @@ func TestExpressionGenDocs(t *testing.T) {
 		}
 	}
 
-	f, err := os.Create("./expressions.md")
+	f, err := os.Create("../../docs/expressions.md")
 	assert.Nil(t, err)
 	defer f.Close()
 
