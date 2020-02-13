@@ -35,19 +35,19 @@ func (plan *SelectPlan) Build() error {
 	}
 	tree.Add(source)
 
-	// Base Fields.
+	// Fields.
 	fields, err := parseFields(nil, ast.SelectExprs)
 	if err != nil {
 		return err
 	}
 
-	// Base Aliases.
+	// Aliases.
 	aliases, err := parseAliases(fields)
 	if err != nil {
 		return err
 	}
 
-	// Fields.
+	// Fields with aliased.
 	fields, err = parseFields(aliases, ast.SelectExprs)
 	if err != nil {
 		return err
@@ -61,6 +61,16 @@ func (plan *SelectPlan) Build() error {
 		}
 		filterPlan := NewFilterPlan(logic)
 		tree.Add(filterPlan)
+	}
+
+	// GroupBy.
+	{
+		groupBy, err := parseGroupBy(aliases, ast.GroupBy)
+		if err != nil {
+			return err
+		}
+		groupByPlan := NewGroupByPlan(fields, groupBy)
+		tree.Add(groupByPlan)
 	}
 
 	// OrderBy.

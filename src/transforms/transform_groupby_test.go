@@ -18,20 +18,21 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestProjectionTransform(t *testing.T) {
+func TestGroupByTransform(t *testing.T) {
 	tests := []struct {
 		name   string
-		plan   *planners.ProjectionPlan
+		plan   *planners.GroupByPlan
 		source *datablocks.DataBlock
 		expect *datablocks.DataBlock
 	}{
 		{
 			name: "simple-all)",
-			plan: planners.NewProjectPlan(
+			plan: planners.NewGroupByPlan(
 				planners.NewMapPlan(
 					planners.NewVariablePlan("name"),
 					planners.NewVariablePlan("age"),
 				),
+				planners.NewMapPlan(),
 			),
 			source: mocks.NewBlockFromSlice(
 				[]columns.Column{
@@ -56,10 +57,11 @@ func TestProjectionTransform(t *testing.T) {
 		},
 		{
 			name: "simple-age",
-			plan: planners.NewProjectPlan(
+			plan: planners.NewGroupByPlan(
 				planners.NewMapPlan(
 					planners.NewVariablePlan("age"),
 				),
+				planners.NewMapPlan(),
 			),
 			source: mocks.NewBlockFromSlice(
 				[]columns.Column{
@@ -83,12 +85,13 @@ func TestProjectionTransform(t *testing.T) {
 		},
 		{
 			name: "simple-age-as-xage",
-			plan: planners.NewProjectPlan(
+			plan: planners.NewGroupByPlan(
 				planners.NewMapPlan(
 					planners.NewAliasedExpressionPlan("xage",
 						planners.NewVariablePlan("age"),
 					),
 				),
+				planners.NewMapPlan(),
 			),
 			source: mocks.NewBlockFromSlice(
 				[]columns.Column{
@@ -120,22 +123,22 @@ func TestProjectionTransform(t *testing.T) {
 		stream := mocks.NewMockBlockInputStream(test.source)
 		datasource := NewDataSourceTransform(ctx, stream)
 
-		projection := NewProjectionTransform(ctx, test.plan)
+		groupby := NewGroupByTransform(ctx, test.plan)
+		projection := NewProjectionTransform(ctx, planners.NewProjectPlan(test.plan.Projects))
 
 		sink := processors.NewSink("sink")
 		pipeline := processors.NewPipeline(context.Background())
 		pipeline.Add(datasource)
+		pipeline.Add(groupby)
 		pipeline.Add(projection)
 		pipeline.Add(sink)
 		pipeline.Run()
 
-		var blocks []*datablocks.DataBlock
 		for x := range pipeline.Out() {
-			blocks = append(blocks, x.(*datablocks.DataBlock))
+			switch x := x.(type) {
+			case *datablocks.DataBlock:
+				assert.True(t, mocks.DataBlockEqual(x, test.expect))
+			}
 		}
-		actual, err := datablocks.Append(blocks...)
-		assert.Nil(t, err)
-		expect := test.expect
-		assert.Equal(t, expect, actual)
 	}
 }

@@ -31,7 +31,7 @@ func (t *ProjectionTransform) Execute() {
 	onNext := func(x interface{}) {
 		switch y := x.(type) {
 		case *datablocks.DataBlock:
-			if block, err := y.ProjectByPlan(t.plan); err != nil {
+			if block, err := y.ProjectByPlan(t.plan.Projections); err != nil {
 				out.Send(err)
 			} else {
 				out.Send(block)
