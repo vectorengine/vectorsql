@@ -15,22 +15,18 @@ type DataBlock struct {
 	info      *DataBlockInfo
 	seqs      []*datavalues.Value
 	values    []*DataBlockValue
-	indexmap  map[string]int
-	valuesmap map[string]*DataBlockValue
-
 	immutable bool
 }
 
 func NewDataBlock(cols []columns.Column) *DataBlock {
 	block := &DataBlock{
-		info:      &DataBlockInfo{},
-		values:    []*DataBlockValue{},
-		indexmap:  make(map[string]int),
-		valuesmap: make(map[string]*DataBlockValue),
+		info:   &DataBlockInfo{},
+		values: []*DataBlockValue{},
 	}
 
 	for _, col := range cols {
-		block.InsertColumn(col)
+		cv := NewDataBlockValue(col)
+		block.values = append(block.values, cv)
 	}
 	return block
 }
@@ -38,15 +34,6 @@ func NewDataBlock(cols []columns.Column) *DataBlock {
 // Clone a sample block
 func (block *DataBlock) Clone() *DataBlock {
 	return NewDataBlock(block.Columns())
-}
-
-func (block *DataBlock) InsertColumn(col columns.Column) {
-	cv := NewDataBlockValue(col)
-	idx := len(block.indexmap)
-	block.indexmap[col.Name] = idx
-	block.valuesmap[col.Name] = cv
-
-	block.values = append(block.values, cv)
 }
 
 func (block *DataBlock) setSeqs(seqs []*datavalues.Value) {
@@ -85,23 +72,12 @@ func (block *DataBlock) Columns() []columns.Column {
 }
 
 func (block *DataBlock) Column(name string) (columns.Column, error) {
-	cv, ok := block.valuesmap[name]
-	if !ok {
-		return columns.Column{}, errors.Errorf("Can't find column:%v", name)
-	}
-	return cv.column, nil
-}
-
-func (block *DataBlock) ColumnIndexes(names ...string) ([]ColumnIndex, error) {
-	cidxs := make([]ColumnIndex, len(names))
-	for i, name := range names {
-		idx, ok := block.indexmap[name]
-		if !ok {
-			return nil, errors.Errorf("Can't find column:%v", name)
+	for _, v := range block.values {
+		if v.column.Name == name {
+			return v.column, nil
 		}
-		cidxs[i] = ColumnIndex{Name: name, Index: idx}
 	}
-	return cidxs, nil
+	return columns.Column{}, errors.Errorf("Can't find column:%v", name)
 }
 
 func (block *DataBlock) RowIterator() *DataBlockRowIterator {
@@ -109,15 +85,12 @@ func (block *DataBlock) RowIterator() *DataBlockRowIterator {
 }
 
 func (block *DataBlock) ColumnIterator(name string) (*DataBlockColumnIterator, error) {
-	idx := 0
-	if _, ok := block.valuesmap[name]; !ok {
-		return nil, errors.Errorf("Can't find column:%v", name)
+	for i, v := range block.values {
+		if v.column.Name == name {
+			return newDataBlockColumnIterator(block, i), nil
+		}
 	}
-	idx, ok := block.indexmap[name]
-	if !ok {
-		return nil, errors.Errorf("Can't find column:%v", name)
-	}
-	return newDataBlockColumnIterator(block, idx), nil
+	return nil, errors.Errorf("Can't find column:%v", name)
 }
 
 func (block *DataBlock) ColumnIterators() []*DataBlockColumnIterator {
@@ -141,26 +114,11 @@ func (block *DataBlock) First(name string) (*datavalues.Value, error) {
 	return nil, nil
 }
 
-func (block *DataBlock) WriteBatch(batcher *BatchWriter) error {
+func (block *DataBlock) WriteRow(values []*datavalues.Value) error {
 	if block.immutable {
 		return errors.New("Block is immutable")
 	}
 
-	cols := batcher.values
-	for _, col := range cols {
-		if _, ok := block.valuesmap[col.column.Name]; !ok {
-			return errors.Errorf("Can't find column:%v", col)
-		}
-	}
-
-	for _, col := range cols {
-		cv := block.valuesmap[col.column.Name]
-		cv.values = append(cv.values, col.values...)
-	}
-	return nil
-}
-
-func (block *DataBlock) WriteRow(values []*datavalues.Value) error {
 	cols := block.NumColumns()
 	if len(values) != cols {
 		return errors.Errorf("Can't append row, expect column length:%v", cols)
