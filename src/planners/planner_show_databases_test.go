@@ -40,6 +40,15 @@ func TestShowDatabasesPlan(t *testing.T) {
                     "Schema": "system"
                 },
                 {
+                    "Name": "GroupByPlan",
+                    "Projects": {
+                        "Name": "MapPlan"
+                    },
+                    "GroupBys": {
+                        "Name": "MapPlan"
+                    }
+                },
+                {
                     "Name": "OrderByPlan",
                     "Orders": [
                         {

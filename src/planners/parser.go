@@ -223,6 +223,18 @@ func parseWhere(aliases map[string]IPlan, expr sqlparser.Expr) (IPlan, error) {
 	return parseExpression(aliases, expr)
 }
 
+func parseGroupBy(aliases map[string]IPlan, groupby sqlparser.GroupBy) (*MapPlan, error) {
+	all := NewMapPlan()
+	for i, g := range groupby {
+		expr, err := parseExpression(aliases, g)
+		if err != nil {
+			return nil, errors.Errorf("couldn't parse group by expression with index %v", i)
+		}
+		all.Add(expr)
+	}
+	return all, nil
+}
+
 func parseOrderBy(aliases map[string]IPlan, orderBy sqlparser.OrderBy) ([]Order, error) {
 	orders := make([]Order, len(orderBy))
 

@@ -32,6 +32,11 @@ func (it *DataBlockRowIterator) Next() bool {
 	return it.current < it.rows
 }
 
+func (it *DataBlockRowIterator) Last() []*datavalues.Value {
+	it.current = it.rows - 1
+	return it.Value()
+}
+
 func (it *DataBlockRowIterator) Column(idx int) columns.Column {
 	return it.block.values[idx].column
 }

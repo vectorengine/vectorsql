@@ -51,6 +51,15 @@ func BuildExpressions(plan IPlan) (expressions.IExpression, error) {
 			return nil, err
 		}
 		return expressions.ALIASED(t.As, expr), nil
+	case *UnaryExpressionPlan:
+		expr, err := BuildExpressions(t.Expr)
+		if err != nil {
+			return nil, err
+		}
+		if expr, err = expressions.ExpressionFactory(t.FuncName, []interface{}{expr}); err != nil {
+			return nil, err
+		}
+		return expr, nil
 	case *BinaryExpressionPlan:
 		left, err := BuildExpressions(t.Left)
 		if err != nil {

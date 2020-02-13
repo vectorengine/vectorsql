@@ -15,18 +15,21 @@ type DataBlock struct {
 	info      *DataBlockInfo
 	seqs      []*datavalues.Value
 	values    []*DataBlockValue
+	valuesmap map[string]*DataBlockValue
 	immutable bool
 }
 
 func NewDataBlock(cols []columns.Column) *DataBlock {
 	block := &DataBlock{
-		info:   &DataBlockInfo{},
-		values: []*DataBlockValue{},
+		info:      &DataBlockInfo{},
+		values:    make([]*DataBlockValue, len(cols)),
+		valuesmap: make(map[string]*DataBlockValue, len(cols)),
 	}
 
-	for _, col := range cols {
+	for i, col := range cols {
 		cv := NewDataBlockValue(col)
-		block.values = append(block.values, cv)
+		block.values[i] = cv
+		block.valuesmap[col.Name] = cv
 	}
 	return block
 }
@@ -72,12 +75,31 @@ func (block *DataBlock) Columns() []columns.Column {
 }
 
 func (block *DataBlock) Column(name string) (columns.Column, error) {
-	for _, v := range block.values {
-		if v.column.Name == name {
-			return v.column, nil
+	cv, ok := block.valuesmap[name]
+	if !ok {
+		return columns.Column{}, errors.Errorf("Can't find column:%v", name)
+	}
+	return cv.column, nil
+}
+
+func (block *DataBlock) DataBlockValue(name string) (*DataBlockValue, error) {
+	if block.valuesmap != nil {
+		if cv, ok := block.valuesmap[name]; ok {
+			return cv, nil
+		}
+	} else {
+		for _, cv := range block.values {
+			if cv.column.Name == name {
+				return cv, nil
+			}
 		}
 	}
-	return columns.Column{}, errors.Errorf("Can't find column:%v", name)
+	return nil, errors.Errorf("Can't find column:%v", name)
+}
+
+func (block *DataBlock) Last() []*datavalues.Value {
+	it := block.RowIterator()
+	return it.Last()
 }
 
 func (block *DataBlock) RowIterator() *DataBlockRowIterator {
@@ -101,17 +123,6 @@ func (block *DataBlock) ColumnIterators() []*DataBlockColumnIterator {
 		iterators = append(iterators, iter)
 	}
 	return iterators
-}
-
-func (block *DataBlock) First(name string) (*datavalues.Value, error) {
-	it, err := block.ColumnIterator(name)
-	if err != nil {
-		return nil, errors.Errorf("Can't find column:%v", name)
-	}
-	if it.Next() {
-		return it.Value(), nil
-	}
-	return nil, nil
 }
 
 func (block *DataBlock) WriteRow(values []*datavalues.Value) error {
