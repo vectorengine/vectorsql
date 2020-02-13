@@ -26,6 +26,13 @@ func NewDataBlockValue(col columns.Column) *DataBlockValue {
 	}
 }
 
+func NewDataBlockValueWithCapacity(col columns.Column, capacity int) *DataBlockValue {
+	return &DataBlockValue{
+		column: col,
+		values: make([]*datavalues.Value, capacity),
+	}
+}
+
 func (v *DataBlockValue) NumRows() int {
 	return len(v.values)
 }

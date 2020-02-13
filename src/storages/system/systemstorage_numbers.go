@@ -64,10 +64,9 @@ func (stream *SystemNumbersBlockIntputStream) Name() string {
 func (stream *SystemNumbersBlockIntputStream) Read() (*datablocks.DataBlock, error) {
 	rows := 0
 	block := stream.block.Clone()
-	batcher := datablocks.NewBatchWriter(block.Columns())
 
 	for rows < stream.maxBlockSize {
-		if err := batcher.WriteRow(datavalues.MakeInt(stream.current)); err != nil {
+		if err := block.WriteRow([]*datavalues.Value{datavalues.MakeInt(stream.current)}); err != nil {
 			return nil, err
 		}
 		stream.current++
@@ -76,9 +75,6 @@ func (stream *SystemNumbersBlockIntputStream) Read() (*datablocks.DataBlock, err
 
 	if rows == 0 {
 		return nil, nil
-	}
-	if err := block.WriteBatch(batcher); err != nil {
-		return nil, err
 	}
 	return block, nil
 }

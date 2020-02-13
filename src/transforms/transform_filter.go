@@ -43,7 +43,6 @@ func (t *FilterTransform) Execute() {
 }
 
 func (t *FilterTransform) check(x *datablocks.DataBlock) error {
-	var fields []string
 	filterPlan := t.filter
 
 	expr, err := planners.BuildExpressions(filterPlan.SubPlan)
@@ -51,28 +50,14 @@ func (t *FilterTransform) check(x *datablocks.DataBlock) error {
 		return err
 	}
 
-	if err := filterPlan.Walk(func(p planners.IPlan) (bool, error) {
-		switch p := p.(type) {
-		case *planners.VariablePlan:
-			fields = append(fields, string(p.Value))
-		}
-		return true, nil
-	}); err != nil {
-		return err
-	}
-	colidxs, err := x.ColumnIndexes(fields...)
-	if err != nil {
-		return err
-	}
-
 	i := 0
 	checks := make([]*datavalues.Value, x.NumRows())
-	params := make(expressions.Map, len(fields))
-	rowiter := x.RowIterator()
-	for rowiter.Next() {
-		row := rowiter.Value()
-		for _, colidx := range colidxs {
-			params[colidx.Name] = row[colidx.Index]
+	params := make(expressions.Map)
+	it := x.RowIterator()
+	for it.Next() {
+		row := it.Value()
+		for k := range row {
+			params[it.Column(k).Name] = row[k]
 		}
 		v, err := expr.Eval(params)
 		if err != nil {

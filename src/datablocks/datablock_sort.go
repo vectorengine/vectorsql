@@ -10,11 +10,9 @@ import (
 	"planners"
 	"sort"
 	"strings"
-
-	"base/errors"
 )
 
-func (block *DataBlock) OrderByPlan(plan *planners.OrderByPlan) error {
+func (block *DataBlock) SortByPlan(plan *planners.OrderByPlan) error {
 	var fields []string
 
 	// Find the column name which all the orderby used.
@@ -41,11 +39,11 @@ func (block *DataBlock) OrderByPlan(plan *planners.OrderByPlan) error {
 	// Orderby column value.
 	tuples := make([]interface{}, len(fields))
 	for i, name := range fields {
-		cv, ok := block.valuesmap[name]
-		if !ok {
-			return errors.Errorf("Can't find column:%v", name)
+		it, err := block.ColumnIterator(name)
+		if err != nil {
+			return err
 		}
-		tuples[i] = datavalues.MakeTuple(cv.values...)
+		tuples[i] = datavalues.MakeTuple(it.cv.values...)
 	}
 	// Append the Seqs column.
 	numRows := block.NumRows()

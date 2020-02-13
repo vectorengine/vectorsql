@@ -14,17 +14,15 @@ import (
 
 func NewBlockFromSlice(cols []columns.Column, datas ...[]interface{}) *datablocks.DataBlock {
 	block := datablocks.NewDataBlock(cols)
-	batcher := datablocks.NewBatchWriter(block.Columns())
 	for _, data := range datas {
 		if len(data) > 0 {
 			var row []*datavalues.Value
 			for i := range cols {
 				row = append(row, datavalues.ToValue(data[i]))
 			}
-			_ = batcher.WriteRow(row...)
+			_ = block.WriteRow(row)
 		}
 	}
-	_ = block.WriteBatch(batcher)
 	return block
 }
 

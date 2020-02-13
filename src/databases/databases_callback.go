@@ -11,33 +11,33 @@ import (
 
 // Handlers.
 func fillDatabasesFunc(block *datablocks.DataBlock) error {
-	batcher := datablocks.NewBatchWriter(block.Columns())
 	for _, database := range databases.databases {
-		if err := batcher.WriteRow(
+		if err := block.WriteRow([]*datavalues.Value{
 			datavalues.MakeString(database.Meta().GetDBName()),
 			datavalues.MakeString(database.Meta().GetEngineName()),
 			datavalues.MakeString(database.Meta().GetDataPath()),
 			datavalues.MakeString(database.Meta().GetMetaDataPath()),
+		},
 		); err != nil {
 			return err
 		}
 	}
-	return block.WriteBatch(batcher)
+	return nil
 }
 
 func fillTablesFunc(block *datablocks.DataBlock) error {
-	batcher := datablocks.NewBatchWriter(block.Columns())
 	for _, database := range databases.databases {
 		tables := database.GetTables()
 		for _, table := range tables {
-			if err := batcher.WriteRow(
+			if err := block.WriteRow([]*datavalues.Value{
 				datavalues.MakeString(table.getTable()),
 				datavalues.MakeString(table.getDatabase()),
 				datavalues.MakeString(table.getEngine()),
+			},
 			); err != nil {
 				return err
 			}
 		}
 	}
-	return block.WriteBatch(batcher)
+	return nil
 }

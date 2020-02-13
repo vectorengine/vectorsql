@@ -84,7 +84,6 @@ func (executor *TableValuedFunctionExecutor) Execute() (processors.IProcessor, e
 	chunks := (slicesize / blocksize)
 	for i := 0; i < chunks+1; i++ {
 		block := datablocks.NewDataBlock(cols)
-		batcher := datablocks.NewBatchWriter(cols)
 
 		begin := i * blocksize
 		end := (i + 1) * blocksize
@@ -92,12 +91,9 @@ func (executor *TableValuedFunctionExecutor) Execute() (processors.IProcessor, e
 			end = slicesize
 		}
 		for j := begin; j < end; j++ {
-			if err := batcher.WriteRow(slice[j].AsSlice()...); err != nil {
+			if err := block.WriteRow(slice[j].AsSlice()); err != nil {
 				return nil, err
 			}
-		}
-		if err := block.WriteBatch(batcher); err != nil {
-			return nil, err
 		}
 		blocks = append(blocks, block)
 	}

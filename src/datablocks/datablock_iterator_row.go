@@ -5,6 +5,7 @@
 package datablocks
 
 import (
+	"columns"
 	"datavalues"
 )
 
@@ -29,6 +30,10 @@ func newDataBlockRowIterator(block *DataBlock) *DataBlockRowIterator {
 func (it *DataBlockRowIterator) Next() bool {
 	it.current++
 	return it.current < it.rows
+}
+
+func (it *DataBlockRowIterator) Column(idx int) columns.Column {
+	return it.block.values[idx].column
 }
 
 func (it *DataBlockRowIterator) Value() []*datavalues.Value {
