@@ -61,7 +61,7 @@ func (executor *TableValuedFunctionExecutor) Execute() (processors.IProcessor, e
 		return nil, err
 	}
 
-	var cols []columns.Column
+	var cols []*columns.Column
 	switch strings.ToUpper(plan.FuncName) {
 	case "RANGETABLE", "RANDTABLE":
 		for i := 1; i < len(variables); i++ {
@@ -69,10 +69,7 @@ func (executor *TableValuedFunctionExecutor) Execute() (processors.IProcessor, e
 			if err != nil {
 				return nil, err
 			}
-			cols = append(cols, columns.Column{
-				Name:     variables[i].AsString(),
-				DataType: datatype,
-			})
+			cols = append(cols, columns.NewColumn(variables[i].AsString(), datatype))
 		}
 	}
 

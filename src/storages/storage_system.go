@@ -16,17 +16,17 @@ const (
 	SystemNumbersStorageEngineName   = "SYSTEM_NUMBERS"
 )
 
-func NewSystemDatabasesStorage(ctx *StorageContext, cols []columns.Column) IStorage {
+func NewSystemDatabasesStorage(ctx *StorageContext, cols []*columns.Column) IStorage {
 	systemCtx := system.NewSystemStorageContext(ctx.log, ctx.conf, ctx.tablesFillFunc, ctx.databasesFillFunc)
 	return system.NewSystemDatabasesStorage(systemCtx)
 }
 
-func NewSystemTablesStorage(ctx *StorageContext, cols []columns.Column) IStorage {
+func NewSystemTablesStorage(ctx *StorageContext, cols []*columns.Column) IStorage {
 	systemCtx := system.NewSystemStorageContext(ctx.log, ctx.conf, ctx.tablesFillFunc, ctx.databasesFillFunc)
 	return system.NewSystemTablesStorage(systemCtx)
 }
 
-func NewSystemNumbersStorage(ctx *StorageContext, cols []columns.Column) IStorage {
+func NewSystemNumbersStorage(ctx *StorageContext, cols []*columns.Column) IStorage {
 	systemCtx := system.NewSystemStorageContext(ctx.log, ctx.conf, ctx.tablesFillFunc, ctx.databasesFillFunc)
 	return system.NewSystemNumbersStorage(systemCtx)
 }

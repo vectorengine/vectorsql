@@ -33,7 +33,7 @@ func TestFilterTransform(t *testing.T) {
 				planners.NewConstantPlan("y"),
 			),
 			source: mocks.NewBlockFromSlice(
-				[]columns.Column{
+				[]*columns.Column{
 					{Name: "name", DataType: datatypes.NewStringDataType()},
 					{Name: "age", DataType: datatypes.NewInt32DataType()},
 				},
@@ -42,7 +42,7 @@ func TestFilterTransform(t *testing.T) {
 				[]interface{}{"z", 10},
 			),
 			expect: mocks.NewBlockFromSlice(
-				[]columns.Column{
+				[]*columns.Column{
 					{Name: "name", DataType: datatypes.NewStringDataType()},
 					{Name: "age", DataType: datatypes.NewInt32DataType()},
 				},
@@ -57,7 +57,7 @@ func TestFilterTransform(t *testing.T) {
 				planners.NewConstantPlan("y%"),
 			),
 			source: mocks.NewBlockFromSlice(
-				[]columns.Column{
+				[]*columns.Column{
 					{Name: "name", DataType: datatypes.NewStringDataType()},
 					{Name: "age", DataType: datatypes.NewInt32DataType()},
 				},
@@ -66,7 +66,7 @@ func TestFilterTransform(t *testing.T) {
 				[]interface{}{"yx", 12},
 			),
 			expect: mocks.NewBlockFromSlice(
-				[]columns.Column{
+				[]*columns.Column{
 					{Name: "name", DataType: datatypes.NewStringDataType()},
 					{Name: "age", DataType: datatypes.NewInt32DataType()},
 				},
@@ -90,7 +90,7 @@ func TestFilterTransform(t *testing.T) {
 				),
 			),
 			source: mocks.NewBlockFromSlice(
-				[]columns.Column{
+				[]*columns.Column{
 					{Name: "name", DataType: datatypes.NewStringDataType()},
 					{Name: "age", DataType: datatypes.NewInt32DataType()},
 				},
@@ -99,7 +99,7 @@ func TestFilterTransform(t *testing.T) {
 				[]interface{}{"yx", 12},
 			),
 			expect: mocks.NewBlockFromSlice(
-				[]columns.Column{
+				[]*columns.Column{
 					{Name: "name", DataType: datatypes.NewStringDataType()},
 					{Name: "age", DataType: datatypes.NewInt32DataType()},
 				},
@@ -130,7 +130,7 @@ func TestFilterTransform(t *testing.T) {
 				),
 			),
 			source: mocks.NewBlockFromSlice(
-				[]columns.Column{
+				[]*columns.Column{
 					{Name: "name", DataType: datatypes.NewStringDataType()},
 					{Name: "age", DataType: datatypes.NewInt32DataType()},
 				},
@@ -139,7 +139,7 @@ func TestFilterTransform(t *testing.T) {
 				[]interface{}{"z", 12},
 			),
 			expect: mocks.NewBlockFromSlice(
-				[]columns.Column{
+				[]*columns.Column{
 					{Name: "name", DataType: datatypes.NewStringDataType()},
 					{Name: "age", DataType: datatypes.NewInt32DataType()},
 				},

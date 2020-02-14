@@ -19,7 +19,7 @@ type DataBlock struct {
 	immutable bool
 }
 
-func NewDataBlock(cols []columns.Column) *DataBlock {
+func NewDataBlock(cols []*columns.Column) *DataBlock {
 	block := &DataBlock{
 		info:      &DataBlockInfo{},
 		values:    make([]*DataBlockValue, len(cols)),
@@ -37,6 +37,15 @@ func NewDataBlock(cols []columns.Column) *DataBlock {
 // Clone a sample block
 func (block *DataBlock) Clone() *DataBlock {
 	return NewDataBlock(block.Columns())
+}
+
+func (block *DataBlock) SetToLast() {
+	if block.seqs == nil {
+		block.seqs = make([]*datavalues.Value, 1)
+		block.seqs[0] = datavalues.MakeInt(block.NumRows() - 1)
+	} else {
+		block.seqs = block.seqs[len(block.seqs)-1:]
+	}
 }
 
 func (block *DataBlock) setSeqs(seqs []*datavalues.Value) {
@@ -65,19 +74,18 @@ func (block *DataBlock) NumColumns() int {
 	return len(block.values)
 }
 
-func (block *DataBlock) Columns() []columns.Column {
-	var cols []columns.Column
-
-	for _, cv := range block.values {
-		cols = append(cols, cv.column)
+func (block *DataBlock) Columns() []*columns.Column {
+	cols := make([]*columns.Column, len(block.values))
+	for i, cv := range block.values {
+		cols[i] = cv.column
 	}
 	return cols
 }
 
-func (block *DataBlock) Column(name string) (columns.Column, error) {
+func (block *DataBlock) Column(name string) (*columns.Column, error) {
 	cv, ok := block.valuesmap[name]
 	if !ok {
-		return columns.Column{}, errors.Errorf("Can't find column:%v", name)
+		return nil, errors.Errorf("Can't find column:%v", name)
 	}
 	return cv.column, nil
 }
@@ -95,11 +103,6 @@ func (block *DataBlock) DataBlockValue(name string) (*DataBlockValue, error) {
 		}
 	}
 	return nil, errors.Errorf("Can't find column:%v", name)
-}
-
-func (block *DataBlock) Last() []*datavalues.Value {
-	it := block.RowIterator()
-	return it.Last()
 }
 
 func (block *DataBlock) RowIterator() *DataBlockRowIterator {

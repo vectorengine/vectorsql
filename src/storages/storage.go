@@ -13,7 +13,7 @@ import (
 
 type IStorage interface {
 	Name() string
-	Columns() []columns.Column
+	Columns() []*columns.Column
 	GetInputStream(*sessions.Session, *planners.ScanPlan) (datablocks.IDataBlockInputStream, error)
 	GetOutputStream(*sessions.Session, *planners.ScanPlan) (datablocks.IDataBlockOutputStream, error)
 }

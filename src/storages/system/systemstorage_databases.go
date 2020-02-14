@@ -29,8 +29,8 @@ func (storage *SystemDatabasesStorage) Name() string {
 	return ""
 }
 
-func (storage *SystemDatabasesStorage) Columns() []columns.Column {
-	return []columns.Column{
+func (storage *SystemDatabasesStorage) Columns() []*columns.Column {
+	return []*columns.Column{
 		{Name: "name", DataType: datatypes.NewStringDataType()},
 		{Name: "engine", DataType: datatypes.NewStringDataType()},
 		{Name: "data_path", DataType: datatypes.NewStringDataType()},
@@ -43,22 +43,11 @@ func (storage *SystemDatabasesStorage) GetOutputStream(session *sessions.Session
 }
 
 func (storage *SystemDatabasesStorage) GetInputStream(session *sessions.Session, scan *planners.ScanPlan) (datablocks.IDataBlockInputStream, error) {
-	var cols []columns.Column
-
 	ctx := storage.ctx
 	log := ctx.log
 
-	// Column.
-	for _, col := range storage.Columns() {
-		datatype, err := datatypes.DataTypeFactory(col.DataType.Name())
-		if err != nil {
-			return nil, err
-		}
-		cols = append(cols, columns.NewColumn(col.Name, datatype))
-	}
-
 	// Block.
-	block := datablocks.NewDataBlock(cols)
+	block := datablocks.NewDataBlock(storage.Columns())
 	if err := ctx.databasesFillFunc(block); err != nil {
 		return nil, err
 	}

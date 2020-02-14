@@ -37,7 +37,7 @@ func (it *DataBlockRowIterator) Last() []*datavalues.Value {
 	return it.Value()
 }
 
-func (it *DataBlockRowIterator) Column(idx int) columns.Column {
+func (it *DataBlockRowIterator) Column(idx int) *columns.Column {
 	return it.block.values[idx].column
 }
 

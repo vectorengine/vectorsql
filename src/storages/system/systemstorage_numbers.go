@@ -28,8 +28,8 @@ func (storage *SystemNumbersStorage) Name() string {
 	return ""
 }
 
-func (storage *SystemNumbersStorage) Columns() []columns.Column {
-	return []columns.Column{
+func (storage *SystemNumbersStorage) Columns() []*columns.Column {
+	return []*columns.Column{
 		{Name: "number", DataType: datatypes.NewUInt64DataType()},
 	}
 }

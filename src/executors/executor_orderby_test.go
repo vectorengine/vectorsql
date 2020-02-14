@@ -39,7 +39,7 @@ func TestOrderByExecutor(t *testing.T) {
 				},
 			),
 			source: mocks.NewBlockFromSlice(
-				[]columns.Column{
+				[]*columns.Column{
 					{Name: "name", DataType: datatypes.NewStringDataType()},
 					{Name: "age", DataType: datatypes.NewInt32DataType()},
 				},
@@ -49,7 +49,7 @@ func TestOrderByExecutor(t *testing.T) {
 				[]interface{}{"y", 13},
 			),
 			expect: mocks.NewBlockFromSlice(
-				[]columns.Column{
+				[]*columns.Column{
 					{Name: "name", DataType: datatypes.NewStringDataType()},
 					{Name: "age", DataType: datatypes.NewInt32DataType()},
 				},

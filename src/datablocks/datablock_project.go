@@ -27,9 +27,9 @@ func (block *DataBlock) ProjectByPlan(plan *planners.MapPlan) (*DataBlock, error
 	rows := block.NumRows()
 	if rows == 0 {
 		// If empty, returns header only.
-		cols := make([]columns.Column, len(exprs))
+		cols := make([]*columns.Column, len(exprs))
 		for i, expr := range exprs {
-			cols[i] = columns.Column{Name: expr.String(), DataType: datatypes.NewStringDataType()}
+			cols[i] = columns.NewColumn(expr.String(), datatypes.NewStringDataType())
 		}
 		return NewDataBlock(cols), nil
 	} else {

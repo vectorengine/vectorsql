@@ -26,7 +26,7 @@ func TestDataSourceTransfrom(t *testing.T) {
 		{
 			name: "simple",
 			source: mocks.NewBlockFromSlice(
-				[]columns.Column{
+				[]*columns.Column{
 					{Name: "name", DataType: datatypes.NewStringDataType()},
 				},
 				[]interface{}{"x"},
@@ -34,7 +34,7 @@ func TestDataSourceTransfrom(t *testing.T) {
 				[]interface{}{"z"},
 			),
 			expect: mocks.NewBlockFromSlice(
-				[]columns.Column{
+				[]*columns.Column{
 					{Name: "name", DataType: datatypes.NewStringDataType()},
 				},
 				[]interface{}{"x"},

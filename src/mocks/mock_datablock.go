@@ -12,7 +12,7 @@ import (
 	"datavalues"
 )
 
-func NewBlockFromSlice(cols []columns.Column, datas ...[]interface{}) *datablocks.DataBlock {
+func NewBlockFromSlice(cols []*columns.Column, datas ...[]interface{}) *datablocks.DataBlock {
 	block := datablocks.NewDataBlock(cols)
 	for _, data := range datas {
 		if len(data) > 0 {

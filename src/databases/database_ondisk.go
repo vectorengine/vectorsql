@@ -134,16 +134,13 @@ func (database *OnDiskDatabase) attachTable(tableName string, node *sqlparser.DD
 		return err
 	}
 
-	var cols []columns.Column
-	for _, coldef := range colDefinitions {
+	cols := make([]*columns.Column, len(colDefinitions))
+	for i, coldef := range colDefinitions {
 		dataType, err := datatypes.DataTypeFactory(coldef.Type.Type)
 		if err != nil {
 			return err
 		}
-		cols = append(cols, columns.Column{
-			Name:     coldef.Name.String(),
-			DataType: dataType,
-		})
+		cols[i] = columns.NewColumn(coldef.Name.String(), dataType)
 	}
 
 	storageCtx := storages.NewStorageContext(ctx.log, ctx.conf)

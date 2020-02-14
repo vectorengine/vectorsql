@@ -16,11 +16,11 @@ import (
 
 type MemoryStorage struct {
 	ctx    *MemoryStorageContext
-	cols   []columns.Column
+	cols   []*columns.Column
 	output *NativeBlockOutputStream
 }
 
-func NewMemoryStorage(ctx *MemoryStorageContext, cols []columns.Column) *MemoryStorage {
+func NewMemoryStorage(ctx *MemoryStorageContext, cols []*columns.Column) *MemoryStorage {
 	return &MemoryStorage{
 		ctx:    ctx,
 		cols:   cols,
@@ -32,7 +32,7 @@ func (storage *MemoryStorage) Name() string {
 	return "Memory"
 }
 
-func (storage *MemoryStorage) Columns() []columns.Column {
+func (storage *MemoryStorage) Columns() []*columns.Column {
 	return storage.cols
 }
 

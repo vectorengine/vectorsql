@@ -50,7 +50,7 @@ func TestTVFExecutor(t *testing.T) {
 				),
 			),
 			expect: mocks.NewBlockFromSlice(
-				[]columns.Column{
+				[]*columns.Column{
 					{Name: "c1", DataType: datatypes.NewUInt32DataType()},
 					{Name: "c2", DataType: datatypes.NewStringDataType()},
 				},

@@ -22,11 +22,7 @@ func (block *DataBlock) GroupByPlan(groupby *planners.GroupByPlan) ([]*DataBlock
 			return nil, err
 		}
 		if hasAggregate {
-			aggrGroup := group.Clone()
-			if err := aggrGroup.WriteRow(group.Last()); err != nil {
-				return nil, err
-			}
-			group = aggrGroup
+			group.SetToLast()
 		}
 		return []*DataBlock{group}, nil
 	} else {
@@ -60,13 +56,13 @@ func (block *DataBlock) GroupByPlan(groupby *planners.GroupByPlan) ([]*DataBlock
 				groupbyValues[i] = val
 			}
 			key := datavalues.MakeTuple(groupbyValues...)
-			v, ok, err := hashmap.Get(key)
+			v, hash, ok, err := hashmap.Get(key)
 			if err != nil {
 				return nil, err
 			}
 			if !ok {
 				v = block.Clone()
-				if err := hashmap.Set(key, v); err != nil {
+				if err := hashmap.SetByHash(key, hash, v); err != nil {
 					return nil, err
 				}
 			}
@@ -90,14 +86,9 @@ func (block *DataBlock) GroupByPlan(groupby *planners.GroupByPlan) ([]*DataBlock
 				return nil, err
 			}
 			if hasAggregate {
-				aggrGroup := group.Clone()
-				if err := aggrGroup.WriteRow(group.Last()); err != nil {
-					return nil, err
-				}
-				groups[i] = aggrGroup
-			} else {
-				groups[i] = group
+				group.SetToLast()
 			}
+			groups[i] = group
 			i++
 		}
 		return groups, nil

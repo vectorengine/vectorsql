@@ -11,12 +11,13 @@ import (
 	"os/signal"
 	"runtime"
 	"syscall"
+	"time"
 
+	"base/humanize"
+	"base/xlog"
 	"config"
 	"databases"
 	"servers"
-
-	"base/xlog"
 )
 
 var (
@@ -61,8 +62,21 @@ func main() {
 	defer server.Stop()
 	log.Info("Servers start...")
 
+	go logMemStats(log)
+
 	// Handle signal.
 	ch := make(chan os.Signal, 1)
 	signal.Notify(ch, syscall.SIGINT, syscall.SIGTERM)
 	<-ch
+}
+
+func logMemStats(log *xlog.Log) {
+	t := time.NewTicker(10 * time.Second)
+	defer t.Stop()
+
+	for range t.C {
+		memstats := &runtime.MemStats{}
+		runtime.ReadMemStats(memstats)
+		log.Info("Memory InUse: %v    Alloc: %v    Sys: %v", humanize.Bytes(memstats.HeapInuse), humanize.Bytes(memstats.Alloc), humanize.Bytes(memstats.Sys))
+	}
 }

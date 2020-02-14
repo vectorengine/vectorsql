@@ -31,7 +31,7 @@ func TestShowDatabasesExecutor(t *testing.T) {
 			name:  "show databases",
 			query: "show databases",
 			expect: mocks.NewBlockFromSlice(
-				[]columns.Column{
+				[]*columns.Column{
 					{Name: "name", DataType: datatypes.NewStringDataType()},
 					{Name: "engine", DataType: datatypes.NewStringDataType()},
 					{Name: "data_path", DataType: datatypes.NewStringDataType()},

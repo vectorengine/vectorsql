@@ -31,7 +31,7 @@ func newDataBlockColumnIterator(block *DataBlock, idx int) *DataBlockColumnItera
 	}
 }
 
-func (it *DataBlockColumnIterator) Column() columns.Column {
+func (it *DataBlockColumnIterator) Column() *columns.Column {
 	return it.cv.column
 }
 

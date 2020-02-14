@@ -14,7 +14,7 @@ const (
 	MemoryStorageEngineName = "MEMORY"
 )
 
-func NewMemoryStorage(ctx *StorageContext, cols []columns.Column) IStorage {
+func NewMemoryStorage(ctx *StorageContext, cols []*columns.Column) IStorage {
 	mctx := mem.NewMemoryStorageContext(ctx.log, ctx.conf)
 	return mem.NewMemoryStorage(mctx, cols)
 }

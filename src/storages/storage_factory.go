@@ -12,7 +12,7 @@ import (
 	"base/errors"
 )
 
-type storageCreator func(*StorageContext, []columns.Column) IStorage
+type storageCreator func(*StorageContext, []*columns.Column) IStorage
 
 var (
 	table = map[string]storageCreator{
@@ -23,7 +23,7 @@ var (
 	}
 )
 
-func StorageFactory(ctx *StorageContext, engine string, columns []columns.Column) (IStorage, error) {
+func StorageFactory(ctx *StorageContext, engine string, columns []*columns.Column) (IStorage, error) {
 	name := strings.ToUpper(engine)
 	creator, ok := table[name]
 	if !ok {

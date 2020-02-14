@@ -15,18 +15,18 @@ type ColumnIndex struct {
 }
 
 type DataBlockValue struct {
-	column columns.Column
+	column *columns.Column
 	values []*datavalues.Value
 }
 
-func NewDataBlockValue(col columns.Column) *DataBlockValue {
+func NewDataBlockValue(col *columns.Column) *DataBlockValue {
 	return &DataBlockValue{
 		column: col,
-		values: make([]*datavalues.Value, 0, 1024),
+		values: make([]*datavalues.Value, 0),
 	}
 }
 
-func NewDataBlockValueWithCapacity(col columns.Column, capacity int) *DataBlockValue {
+func NewDataBlockValueWithCapacity(col *columns.Column, capacity int) *DataBlockValue {
 	return &DataBlockValue{
 		column: col,
 		values: make([]*datavalues.Value, capacity),

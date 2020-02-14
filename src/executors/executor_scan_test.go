@@ -26,7 +26,7 @@ func TestScanExecutor(t *testing.T) {
 			name: "ScanExecutor",
 			plan: planners.NewScanPlan("databases", "system"),
 			expect: mocks.NewBlockFromSlice(
-				[]columns.Column{
+				[]*columns.Column{
 					{Name: "name", DataType: datatypes.NewStringDataType()},
 					{Name: "engine", DataType: datatypes.NewStringDataType()},
 					{Name: "data_path", DataType: datatypes.NewStringDataType()},

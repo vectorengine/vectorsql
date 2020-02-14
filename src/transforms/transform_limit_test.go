@@ -32,7 +32,7 @@ func TestLimitTransfrom(t *testing.T) {
 				planners.NewConstantPlan(2),
 			),
 			source: mocks.NewBlockFromSlice(
-				[]columns.Column{
+				[]*columns.Column{
 					{Name: "name", DataType: datatypes.NewStringDataType()},
 					{Name: "age", DataType: datatypes.NewInt32DataType()},
 				},
@@ -42,7 +42,7 @@ func TestLimitTransfrom(t *testing.T) {
 				[]interface{}{"y", 13},
 			),
 			expect: mocks.NewBlockFromSlice(
-				[]columns.Column{
+				[]*columns.Column{
 					{Name: "name", DataType: datatypes.NewStringDataType()},
 					{Name: "age", DataType: datatypes.NewInt32DataType()},
 				},

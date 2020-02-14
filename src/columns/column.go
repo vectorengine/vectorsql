@@ -13,8 +13,8 @@ type Column struct {
 	DataType datatypes.IDataType
 }
 
-func NewColumn(name string, datatype datatypes.IDataType) Column {
-	return Column{
+func NewColumn(name string, datatype datatypes.IDataType) *Column {
+	return &Column{
 		Name:     name,
 		DataType: datatype,
 	}

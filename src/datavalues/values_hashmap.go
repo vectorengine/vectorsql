@@ -6,9 +6,10 @@
 package datavalues
 
 import (
-	"base/errors"
+	"encoding/binary"
+	"hash/fnv"
 
-	"github.com/mitchellh/hashstructure"
+	"base/errors"
 )
 
 type HashMap struct {
@@ -27,8 +28,17 @@ type entry struct {
 	value interface{}
 }
 
+func fastHash(key *Value) (uint64, error) {
+	hashes := fnv.New64()
+	err := binary.Write(hashes, binary.LittleEndian, []byte(key.String()))
+	if err != nil {
+		return 0, errors.Wrap(err)
+	}
+	return hashes.Sum64(), nil
+}
+
 func (hm *HashMap) Set(key *Value, value interface{}) error {
-	hash, err := hashstructure.Hash(key, nil)
+	hash, err := fastHash(key)
 	if err != nil {
 		return errors.Wrapf(err, "couldn't hash %+v", key)
 	}
@@ -48,19 +58,35 @@ func (hm *HashMap) Set(key *Value, value interface{}) error {
 	return nil
 }
 
-func (hm *HashMap) Get(key *Value) (interface{}, bool, error) {
-	hash, err := hashstructure.Hash(key, nil)
+func (hm *HashMap) SetByHash(key *Value, hash uint64, value interface{}) error {
+	list := hm.container[hash]
+	for i := range list {
+		if AreEqual(list[i].key, key) {
+			list[i].value = value
+			return nil
+		}
+	}
+	hm.container[hash] = append(list, entry{
+		key:   key,
+		value: value,
+	})
+	hm.count++
+	return nil
+}
+
+func (hm *HashMap) Get(key *Value) (interface{}, uint64, bool, error) {
+	hash, err := fastHash(key)
 	if err != nil {
-		return nil, false, errors.Wrapf(err, "couldn't hash %+v", key)
+		return nil, 0, false, errors.Wrapf(err, "couldn't hash %+v", key)
 	}
 
 	list := hm.container[hash]
 	for i := range list {
 		if AreEqual(list[i].key, key) {
-			return list[i].value, true, nil
+			return list[i].value, hash, true, nil
 		}
 	}
-	return nil, false, nil
+	return nil, hash, false, nil
 }
 
 func (hm *HashMap) Count() int {
