@@ -235,11 +235,11 @@ func parseGroupBy(aliases map[string]IPlan, groupby sqlparser.GroupBy) (*MapPlan
 	return all, nil
 }
 
-func parseOrderBy(aliases map[string]IPlan, orderBy sqlparser.OrderBy) ([]Order, error) {
+func parseOrderBy(orderBy sqlparser.OrderBy) ([]Order, error) {
 	orders := make([]Order, len(orderBy))
 
 	for i, field := range orderBy {
-		expr, err := parseExpression(aliases, field.Expr)
+		expr, err := parseExpression(nil, field.Expr)
 		if err != nil {
 			return nil, errors.Errorf("couldn't parse order by expression with index %v", i)
 		}

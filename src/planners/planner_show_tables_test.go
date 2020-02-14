@@ -41,6 +41,7 @@ func TestShowTablesPlan(t *testing.T) {
                 },
                 {
                     "Name": "GroupByPlan",
+                    "HasAggregate": false,
                     "Projects": {
                         "Name": "MapPlan"
                     },

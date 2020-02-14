@@ -75,7 +75,7 @@ func (plan *SelectPlan) Build() error {
 
 	// OrderBy.
 	if ast.OrderBy != nil {
-		orders, err := parseOrderBy(aliases, ast.OrderBy)
+		orders, err := parseOrderBy(ast.OrderBy)
 		if err != nil {
 			return err
 		}

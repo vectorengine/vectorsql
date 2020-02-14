@@ -11,20 +11,9 @@ import (
 )
 
 func (block *DataBlock) GroupByPlan(groupby *planners.GroupByPlan) ([]*DataBlock, error) {
-	hasAggregator := false
 	groupbys := groupby.GroupBys
 	projects := groupby.Projects
-
-	if err := projects.Walk(func(plan planners.IPlan) (bool, error) {
-		switch plan.(type) {
-		case *planners.UnaryExpressionPlan:
-			hasAggregator = true
-			return false, nil
-		}
-		return true, nil
-	}); err != nil {
-		return nil, err
-	}
+	hasAggregate := groupby.HasAggregate
 
 	// GroupBy all.
 	if groupbys.Length() == 0 {
@@ -32,7 +21,7 @@ func (block *DataBlock) GroupByPlan(groupby *planners.GroupByPlan) ([]*DataBlock
 		if err != nil {
 			return nil, err
 		}
-		if hasAggregator {
+		if hasAggregate {
 			aggrGroup := group.Clone()
 			if err := aggrGroup.WriteRow(group.Last()); err != nil {
 				return nil, err
@@ -100,7 +89,7 @@ func (block *DataBlock) GroupByPlan(groupby *planners.GroupByPlan) ([]*DataBlock
 			if err != nil {
 				return nil, err
 			}
-			if hasAggregator {
+			if hasAggregate {
 				aggrGroup := group.Clone()
 				if err := aggrGroup.WriteRow(group.Last()); err != nil {
 					return nil, err
