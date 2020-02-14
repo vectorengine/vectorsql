@@ -52,8 +52,21 @@ func TestSelectPlan(t *testing.T) {
 }`,
 		},
 		{
-			name:  "filter",
-			query: "select sum(c1+1) as sum1, c1, c2 from randtable(rows->10, c1->'UInt32', c2->'UInt32', c3->'String') where c1>1 and c2<10 group by c3 order by c3 desc, sum1 desc",
+			name: "filter",
+			query: `SELECT 
+    sum(c1) AS c1_sum, 
+    count(c1) AS c1_count, 
+    c1_sum / c1_count AS c1_avg, 
+    c2, 
+    c3
+FROM randtable(rows -> 1000, c1 -> 'UInt32', c2 -> 'UInt32', c3 -> 'String')
+WHERE (c1 > 80) AND ((c1 + c2) < 500)
+GROUP BY c3
+ORDER BY 
+    c1_count DESC, 
+    c3 ASC
+LIMIT 10
+`,
 			expect: `{
     "Name": "SelectPlan",
     "SubPlan": {
@@ -78,7 +91,7 @@ func TestSelectPlan(t *testing.T) {
                                 },
                                 "Right": {
                                     "Name": "ConstantPlan",
-                                    "Value": 10
+                                    "Value": 1000
                                 }
                             }
                         },
@@ -147,56 +160,92 @@ func TestSelectPlan(t *testing.T) {
                         },
                         "Right": {
                             "Name": "ConstantPlan",
-                            "Value": 1
+                            "Value": 80
                         }
                     },
                     "Right": {
                         "Name": "BinaryExpressionPlan",
                         "FuncName": "\u003c",
                         "Left": {
-                            "Name": "VariablePlan",
-                            "Value": "c2"
+                            "Name": "BinaryExpressionPlan",
+                            "FuncName": "+",
+                            "Left": {
+                                "Name": "VariablePlan",
+                                "Value": "c1"
+                            },
+                            "Right": {
+                                "Name": "VariablePlan",
+                                "Value": "c2"
+                            }
                         },
                         "Right": {
                             "Name": "ConstantPlan",
-                            "Value": 10
+                            "Value": 500
                         }
                     }
                 }
             },
             {
                 "Name": "GroupByPlan",
-                "HasAggregate": false,
+                "HasAggregate": true,
                 "Projects": {
                     "Name": "MapPlan",
                     "SubPlans": [
                         {
                             "Name": "AliasedExpressionPlan",
-                            "As": "sum1",
+                            "As": "c1_sum",
                             "Expr": {
                                 "Name": "UnaryExpressionPlan",
                                 "FuncName": "SUM",
                                 "Expr": {
-                                    "Name": "BinaryExpressionPlan",
-                                    "FuncName": "+",
-                                    "Left": {
+                                    "Name": "VariablePlan",
+                                    "Value": "c1"
+                                }
+                            }
+                        },
+                        {
+                            "Name": "AliasedExpressionPlan",
+                            "As": "c1_count",
+                            "Expr": {
+                                "Name": "UnaryExpressionPlan",
+                                "FuncName": "COUNT",
+                                "Expr": {
+                                    "Name": "VariablePlan",
+                                    "Value": "c1"
+                                }
+                            }
+                        },
+                        {
+                            "Name": "AliasedExpressionPlan",
+                            "As": "c1_avg",
+                            "Expr": {
+                                "Name": "BinaryExpressionPlan",
+                                "FuncName": "/",
+                                "Left": {
+                                    "Name": "UnaryExpressionPlan",
+                                    "FuncName": "SUM",
+                                    "Expr": {
                                         "Name": "VariablePlan",
                                         "Value": "c1"
-                                    },
-                                    "Right": {
-                                        "Name": "ConstantPlan",
-                                        "Value": 1
+                                    }
+                                },
+                                "Right": {
+                                    "Name": "UnaryExpressionPlan",
+                                    "FuncName": "COUNT",
+                                    "Expr": {
+                                        "Name": "VariablePlan",
+                                        "Value": "c1"
                                     }
                                 }
                             }
                         },
                         {
                             "Name": "VariablePlan",
-                            "Value": "c1"
+                            "Value": "c2"
                         },
                         {
                             "Name": "VariablePlan",
-                            "Value": "c2"
+                            "Value": "c3"
                         }
                     ]
                 },
@@ -216,18 +265,29 @@ func TestSelectPlan(t *testing.T) {
                     {
                         "Expression": {
                             "Name": "VariablePlan",
-                            "Value": "c3"
+                            "Value": "c1_count"
                         },
                         "Direction": "desc"
                     },
                     {
                         "Expression": {
                             "Name": "VariablePlan",
-                            "Value": "sum1"
+                            "Value": "c3"
                         },
-                        "Direction": "desc"
+                        "Direction": "asc"
                     }
                 ]
+            },
+            {
+                "Name": "LimitPlan",
+                "OffsetPlan": {
+                    "Name": "ConstantPlan",
+                    "Value": 0
+                },
+                "RowcountPlan": {
+                    "Name": "ConstantPlan",
+                    "Value": 10
+                }
             },
             {
                 "Name": "ProjectionPlan",
@@ -236,31 +296,59 @@ func TestSelectPlan(t *testing.T) {
                     "SubPlans": [
                         {
                             "Name": "AliasedExpressionPlan",
-                            "As": "sum1",
+                            "As": "c1_sum",
                             "Expr": {
                                 "Name": "UnaryExpressionPlan",
                                 "FuncName": "SUM",
                                 "Expr": {
-                                    "Name": "BinaryExpressionPlan",
-                                    "FuncName": "+",
-                                    "Left": {
+                                    "Name": "VariablePlan",
+                                    "Value": "c1"
+                                }
+                            }
+                        },
+                        {
+                            "Name": "AliasedExpressionPlan",
+                            "As": "c1_count",
+                            "Expr": {
+                                "Name": "UnaryExpressionPlan",
+                                "FuncName": "COUNT",
+                                "Expr": {
+                                    "Name": "VariablePlan",
+                                    "Value": "c1"
+                                }
+                            }
+                        },
+                        {
+                            "Name": "AliasedExpressionPlan",
+                            "As": "c1_avg",
+                            "Expr": {
+                                "Name": "BinaryExpressionPlan",
+                                "FuncName": "/",
+                                "Left": {
+                                    "Name": "UnaryExpressionPlan",
+                                    "FuncName": "SUM",
+                                    "Expr": {
                                         "Name": "VariablePlan",
                                         "Value": "c1"
-                                    },
-                                    "Right": {
-                                        "Name": "ConstantPlan",
-                                        "Value": 1
+                                    }
+                                },
+                                "Right": {
+                                    "Name": "UnaryExpressionPlan",
+                                    "FuncName": "COUNT",
+                                    "Expr": {
+                                        "Name": "VariablePlan",
+                                        "Value": "c1"
                                     }
                                 }
                             }
                         },
                         {
                             "Name": "VariablePlan",
-                            "Value": "c1"
+                            "Value": "c2"
                         },
                         {
                             "Name": "VariablePlan",
-                            "Value": "c2"
+                            "Value": "c3"
                         }
                     ]
                 }
