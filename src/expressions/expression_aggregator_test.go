@@ -21,47 +21,47 @@ func TestAggregatorsExpression(t *testing.T) {
 		{
 			name:   "sum(1)",
 			expr:   SUM(1),
-			expect: datavalues.ToValue(2.0),
+			expect: datavalues.ToValue(2),
 		},
 		{
 			name:   "sum(a)",
 			expr:   SUM("a"),
-			expect: datavalues.ToValue(4.0),
+			expect: datavalues.ToValue(4),
 		},
 		{
 			name:   "sum(a+1)",
 			expr:   SUM(ADD("a", 1)),
-			expect: datavalues.ToValue(6.0),
+			expect: datavalues.ToValue(6),
 		},
 		{
 			name:   "sum(b)+a",
 			expr:   ADD(SUM("b"), "a"),
-			expect: datavalues.ToValue(10.0),
+			expect: datavalues.ToValue(10),
 		},
 		{
 			name:   "sum(a+(b+1))",
 			expr:   SUM(ADD("a", ADD("b", 1))),
-			expect: datavalues.ToValue(13.0),
+			expect: datavalues.ToValue(13),
 		},
 		{
 			name:   "min(a)",
 			expr:   MIN("a"),
-			expect: datavalues.ToValue(1.0),
+			expect: datavalues.ToValue(1),
 		},
 		{
 			name:   "min(a+1)",
 			expr:   MIN(ADD("a", 1)),
-			expect: datavalues.ToValue(2.0),
+			expect: datavalues.ToValue(2),
 		},
 		{
 			name:   "max(a)",
 			expr:   MAX("a"),
-			expect: datavalues.ToValue(3.0),
+			expect: datavalues.ToValue(3),
 		},
 		{
 			name:   "max(a+1)",
 			expr:   MAX(ADD("a", 1)),
-			expect: datavalues.ToValue(4.0),
+			expect: datavalues.ToValue(4),
 		},
 		{
 			name:   "count(b)",

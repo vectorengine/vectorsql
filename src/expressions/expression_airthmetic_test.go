@@ -62,7 +62,7 @@ func TestAirthmeticsExpression(t *testing.T) {
 		{
 			name:   "a/b",
 			expr:   DIV("a", "b"),
-			expect: datavalues.ToValue(0),
+			expect: datavalues.ToValue(0.5),
 		},
 		{
 			name:      "a+c",

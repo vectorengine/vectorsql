@@ -6,6 +6,7 @@ package binary
 
 import (
 	"io"
+	"math"
 
 	"encoding/binary"
 )
@@ -29,6 +30,18 @@ func (reader *Reader) Bool() (bool, error) {
 	return v == 1, nil
 }
 
+func (reader *Reader) Uvarint() (uint64, error) {
+	return binary.ReadUvarint(reader)
+}
+
+func (reader *Reader) Int8() (int8, error) {
+	v, err := reader.ReadByte()
+	if err != nil {
+		return 0, err
+	}
+	return int8(v), nil
+}
+
 func (reader *Reader) UInt8() (uint8, error) {
 	v, err := reader.ReadByte()
 	if err != nil {
@@ -37,8 +50,12 @@ func (reader *Reader) UInt8() (uint8, error) {
 	return uint8(v), nil
 }
 
-func (reader *Reader) Uvarint() (uint64, error) {
-	return binary.ReadUvarint(reader)
+func (reader *Reader) Int32() (int32, error) {
+	v, err := reader.UInt32()
+	if err != nil {
+		return 0, err
+	}
+	return int32(v), nil
 }
 
 func (reader *Reader) UInt32() (uint32, error) {
@@ -51,12 +68,42 @@ func (reader *Reader) UInt32() (uint32, error) {
 		uint32(reader.datas[3])<<24, nil
 }
 
-func (reader *Reader) Int32() (int32, error) {
+func (reader *Reader) Int64() (int64, error) {
+	v, err := reader.UInt64()
+	if err != nil {
+		return 0, err
+	}
+	return int64(v), nil
+}
+
+func (reader *Reader) UInt64() (uint64, error) {
+	if _, err := reader.input.Read(reader.datas[:8]); err != nil {
+		return 0, err
+	}
+	return uint64(reader.datas[0]) |
+		uint64(reader.datas[1])<<8 |
+		uint64(reader.datas[2])<<16 |
+		uint64(reader.datas[3])<<24 |
+		uint64(reader.datas[4])<<32 |
+		uint64(reader.datas[5])<<40 |
+		uint64(reader.datas[6])<<48 |
+		uint64(reader.datas[7])<<56, nil
+}
+
+func (reader *Reader) Float32() (float32, error) {
 	v, err := reader.UInt32()
 	if err != nil {
 		return 0, err
 	}
-	return int32(v), nil
+	return math.Float32frombits(v), nil
+}
+
+func (reader *Reader) Float64() (float64, error) {
+	v, err := reader.UInt64()
+	if err != nil {
+		return 0, err
+	}
+	return math.Float64frombits(v), nil
 }
 
 func (reader *Reader) Bytes(ln int) ([]byte, error) {

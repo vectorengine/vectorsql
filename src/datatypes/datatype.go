@@ -26,7 +26,7 @@ func GetDataTypeByValue(val *datavalues.Value) (IDataType, error) {
 	case datavalues.TypeString:
 		return NewStringDataType(), nil
 	case datavalues.TypeFloat:
-		return NewUInt64DataType(), nil
+		return NewFloat64DataType(), nil
 	case datavalues.TypeInt:
 		return NewInt32DataType(), nil
 	default:

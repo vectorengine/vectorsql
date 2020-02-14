@@ -178,9 +178,6 @@ func (v Value) AsInt() int {
 }
 
 func (v Value) AsFloat() float64 {
-	if v.GetInt() != 0 {
-		return float64(v.GetInt())
-	}
 	return v.GetFloat()
 }
 

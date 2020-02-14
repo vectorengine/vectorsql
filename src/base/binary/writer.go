@@ -7,6 +7,7 @@ package binary
 import (
 	"bufio"
 	"io"
+	"math"
 
 	"encoding/binary"
 )
@@ -29,12 +30,28 @@ func (writer *Writer) Bool(v bool) error {
 	return writer.UInt8(0)
 }
 
+func (writer *Writer) Uvarint(v uint64) error {
+	ln := binary.PutUvarint(writer.datas[:binary.MaxVarintLen64], v)
+	if _, err := writer.output.Write(writer.datas[0:ln]); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (writer *Writer) Int8(v int8) error {
+	return writer.UInt8(uint8(v))
+}
+
 func (writer *Writer) UInt8(v uint8) error {
 	writer.datas[0] = v
 	if _, err := writer.output.Write(writer.datas[:1]); err != nil {
 		return err
 	}
 	return nil
+}
+
+func (writer *Writer) Int32(v int32) error {
+	return writer.UInt32(uint32(v))
 }
 
 func (writer *Writer) UInt32(v uint32) error {
@@ -46,6 +63,10 @@ func (writer *Writer) UInt32(v uint32) error {
 		return err
 	}
 	return nil
+}
+
+func (writer *Writer) Int64(v int64) error {
+	return writer.UInt64(uint64(v))
 }
 
 func (writer *Writer) UInt64(v uint64) error {
@@ -65,20 +86,12 @@ func (writer *Writer) UInt64(v uint64) error {
 	return nil
 }
 
-func (writer *Writer) Int32(v int32) error {
-	return writer.UInt32(uint32(v))
+func (writer *Writer) Float32(v float32) error {
+	return writer.UInt32(math.Float32bits(v))
 }
 
-func (writer *Writer) Int64(v int64) error {
-	return writer.UInt64(uint64(v))
-}
-
-func (writer *Writer) Uvarint(v uint64) error {
-	ln := binary.PutUvarint(writer.datas[:binary.MaxVarintLen64], v)
-	if _, err := writer.output.Write(writer.datas[0:ln]); err != nil {
-		return err
-	}
-	return nil
+func (writer *Writer) Float64(v float64) error {
+	return writer.UInt64(math.Float64bits(v))
 }
 
 func (writer *Writer) String(v string) error {

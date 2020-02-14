@@ -69,7 +69,7 @@ func Div(v1 *Value, v2 *Value) (*Value, error) {
 
 	switch v1.GetType() {
 	case TypeInt:
-		return ToValue(v1.AsInt() / v2.AsInt()), nil
+		return ToValue(float64(v1.AsInt()) / float64(v2.AsInt())), nil
 	case TypeFloat:
 		return ToValue(v1.AsFloat() / v2.AsFloat()), nil
 	}
