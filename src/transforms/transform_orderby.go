@@ -47,14 +47,16 @@ func (t *OrderByTransform) Execute() {
 		if len(errors) > 0 {
 			out.Send(errors[0])
 		} else {
-			block, err := datablocks.Append(blocks...)
-			if err != nil {
-				out.Send(err)
-			} else {
-				if err := block.SortByPlan(t.plan); err != nil {
+			if blocks != nil {
+				block, err := datablocks.Append(blocks...)
+				if err != nil {
 					out.Send(err)
 				} else {
-					out.Send(block)
+					if err := block.SortByPlan(t.plan); err != nil {
+						out.Send(err)
+					} else {
+						out.Send(block)
+					}
 				}
 			}
 		}

@@ -24,14 +24,14 @@ func NewGroupByPlan(projects *MapPlan, groupbys *MapPlan) *GroupByPlan {
 		if err != nil {
 			return nil
 		}
-		if err := exprs.Walk(func(expr expressions.IExpression) (bool, error) {
+		if err := expressions.Walk(func(expr expressions.IExpression) (bool, error) {
 			switch expr.(type) {
 			case *expressions.AggregateExpression:
 				hasAggregate = true
 				return false, nil
 			}
 			return true, nil
-		}); err != nil {
+		}, exprs); err != nil {
 			return nil
 		}
 		if hasAggregate {

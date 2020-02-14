@@ -33,39 +33,47 @@ $./bin/vectorsql-server -c conf/vectorsql-default.toml
 
 ```
 $clickhouse-client --compression=0
-VectorSQL :) select c1, c2, (c1+c2) as c12, c3 from randtable(rows->50, c1->'UInt32', c2->'UInt32', c3->'String') where c12>10 and c12<20 order by c12 desc, c3 asc;
+VectorSQL :) select sum(c1) as c1_sum, count(c1) as c1_count, c1_sum/c1_count as c1_avg, c2, c3 from randtable(rows->1000, c1->'UInt32', c2->'UInt32', c3->'String') where c1>80 and (c1+c2)<500 group by c3 order by c1_count desc, c3 asc limit 10;
 
-SELECT
-    c1,
-    c2,
-    c1 + c2 AS c12,
+SELECT 
+    sum(c1) AS c1_sum, 
+    count(c1) AS c1_count, 
+    c1_sum / c1_count AS c1_avg, 
+    c2, 
     c3
-FROM randtable(rows -> 50, c1 -> 'UInt32', c2 -> 'UInt32', c3 -> 'String')
-WHERE (c12 > 10) AND (c12 < 20)
-ORDER BY
-    c12 DESC,
+FROM randtable(rows -> 1000, c1 -> 'UInt32', c2 -> 'UInt32', c3 -> 'String')
+WHERE (c1 > 80) AND ((c1 + c2) < 500)
+GROUP BY c3
+ORDER BY 
+    c1_count DESC, 
     c3 ASC
+LIMIT 10
 
-┌─c1─┬─c2─┬─c12─┬─c3────────┐
-│  5 │ 14 │  19 │ string-23 │
-│  0 │ 19 │  19 │ string-34 │
-│  0 │ 17 │  17 │ string-46 │
-│  3 │ 13 │  16 │ string-4  │
-│  3 │  9 │  12 │ string-44 │
-└────┴────┴─────┴───────────┘
-↑ Progress: 0.00 rows, 0.00 B (0.00 rows/s., 0.00 B/s.)
-5 rows in set. Elapsed: 0.006 sec.
+┌─c1_sum─┬─c1_count─┬─c1_avg─┬──c2─┬─c3─────────┐
+│    660 │        3 │    220 │ 326 │ string-363 │
+│    295 │        1 │    295 │ 175 │ string-1   │
+│    110 │        1 │    110 │ 302 │ string-100 │
+│    165 │        1 │    165 │ 273 │ string-112 │
+│    105 │        1 │    105 │ 241 │ string-125 │
+│    132 │        1 │    132 │ 252 │ string-126 │
+│    283 │        1 │    283 │  60 │ string-131 │
+│    207 │        1 │    207 │ 194 │ string-143 │
+│    116 │        1 │    116 │ 251 │ string-144 │
+│    125 │        1 │    125 │  67 │ string-15  │
+└────────┴──────────┴────────┴─────┴────────────┘
+← Progress: 0.00 rows, 0.00 B (0.00 rows/s., 0.00 B/s.) 
+10 rows in set. Elapsed: 0.006 sec. 
 ```
 
 * http-client
 
 ```
-curl -XPOST http://127.0.0.1:8123 -d "select c1, c2, (c1+c2) as c12, c3 from randtable(rows->50, c1->'UInt32', c2->'UInt32', c3->'String') where c12>10 and c12<20 order by c12 desc, c3 asc"
-14	5	19	string-33
-1	15	16	string-32
-4	12	16	string-7
-11	4	15	string-35
-10	1	11	string-31
+ curl -XPOST http://127.0.0.1:8123 -d "select sum(c1) as c1_sum, count(c1) as c1_count, c1_sum/c1_count as c1_avg, c2, c3 from randtable(rows->1000, c1->'UInt32', c2->'UInt32', c3->'String') where c1>80 and (c1+c2)<500 group by c3 order by c1_count desc, c3 asc limit 5"
+590	2	295	90	string-431
+243	2	121.5	346	string-433
+239	1	239	255	string-13
+108	1	108	318	string-15
+187	1	187	78	string-173
 ```
 
 ## Metrics

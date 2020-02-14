@@ -30,7 +30,7 @@ func (e *AliasedExpression) Eval(params IParams) (*datavalues.Value, error) {
 }
 
 func (e *AliasedExpression) Walk(visit Visit) error {
-	return nil
+	return Walk(visit, e.expr)
 }
 
 func (e *AliasedExpression) String() string {

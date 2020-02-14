@@ -8,9 +8,8 @@ import (
 	"expvar"
 	"time"
 
-	"datavalues"
-
 	"base/metric"
+	"datavalues"
 )
 
 func Append(blocks ...*DataBlock) (*DataBlock, error) {
