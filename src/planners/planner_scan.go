@@ -14,7 +14,6 @@ type ScanPlan struct {
 	Schema  string
 	Filter  *FilterPlan     `json:",omitempty"`
 	Project *ProjectionPlan `json:",omitempty"`
-	Limit   *LimitPlan      `json:",omitempty"`
 }
 
 func NewScanPlan(table string, schema string) *ScanPlan {
