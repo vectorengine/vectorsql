@@ -328,3 +328,35 @@ func Test_wantedType(t *testing.T) {
 		}
 	}
 }
+
+func TestSameType(t *testing.T) {
+	tests := []struct {
+		name    string
+		args    []*datavalues.Value
+		wantErr bool
+	}{
+		{
+			name: "sametype - pass",
+			args: []*datavalues.Value{
+				datavalues.ZeroInt(),
+				datavalues.MakeInt(7),
+			},
+			wantErr: false,
+		},
+		{
+			name: "sametype - fail",
+			args: []*datavalues.Value{
+				datavalues.ZeroInt(),
+				datavalues.ZeroString(),
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := SameType(0, 1).Validate(tt.args...); (err != nil) != tt.wantErr {
+				t.Errorf("sameType() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}

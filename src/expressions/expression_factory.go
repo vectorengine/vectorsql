@@ -45,6 +45,7 @@ var (
 		"RANGETABLE": RANGETABLE,
 		"RANDTABLE":  RANDTABLE,
 		"ZIP":        ZIP,
+		"IF":         IF,
 	}
 )
 

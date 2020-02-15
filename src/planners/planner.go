@@ -38,8 +38,6 @@ func Walk(visit Visit, plans ...IPlan) error {
 }
 
 func BuildExpressions(plan IPlan) (expressions.IExpression, error) {
-	var expr expressions.IExpression
-
 	switch t := plan.(type) {
 	case *VariablePlan:
 		return expressions.VAR(string(t.Value)), nil
@@ -56,10 +54,7 @@ func BuildExpressions(plan IPlan) (expressions.IExpression, error) {
 		if err != nil {
 			return nil, err
 		}
-		if expr, err = expressions.ExpressionFactory(t.FuncName, []interface{}{expr}); err != nil {
-			return nil, err
-		}
-		return expr, nil
+		return expressions.ExpressionFactory(t.FuncName, []interface{}{expr})
 	case *BinaryExpressionPlan:
 		left, err := BuildExpressions(t.Left)
 		if err != nil {
@@ -69,10 +64,17 @@ func BuildExpressions(plan IPlan) (expressions.IExpression, error) {
 		if err != nil {
 			return nil, err
 		}
-		if expr, err = expressions.ExpressionFactory(t.FuncName, []interface{}{left, right}); err != nil {
-			return nil, err
+		return expressions.ExpressionFactory(t.FuncName, []interface{}{left, right})
+	case *FunctionExpressionPlan:
+		exprArgs := make([]interface{}, len(t.Args))
+		for i, arg := range t.Args {
+			expr, err := BuildExpressions(arg)
+			if err != nil {
+				return nil, err
+			}
+			exprArgs[i] = expr
 		}
-		return expr, nil
+		return expressions.ExpressionFactory(t.FuncName, exprArgs)
 	default:
 		return nil, errors.Errorf("Unsupported expression plan:%s", t)
 	}

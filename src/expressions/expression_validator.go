@@ -134,7 +134,7 @@ func TypeOf(wantedType *datavalues.Value) *typeOf {
 
 func (v *typeOf) Validate(arg *datavalues.Value) error {
 	if v.wantedType.GetType() != arg.GetType() {
-		return errors.Errorf("expected type %v but got %v", v.wantedType.GetType(), arg.GetType())
+		return errors.Errorf("expected type %v but got %v", v.wantedType.Document(), arg.Document())
 	}
 	return nil
 }
@@ -225,6 +225,32 @@ func (v *arg) Document() docs.Documentation {
 		docs.Text(fmt.Sprintf("the %s argument", docs.Ordinal(v.i+1))),
 		v.validator.Document(),
 	)
+}
+
+type sameType struct {
+	idxs []int
+}
+
+func SameType(idx ...int) *sameType {
+	return &sameType{idxs: idx}
+}
+
+func (v *sameType) Validate(args ...*datavalues.Value) error {
+	var current *datavalues.Value
+	for i, idx := range v.idxs {
+		arg := args[idx]
+		if current == nil {
+			current = arg
+		}
+		if current.GetType() != arg.GetType() {
+			return fmt.Errorf("bad argument type at index %v, wanted:%v, got:%v", i, current.Document(), arg.Document())
+		}
+	}
+	return nil
+}
+
+func (v *sameType) Document() docs.Documentation {
+	return docs.Text(fmt.Sprintf("index %+v type must be same", v.idxs))
 }
 
 type allArgs struct {

@@ -198,6 +198,23 @@ Averages elements in the group.
 
 ---
 
+## IF
+### Calling
+
+
+
+### Arguments
+
+
+* exactly 3 arguments must be provided
+* the 1st argument must be of type Bool  
+* index [1 2] type must be same
+
+### Description
+IF (<cond>, <expr1>, <expr2>). Evaluates <cond>, then evaluates <expr1> if the condition is true, or <expr2> otherwise.
+
+---
+
 ## LIKE
 ### Calling
 

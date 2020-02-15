@@ -18,11 +18,19 @@ type GroupByPlan struct {
 }
 
 func NewGroupByPlan(projects *MapPlan, groupbys *MapPlan) *GroupByPlan {
+	return &GroupByPlan{
+		Name:     "GroupByPlan",
+		Projects: projects,
+		GroupBys: groupbys,
+	}
+}
+
+func (plan *GroupByPlan) Build() error {
 	hasAggregate := false
-	for _, plan := range projects.SubPlans {
+	for _, plan := range plan.Projects.SubPlans {
 		exprs, err := BuildExpressions(plan)
 		if err != nil {
-			return nil
+			return err
 		}
 		if err := expressions.Walk(func(expr expressions.IExpression) (bool, error) {
 			switch expr.(type) {
@@ -32,21 +40,13 @@ func NewGroupByPlan(projects *MapPlan, groupbys *MapPlan) *GroupByPlan {
 			}
 			return true, nil
 		}, exprs); err != nil {
-			return nil
+			return err
 		}
 		if hasAggregate {
 			break
 		}
 	}
-	return &GroupByPlan{
-		Name:         "GroupByPlan",
-		HasAggregate: hasAggregate,
-		Projects:     projects,
-		GroupBys:     groupbys,
-	}
-}
-
-func (plan *GroupByPlan) Build() error {
+	plan.HasAggregate = hasAggregate
 	return nil
 }
 
