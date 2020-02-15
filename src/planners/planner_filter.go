@@ -6,6 +6,7 @@ package planners
 
 import (
 	"encoding/json"
+	"fmt"
 )
 
 type FilterPlan struct {
@@ -21,6 +22,14 @@ func NewFilterPlan(plan IPlan) *FilterPlan {
 }
 
 func (plan *FilterPlan) Build() error {
+	// Check Filter plan.
+	hasAggregate, err := CheckAggregateExpressions(plan.SubPlan)
+	if err != nil {
+		return err
+	}
+	if hasAggregate {
+		return fmt.Errorf("Unsupported aggregate expression in Where")
+	}
 	return plan.SubPlan.Build()
 }
 

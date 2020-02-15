@@ -6,8 +6,7 @@ package planners
 
 import (
 	"encoding/json"
-
-	"expressions"
+	"fmt"
 )
 
 type GroupByPlan struct {
@@ -26,25 +25,19 @@ func NewGroupByPlan(projects *MapPlan, groupbys *MapPlan) *GroupByPlan {
 }
 
 func (plan *GroupByPlan) Build() error {
-	hasAggregate := false
-	for _, plan := range plan.Projects.SubPlans {
-		exprs, err := BuildExpressions(plan)
-		if err != nil {
-			return err
-		}
-		if err := expressions.Walk(func(expr expressions.IExpression) (bool, error) {
-			switch expr.(type) {
-			case *expressions.AggregateExpression:
-				hasAggregate = true
-				return false, nil
-			}
-			return true, nil
-		}, exprs); err != nil {
-			return err
-		}
-		if hasAggregate {
-			break
-		}
+	// Check GroupBy plan.
+	hasAggregate, err := CheckAggregateExpressions(plan.GroupBys)
+	if err != nil {
+		return err
+	}
+	if hasAggregate {
+		return fmt.Errorf("Unsupported aggregate expression in GroupBy")
+	}
+
+	// Check Project plan.
+	hasAggregate, err = CheckAggregateExpressions(plan.Projects)
+	if err != nil {
+		return err
 	}
 	plan.HasAggregate = hasAggregate
 	return nil

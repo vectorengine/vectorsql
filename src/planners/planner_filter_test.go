@@ -12,9 +12,10 @@ import (
 
 func TestFilterPlan(t *testing.T) {
 	tests := []struct {
-		name   string
-		plan   IPlan
-		expect string
+		name      string
+		plan      IPlan
+		expect    string
+		errString string
 	}{
 		{
 			name: "simple",
@@ -63,12 +64,33 @@ func TestFilterPlan(t *testing.T) {
     }
 }`,
 		},
+		{
+			name: "simple",
+			plan: NewBinaryExpressionPlan(
+				"OR",
+				NewBinaryExpressionPlan(
+					"=",
+					NewVariablePlan("name"),
+					NewConstantPlan("db1"),
+				),
+				NewUnaryExpressionPlan(
+					"SUM",
+					NewVariablePlan("name"),
+				),
+			),
+			errString: "Unsupported aggregate expression in Where",
+		},
 	}
 
 	for _, test := range tests {
 		plan := NewFilterPlan(test.plan)
 		err := plan.Build()
-		assert.Nil(t, err)
+		if test.errString == "" {
+			assert.Nil(t, err)
+		} else {
+			assert.Equal(t, test.errString, err.Error())
+			continue
+		}
 
 		err = plan.Walk(func(plan IPlan) (bool, error) {
 			return true, nil

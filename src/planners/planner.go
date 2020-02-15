@@ -76,6 +76,28 @@ func BuildExpressions(plan IPlan) (expressions.IExpression, error) {
 		}
 		return expressions.ExpressionFactory(t.FuncName, exprArgs)
 	default:
-		return nil, errors.Errorf("Unsupported expression plan:%s", t)
+		return nil, errors.Errorf("Unsupported expression plan:%T", t)
 	}
+}
+
+func CheckAggregateExpressions(plan IPlan) (bool, error) {
+	hasAggregate := false
+	if err := Walk(func(p IPlan) (bool, error) {
+		switch t := p.(type) {
+		case *UnaryExpressionPlan:
+			expr, err := expressions.ExpressionFactory(t.FuncName, []interface{}{"NULL"})
+			if err != nil {
+				return false, err
+			}
+			switch expr.(type) {
+			case *expressions.AggregateExpression:
+				hasAggregate = true
+				return false, nil
+			}
+		}
+		return true, nil
+	}, plan); err != nil {
+		return false, err
+	}
+	return hasAggregate, nil
 }
