@@ -12,7 +12,7 @@ import (
 	"strings"
 )
 
-func (block *DataBlock) SortByPlan(plan *planners.OrderByPlan) error {
+func (block *DataBlock) OrderByPlan(plan *planners.OrderByPlan) error {
 	var fields []string
 
 	// Find the column name which all the orderby used.

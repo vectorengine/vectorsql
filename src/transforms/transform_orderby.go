@@ -52,7 +52,7 @@ func (t *OrderByTransform) Execute() {
 				if err != nil {
 					out.Send(err)
 				} else {
-					if err := block.SortByPlan(t.plan); err != nil {
+					if err := block.OrderByPlan(t.plan); err != nil {
 						out.Send(err)
 					} else {
 						out.Send(block)
