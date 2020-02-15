@@ -18,14 +18,14 @@ type TSVOutputFormat struct {
 	sampleBlock *datablocks.DataBlock
 }
 
-func NewTSVOutputFormat(sampleBlock *datablocks.DataBlock, writer io.Writer) datablocks.IDataBlockOutputFormat {
+func NewTSVOutputFormat(sampleBlock *datablocks.DataBlock, writer io.Writer) IDataBlockOutputFormat {
 	return &TSVOutputFormat{
 		writer:    writer,
 		withNames: false,
 	}
 }
 
-func NewTSVWithNamesOutputFormat(sampleBlock *datablocks.DataBlock, writer io.Writer) datablocks.IDataBlockOutputFormat {
+func NewTSVWithNamesOutputFormat(sampleBlock *datablocks.DataBlock, writer io.Writer) IDataBlockOutputFormat {
 	return &TSVOutputFormat{
 		writer:    writer,
 		withNames: true,

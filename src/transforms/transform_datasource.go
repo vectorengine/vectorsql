@@ -5,17 +5,17 @@
 package transforms
 
 import (
-	"datablocks"
+	"datastreams"
 	"processors"
 )
 
 type DataSourceTransform struct {
 	ctx   *TransformContext
-	input datablocks.IDataBlockInputStream
+	input datastreams.IDataBlockInputStream
 	processors.BaseProcessor
 }
 
-func NewDataSourceTransform(ctx *TransformContext, input datablocks.IDataBlockInputStream) processors.IProcessor {
+func NewDataSourceTransform(ctx *TransformContext, input datastreams.IDataBlockInputStream) processors.IProcessor {
 	return &DataSourceTransform{
 		ctx:           ctx,
 		input:         input,

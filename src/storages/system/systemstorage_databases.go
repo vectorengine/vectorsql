@@ -38,11 +38,11 @@ func (storage *SystemDatabasesStorage) Columns() []*columns.Column {
 	}
 }
 
-func (storage *SystemDatabasesStorage) GetOutputStream(session *sessions.Session, scan *planners.ScanPlan) (datablocks.IDataBlockOutputStream, error) {
+func (storage *SystemDatabasesStorage) GetOutputStream(session *sessions.Session, scan *planners.ScanPlan) (datastreams.IDataBlockOutputStream, error) {
 	return nil, errors.New("Couldn't find outputstream")
 }
 
-func (storage *SystemDatabasesStorage) GetInputStream(session *sessions.Session, scan *planners.ScanPlan) (datablocks.IDataBlockInputStream, error) {
+func (storage *SystemDatabasesStorage) GetInputStream(session *sessions.Session, scan *planners.ScanPlan) (datastreams.IDataBlockInputStream, error) {
 	ctx := storage.ctx
 	log := ctx.log
 

@@ -20,10 +20,10 @@ type CustomFormatBlockOutputStream struct {
 	writePrefix bool
 	writeSuffix bool
 
-	format datablocks.IDataBlockOutputFormat
+	format dataformats.IDataBlockOutputFormat
 }
 
-func NewCustomFormatBlockOutputStream(header *datablocks.DataBlock, writer io.Writer, formatName string) datablocks.IDataBlockOutputStream {
+func NewCustomFormatBlockOutputStream(header *datablocks.DataBlock, writer io.Writer, formatName string) IDataBlockOutputStream {
 	if formatName == "Native" {
 		return NewNativeBlockOutputStream(writer)
 	}

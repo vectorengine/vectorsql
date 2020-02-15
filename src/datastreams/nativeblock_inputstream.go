@@ -11,7 +11,7 @@ import (
 type NativeBlockInputStream struct {
 }
 
-func NewNativeBlockInputStream() datablocks.IDataBlockInputStream {
+func NewNativeBlockInputStream() IDataBlockInputStream {
 	return &NativeBlockInputStream{}
 }
 

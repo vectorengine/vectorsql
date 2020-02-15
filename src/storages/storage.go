@@ -6,7 +6,7 @@ package storages
 
 import (
 	"columns"
-	"datablocks"
+	"datastreams"
 	"planners"
 	"sessions"
 )
@@ -14,6 +14,6 @@ import (
 type IStorage interface {
 	Name() string
 	Columns() []*columns.Column
-	GetInputStream(*sessions.Session, *planners.ScanPlan) (datablocks.IDataBlockInputStream, error)
-	GetOutputStream(*sessions.Session, *planners.ScanPlan) (datablocks.IDataBlockOutputStream, error)
+	GetInputStream(*sessions.Session, *planners.ScanPlan) (datastreams.IDataBlockInputStream, error)
+	GetOutputStream(*sessions.Session, *planners.ScanPlan) (datastreams.IDataBlockOutputStream, error)
 }

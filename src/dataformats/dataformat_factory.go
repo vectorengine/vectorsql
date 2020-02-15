@@ -10,8 +10,8 @@ import (
 )
 
 type (
-	InputCreator  func(sampleBlock *datablocks.DataBlock, reader io.Reader) datablocks.IDataBlockInputFormat
-	OutputCreator func(sampleBlock *datablocks.DataBlock, writer io.Writer) datablocks.IDataBlockOutputFormat
+	InputCreator  func(sampleBlock *datablocks.DataBlock, reader io.Reader) IDataBlockInputFormat
+	OutputCreator func(sampleBlock *datablocks.DataBlock, writer io.Writer) IDataBlockOutputFormat
 )
 
 var (

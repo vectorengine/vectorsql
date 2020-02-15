@@ -19,7 +19,7 @@ type NativeBlockOutputStream struct {
 	writer io.Writer
 }
 
-func NewNativeBlockOutputStream(writer io.Writer) datablocks.IDataBlockOutputStream {
+func NewNativeBlockOutputStream(writer io.Writer) IDataBlockOutputStream {
 	return &NativeBlockOutputStream{
 		writer: writer,
 	}

@@ -8,6 +8,7 @@ import (
 	"base/errors"
 	"columns"
 	"datablocks"
+	"datastreams"
 	"datatypes"
 	"datavalues"
 	"planners"
@@ -34,11 +35,11 @@ func (storage *SystemNumbersStorage) Columns() []*columns.Column {
 	}
 }
 
-func (storage *SystemNumbersStorage) GetOutputStream(session *sessions.Session, scan *planners.ScanPlan) (datablocks.IDataBlockOutputStream, error) {
+func (storage *SystemNumbersStorage) GetOutputStream(session *sessions.Session, scan *planners.ScanPlan) (datastreams.IDataBlockOutputStream, error) {
 	return nil, errors.New("Couldn't find outputstream")
 }
 
-func (storage *SystemNumbersStorage) GetInputStream(session *sessions.Session, scan *planners.ScanPlan) (datablocks.IDataBlockInputStream, error) {
+func (storage *SystemNumbersStorage) GetInputStream(session *sessions.Session, scan *planners.ScanPlan) (datastreams.IDataBlockInputStream, error) {
 	return NewSystemNumbersBlockInputStream(storage), nil
 }
 

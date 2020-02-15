@@ -16,7 +16,7 @@ type OneBlockInputStream struct {
 	current int
 }
 
-func NewOneBlockInputStream(blocks ...*datablocks.DataBlock) datablocks.IDataBlockInputStream {
+func NewOneBlockInputStream(blocks ...*datablocks.DataBlock) IDataBlockInputStream {
 	return &OneBlockInputStream{
 		blocks: blocks,
 	}
