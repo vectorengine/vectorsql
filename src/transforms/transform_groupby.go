@@ -27,9 +27,7 @@ func NewGroupByTransform(ctx *TransformContext, plan *planners.GroupByPlan) proc
 
 func (t *GroupByTransform) Execute() {
 	var wg sync.WaitGroup
-	var err error
 	var block *datablocks.DataBlock
-	var errors []error
 
 	out := t.Out()
 	defer out.Close()
@@ -40,19 +38,17 @@ func (t *GroupByTransform) Execute() {
 			if block == nil {
 				block = y
 			} else {
-				if block, err = datablocks.Append(block, y); err != nil {
-					errors = append(errors, err)
+				if err := block.Append(y); err != nil {
+					out.Send(err)
 				}
 			}
 		case error:
-			errors = append(errors, y)
+			out.Send(y)
 		}
 	}
 	onDone := func() {
 		defer wg.Done()
-		if len(errors) > 0 {
-			out.Send(errors[0])
-		} else {
+		if block != nil {
 			if blocks, err := block.GroupByPlan(t.plan); err != nil {
 				out.Send(err)
 			} else {

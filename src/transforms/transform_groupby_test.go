@@ -22,7 +22,7 @@ func TestGroupByTransform(t *testing.T) {
 	tests := []struct {
 		name   string
 		plan   *planners.GroupByPlan
-		source *datablocks.DataBlock
+		source []interface{}
 		expect *datablocks.DataBlock
 	}{
 		{
@@ -34,16 +34,17 @@ func TestGroupByTransform(t *testing.T) {
 				),
 				planners.NewMapPlan(),
 			),
-			source: mocks.NewBlockFromSlice(
-				[]*columns.Column{
-					{Name: "name", DataType: datatypes.NewStringDataType()},
-					{Name: "age", DataType: datatypes.NewInt32DataType()},
-				},
-				[]interface{}{"x", 11},
-				[]interface{}{"x", 15},
-				[]interface{}{"y", 19},
-				[]interface{}{"z", 20},
-			),
+			source: mocks.NewSourceFromSlice(
+				mocks.NewBlockFromSlice(
+					[]*columns.Column{
+						{Name: "name", DataType: datatypes.NewStringDataType()},
+						{Name: "age", DataType: datatypes.NewInt32DataType()},
+					},
+					[]interface{}{"x", 11},
+					[]interface{}{"x", 15},
+					[]interface{}{"y", 19},
+					[]interface{}{"z", 20},
+				)),
 			expect: mocks.NewBlockFromSlice(
 				[]*columns.Column{
 					{Name: "name", DataType: datatypes.NewStringDataType()},
@@ -63,16 +64,17 @@ func TestGroupByTransform(t *testing.T) {
 				),
 				planners.NewMapPlan(),
 			),
-			source: mocks.NewBlockFromSlice(
-				[]*columns.Column{
-					{Name: "name", DataType: datatypes.NewStringDataType()},
-					{Name: "age", DataType: datatypes.NewInt32DataType()},
-				},
-				[]interface{}{"x", 11},
-				[]interface{}{"x", 15},
-				[]interface{}{"y", 19},
-				[]interface{}{"z", 20},
-			),
+			source: mocks.NewSourceFromSlice(
+				mocks.NewBlockFromSlice(
+					[]*columns.Column{
+						{Name: "name", DataType: datatypes.NewStringDataType()},
+						{Name: "age", DataType: datatypes.NewInt32DataType()},
+					},
+					[]interface{}{"x", 11},
+					[]interface{}{"x", 15},
+					[]interface{}{"y", 19},
+					[]interface{}{"z", 20},
+				)),
 			expect: mocks.NewBlockFromSlice(
 				[]*columns.Column{
 					{Name: "age", DataType: datatypes.NewInt32DataType()},
@@ -93,16 +95,17 @@ func TestGroupByTransform(t *testing.T) {
 				),
 				planners.NewMapPlan(),
 			),
-			source: mocks.NewBlockFromSlice(
-				[]*columns.Column{
-					{Name: "name", DataType: datatypes.NewStringDataType()},
-					{Name: "age", DataType: datatypes.NewInt32DataType()},
-				},
-				[]interface{}{"x", 11},
-				[]interface{}{"x", 15},
-				[]interface{}{"y", 19},
-				[]interface{}{"z", 20},
-			),
+			source: mocks.NewSourceFromSlice(
+				mocks.NewBlockFromSlice(
+					[]*columns.Column{
+						{Name: "name", DataType: datatypes.NewStringDataType()},
+						{Name: "age", DataType: datatypes.NewInt32DataType()},
+					},
+					[]interface{}{"x", 11},
+					[]interface{}{"x", 15},
+					[]interface{}{"y", 19},
+					[]interface{}{"z", 20},
+				)),
 			expect: mocks.NewBlockFromSlice(
 				[]*columns.Column{
 					{Name: "xage", DataType: datatypes.NewInt32DataType()},

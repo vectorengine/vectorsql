@@ -28,8 +28,7 @@ func NewOrderByTransform(ctx *TransformContext, plan *planners.OrderByPlan) proc
 
 func (t *OrderByTransform) Execute() {
 	var wg sync.WaitGroup
-	var errors []error
-	var blocks []*datablocks.DataBlock
+	var block *datablocks.DataBlock
 
 	out := t.Out()
 	defer out.Close()
@@ -37,27 +36,24 @@ func (t *OrderByTransform) Execute() {
 	onNext := func(x interface{}) {
 		switch y := x.(type) {
 		case *datablocks.DataBlock:
-			blocks = append(blocks, y)
+			if block == nil {
+				block = y
+			} else {
+				if err := block.Append(y); err != nil {
+					out.Send(err)
+				}
+			}
 		case error:
-			errors = append(errors, y)
+			out.Send(y)
 		}
 	}
 	onDone := func() {
 		defer wg.Done()
-		if len(errors) > 0 {
-			out.Send(errors[0])
-		} else {
-			if blocks != nil {
-				block, err := datablocks.Append(blocks...)
-				if err != nil {
-					out.Send(err)
-				} else {
-					if err := block.OrderByPlan(t.plan); err != nil {
-						out.Send(err)
-					} else {
-						out.Send(block)
-					}
-				}
+		if block != nil {
+			if err := block.OrderByPlan(t.plan); err != nil {
+				out.Send(err)
+			} else {
+				out.Send(block)
 			}
 		}
 	}

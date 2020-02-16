@@ -23,7 +23,7 @@ func TestOrderByExecutor(t *testing.T) {
 	tests := []struct {
 		name   string
 		plan   planners.IPlan
-		source *datablocks.DataBlock
+		source []interface{}
 		expect *datablocks.DataBlock
 	}{
 		{
@@ -38,16 +38,17 @@ func TestOrderByExecutor(t *testing.T) {
 					Direction:  "desc",
 				},
 			),
-			source: mocks.NewBlockFromSlice(
-				[]*columns.Column{
-					{Name: "name", DataType: datatypes.NewStringDataType()},
-					{Name: "age", DataType: datatypes.NewInt32DataType()},
-				},
-				[]interface{}{"x", 11},
-				[]interface{}{"z", 13},
-				[]interface{}{"y", 12},
-				[]interface{}{"y", 13},
-			),
+			source: mocks.NewSourceFromSlice(
+				mocks.NewBlockFromSlice(
+					[]*columns.Column{
+						{Name: "name", DataType: datatypes.NewStringDataType()},
+						{Name: "age", DataType: datatypes.NewInt32DataType()},
+					},
+					[]interface{}{"x", 11},
+					[]interface{}{"z", 13},
+					[]interface{}{"y", 12},
+					[]interface{}{"y", 13},
+				)),
 			expect: mocks.NewBlockFromSlice(
 				[]*columns.Column{
 					{Name: "name", DataType: datatypes.NewStringDataType()},

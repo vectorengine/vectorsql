@@ -39,15 +39,6 @@ func (block *DataBlock) Clone() *DataBlock {
 	return NewDataBlock(block.Columns())
 }
 
-func (block *DataBlock) SetToLast() {
-	if block.seqs == nil {
-		block.seqs = make([]*datavalues.Value, 1)
-		block.seqs[0] = datavalues.MakeInt(block.NumRows() - 1)
-	} else {
-		block.seqs = block.seqs[len(block.seqs)-1:]
-	}
-}
-
 func (block *DataBlock) setSeqs(seqs []*datavalues.Value) {
 	block.seqs = seqs
 	block.immutable = true

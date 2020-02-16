@@ -16,7 +16,7 @@ type MockBlockInputStream struct {
 	blocks []interface{}
 }
 
-func NewMockBlockInputStream(datas ...interface{}) *MockBlockInputStream {
+func NewMockBlockInputStream(datas []interface{}) *MockBlockInputStream {
 	return &MockBlockInputStream{
 		blocks: datas,
 	}
@@ -31,18 +31,19 @@ func (stream *MockBlockInputStream) Read() (*datablocks.DataBlock, error) {
 	defer stream.mu.RUnlock()
 
 	cursor := stream.cursor
-	if stream.cursor >= len(stream.blocks) {
+	if cursor >= len(stream.blocks) {
 		return nil, nil
 	}
-	stream.cursor += 1
 	v := stream.blocks[cursor]
+	stream.cursor++
 	switch v := v.(type) {
 	case error:
 		return nil, v
 	case *datablocks.DataBlock:
 		return v, nil
+	default:
+		panic(v)
 	}
-	return nil, nil
 }
 
 func (stream *MockBlockInputStream) Insert(v *datablocks.DataBlock) error {

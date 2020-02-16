@@ -26,7 +26,15 @@ func NewBlockFromSlice(cols []*columns.Column, datas ...[]interface{}) *databloc
 	return block
 }
 
+func NewSourceFromSlice(datas ...interface{}) []interface{} {
+	return datas
+}
+
 func DataBlockEqual(a *datablocks.DataBlock, b *datablocks.DataBlock) bool {
+	if a == nil && b == nil {
+		return true
+	}
+
 	acolumns := a.Columns()
 	bcolumns := b.Columns()
 	if !reflect.DeepEqual(acolumns, bcolumns) {

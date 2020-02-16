@@ -5,7 +5,9 @@
 package transforms
 
 import (
+	"base/errors"
 	"context"
+	"fmt"
 	"testing"
 
 	"columns"
@@ -20,13 +22,14 @@ import (
 
 func TestOrderByTransfrom(t *testing.T) {
 	tests := []struct {
-		name   string
-		plan   planners.IPlan
-		source *datablocks.DataBlock
-		expect *datablocks.DataBlock
+		name      string
+		plan      planners.IPlan
+		source    []interface{}
+		expect    *datablocks.DataBlock
+		errString string
 	}{
 		{
-			name: "simple",
+			name: "simple-pass",
 			plan: planners.NewOrderByPlan(
 				planners.Order{
 					Expression: planners.NewVariablePlan("name"),
@@ -37,26 +40,62 @@ func TestOrderByTransfrom(t *testing.T) {
 					Direction:  "desc",
 				},
 			),
-			source: mocks.NewBlockFromSlice(
-				[]*columns.Column{
-					{Name: "name", DataType: datatypes.NewStringDataType()},
-					{Name: "age", DataType: datatypes.NewInt32DataType()},
-				},
-				[]interface{}{"x", 11},
-				[]interface{}{"z", 13},
-				[]interface{}{"y", 12},
-				[]interface{}{"y", 13},
+			source: mocks.NewSourceFromSlice(
+				mocks.NewBlockFromSlice(
+					[]*columns.Column{
+						{Name: "name", DataType: datatypes.NewStringDataType()},
+						{Name: "age", DataType: datatypes.NewInt32DataType()},
+					},
+					[]interface{}{"x", 11},
+					[]interface{}{"z", 13},
+					[]interface{}{"y", 12},
+				),
+				mocks.NewBlockFromSlice(
+					[]*columns.Column{
+						{Name: "name", DataType: datatypes.NewStringDataType()},
+						{Name: "age", DataType: datatypes.NewInt32DataType()},
+					},
+					[]interface{}{"x", 21},
+					[]interface{}{"z", 23},
+					[]interface{}{"y", 22},
+				),
 			),
 			expect: mocks.NewBlockFromSlice(
 				[]*columns.Column{
 					{Name: "name", DataType: datatypes.NewStringDataType()},
 					{Name: "age", DataType: datatypes.NewInt32DataType()},
 				},
+				[]interface{}{"x", 21},
 				[]interface{}{"x", 11},
-				[]interface{}{"y", 13},
+				[]interface{}{"y", 22},
 				[]interface{}{"y", 12},
+				[]interface{}{"z", 23},
 				[]interface{}{"z", 13},
 			),
+		},
+		{
+			name: "simple-error-pass",
+			plan: planners.NewOrderByPlan(
+				planners.Order{
+					Expression: planners.NewVariablePlan("name"),
+					Direction:  "asc",
+				},
+				planners.Order{
+					Expression: planners.NewVariablePlan("age"),
+					Direction:  "desc",
+				},
+			),
+			source: mocks.NewSourceFromSlice(
+				mocks.NewBlockFromSlice(
+					[]*columns.Column{
+						{Name: "name", DataType: datatypes.NewStringDataType()},
+						{Name: "age", DataType: datatypes.NewInt32DataType()},
+					},
+					[]interface{}{"x", 11},
+				),
+				errors.New("pass-by-error"),
+			),
+			errString: "pass-by-error",
 		},
 	}
 
@@ -67,22 +106,35 @@ func TestOrderByTransfrom(t *testing.T) {
 
 		stream := mocks.NewMockBlockInputStream(test.source)
 		datasource := NewDataSourceTransform(ctx, stream)
-
 		orderby := NewOrderByTransform(ctx, test.plan.(*planners.OrderByPlan))
-
 		sink := processors.NewSink("sink")
+
 		pipeline := processors.NewPipeline(context.Background())
 		pipeline.Add(datasource)
 		pipeline.Add(orderby)
 		pipeline.Add(sink)
 		pipeline.Run()
 
+		var actual *datablocks.DataBlock
 		err := pipeline.Wait(func(x interface{}) error {
-			actual := x.(*datablocks.DataBlock)
-			expect := test.expect
-			assert.True(t, mocks.DataBlockEqual(actual, expect))
+			switch x := x.(type) {
+			case *datablocks.DataBlock:
+				if actual == nil {
+					actual = x
+				} else {
+					err := actual.Append(x)
+					assert.Nil(t, err)
+				}
+			}
 			return nil
 		})
-		assert.Nil(t, err)
+
+		expect := test.expect
+		if test.errString != "" {
+			assert.Equal(t, test.errString, fmt.Sprintf("%s", err))
+		} else {
+			assert.Nil(t, err)
+			assert.True(t, mocks.DataBlockEqual(expect, actual))
+		}
 	}
 }

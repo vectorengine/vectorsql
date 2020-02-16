@@ -20,19 +20,19 @@ import (
 func TestDataSourceTransfrom(t *testing.T) {
 	tests := []struct {
 		name   string
-		source *datablocks.DataBlock
+		source []interface{}
 		expect *datablocks.DataBlock
 	}{
 		{
 			name: "simple",
-			source: mocks.NewBlockFromSlice(
+			source: mocks.NewSourceFromSlice(mocks.NewBlockFromSlice(
 				[]*columns.Column{
 					{Name: "name", DataType: datatypes.NewStringDataType()},
 				},
 				[]interface{}{"x"},
 				[]interface{}{"y"},
 				[]interface{}{"z"},
-			),
+			)),
 			expect: mocks.NewBlockFromSlice(
 				[]*columns.Column{
 					{Name: "name", DataType: datatypes.NewStringDataType()},

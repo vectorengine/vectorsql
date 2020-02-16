@@ -12,18 +12,17 @@ import (
 	"datavalues"
 )
 
-func Append(blocks ...*DataBlock) (*DataBlock, error) {
+func (block *DataBlock) Append(blocks ...*DataBlock) error {
 	// TODO(BohuTANG): Check column
-	block := NewDataBlock(blocks[0].Columns())
 	for j := range blocks {
 		for i := range blocks[j].values {
 			block.values[i].values = append(block.values[i].values, blocks[j].values[i].values...)
 		}
 	}
-	return block, nil
+	return nil
 }
 
-func Split(block *DataBlock, chunksize int) []*DataBlock {
+func (block *DataBlock) Split(chunksize int) []*DataBlock {
 	defer expvar.Get(metric_datablock_split_sec).(metric.Metric).Record(time.Now())
 
 	cols := block.Columns()
@@ -50,4 +49,13 @@ func Split(block *DataBlock, chunksize int) []*DataBlock {
 		}
 	}
 	return blocks
+}
+
+func (block *DataBlock) SetToLast() {
+	if block.seqs == nil {
+		block.seqs = make([]*datavalues.Value, 1)
+		block.seqs[0] = datavalues.MakeInt(block.NumRows() - 1)
+	} else {
+		block.seqs = block.seqs[len(block.seqs)-1:]
+	}
 }

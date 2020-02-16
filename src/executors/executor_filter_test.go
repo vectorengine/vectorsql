@@ -23,7 +23,7 @@ func TestFilterExecutor(t *testing.T) {
 	tests := []struct {
 		name   string
 		plan   planners.IPlan
-		source *datablocks.DataBlock
+		source []interface{}
 		expect *datablocks.DataBlock
 	}{
 		{
@@ -34,15 +34,16 @@ func TestFilterExecutor(t *testing.T) {
 					planners.NewVariablePlan("name"),
 					planners.NewConstantPlan("y"),
 				)),
-			source: mocks.NewBlockFromSlice(
-				[]*columns.Column{
-					{Name: "name", DataType: datatypes.NewStringDataType()},
-					{Name: "age", DataType: datatypes.NewInt32DataType()},
-				},
-				[]interface{}{"x", 10},
-				[]interface{}{"y", 10},
-				[]interface{}{"z", 10},
-			),
+			source: mocks.NewSourceFromSlice(
+				mocks.NewBlockFromSlice(
+					[]*columns.Column{
+						{Name: "name", DataType: datatypes.NewStringDataType()},
+						{Name: "age", DataType: datatypes.NewInt32DataType()},
+					},
+					[]interface{}{"x", 10},
+					[]interface{}{"y", 10},
+					[]interface{}{"z", 10},
+				)),
 			expect: mocks.NewBlockFromSlice(
 				[]*columns.Column{
 					{Name: "name", DataType: datatypes.NewStringDataType()},
