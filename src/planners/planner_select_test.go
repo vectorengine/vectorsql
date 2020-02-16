@@ -54,13 +54,15 @@ func TestSelectPlan(t *testing.T) {
 		{
 			name: "filter",
 			query: `SELECT 
+    IF(c1>10, c2, c2),
     sum(c1) AS c1_sum, 
     count(c1) AS c1_count, 
     c1_sum / c1_count AS c1_avg, 
     c2, 
+    c2+1,
     c3
 FROM randtable(rows -> 1000, c1 -> 'UInt32', c2 -> 'UInt32', c3 -> 'String')
-WHERE (c1 > 80) AND ((c1 + c2) < 500)
+WHERE (c1 > 80) AND ((c1 + c2) < 500) OR (c2>10)
 GROUP BY c3
 ORDER BY 
     c1_count DESC, 
@@ -150,37 +152,53 @@ LIMIT 10
                 "Name": "FilterPlan",
                 "SubPlan": {
                     "Name": "BinaryExpressionPlan",
-                    "FuncName": "AND",
+                    "FuncName": "OR",
                     "Left": {
                         "Name": "BinaryExpressionPlan",
-                        "FuncName": "\u003e",
-                        "Left": {
-                            "Name": "VariablePlan",
-                            "Value": "c1"
-                        },
-                        "Right": {
-                            "Name": "ConstantPlan",
-                            "Value": 80
-                        }
-                    },
-                    "Right": {
-                        "Name": "BinaryExpressionPlan",
-                        "FuncName": "\u003c",
+                        "FuncName": "AND",
                         "Left": {
                             "Name": "BinaryExpressionPlan",
-                            "FuncName": "+",
+                            "FuncName": "\u003e",
                             "Left": {
                                 "Name": "VariablePlan",
                                 "Value": "c1"
                             },
                             "Right": {
-                                "Name": "VariablePlan",
-                                "Value": "c2"
+                                "Name": "ConstantPlan",
+                                "Value": 80
                             }
                         },
                         "Right": {
+                            "Name": "BinaryExpressionPlan",
+                            "FuncName": "\u003c",
+                            "Left": {
+                                "Name": "BinaryExpressionPlan",
+                                "FuncName": "+",
+                                "Left": {
+                                    "Name": "VariablePlan",
+                                    "Value": "c1"
+                                },
+                                "Right": {
+                                    "Name": "VariablePlan",
+                                    "Value": "c2"
+                                }
+                            },
+                            "Right": {
+                                "Name": "ConstantPlan",
+                                "Value": 500
+                            }
+                        }
+                    },
+                    "Right": {
+                        "Name": "BinaryExpressionPlan",
+                        "FuncName": "\u003e",
+                        "Left": {
+                            "Name": "VariablePlan",
+                            "Value": "c2"
+                        },
+                        "Right": {
                             "Name": "ConstantPlan",
-                            "Value": 500
+                            "Value": 10
                         }
                     }
                 }
@@ -191,6 +209,32 @@ LIMIT 10
                 "Projects": {
                     "Name": "MapPlan",
                     "SubPlans": [
+                        {
+                            "Name": "FunctionExpressionPlan",
+                            "FuncName": "IF",
+                            "Args": [
+                                {
+                                    "Name": "BinaryExpressionPlan",
+                                    "FuncName": "\u003e",
+                                    "Left": {
+                                        "Name": "VariablePlan",
+                                        "Value": "c1"
+                                    },
+                                    "Right": {
+                                        "Name": "ConstantPlan",
+                                        "Value": 10
+                                    }
+                                },
+                                {
+                                    "Name": "VariablePlan",
+                                    "Value": "c2"
+                                },
+                                {
+                                    "Name": "VariablePlan",
+                                    "Value": "c2"
+                                }
+                            ]
+                        },
                         {
                             "Name": "AliasedExpressionPlan",
                             "As": "c1_sum",
@@ -242,6 +286,18 @@ LIMIT 10
                         {
                             "Name": "VariablePlan",
                             "Value": "c2"
+                        },
+                        {
+                            "Name": "BinaryExpressionPlan",
+                            "FuncName": "+",
+                            "Left": {
+                                "Name": "VariablePlan",
+                                "Value": "c2"
+                            },
+                            "Right": {
+                                "Name": "ConstantPlan",
+                                "Value": 1
+                            }
                         },
                         {
                             "Name": "VariablePlan",
@@ -295,6 +351,32 @@ LIMIT 10
                     "Name": "MapPlan",
                     "SubPlans": [
                         {
+                            "Name": "FunctionExpressionPlan",
+                            "FuncName": "IF",
+                            "Args": [
+                                {
+                                    "Name": "BinaryExpressionPlan",
+                                    "FuncName": "\u003e",
+                                    "Left": {
+                                        "Name": "VariablePlan",
+                                        "Value": "c1"
+                                    },
+                                    "Right": {
+                                        "Name": "ConstantPlan",
+                                        "Value": 10
+                                    }
+                                },
+                                {
+                                    "Name": "VariablePlan",
+                                    "Value": "c2"
+                                },
+                                {
+                                    "Name": "VariablePlan",
+                                    "Value": "c2"
+                                }
+                            ]
+                        },
+                        {
                             "Name": "AliasedExpressionPlan",
                             "As": "c1_sum",
                             "Expr": {
@@ -345,6 +427,18 @@ LIMIT 10
                         {
                             "Name": "VariablePlan",
                             "Value": "c2"
+                        },
+                        {
+                            "Name": "BinaryExpressionPlan",
+                            "FuncName": "+",
+                            "Left": {
+                                "Name": "VariablePlan",
+                                "Value": "c2"
+                            },
+                            "Right": {
+                                "Name": "ConstantPlan",
+                                "Value": 1
+                            }
                         },
                         {
                             "Name": "VariablePlan",
