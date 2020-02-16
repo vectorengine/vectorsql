@@ -5,6 +5,7 @@
 package parsers
 
 import (
+	"fmt"
 	"testing"
 
 	"parsers/sqlparser"
@@ -28,7 +29,7 @@ func TestParse1(t *testing.T) {
 
 	for _, query := range querys {
 		node, err := Parse(query)
-		t.Logf("%+v, %+v", spew.Sdump(node), err)
+		fmt.Printf("%+v, %+v\n", spew.Sdump(node), err)
 	}
 }
 
@@ -37,12 +38,11 @@ func TestParseDDL(t *testing.T) {
 
 	for _, query := range querys {
 		ast, err := Parse(query)
-		t.Logf("%+v", err)
 		node := ast.(*sqlparser.DDL)
-		t.Logf("%+v, %+v", node.TableSpec.Options, err)
+		fmt.Printf("%+v, %+v\n", node.TableSpec.Options, err)
 
 		buf := sqlparser.NewTrackedBuffer(nil)
 		node.Format(buf)
-		t.Logf("%s", buf.String())
+		fmt.Printf("%s\n", buf.String())
 	}
 }

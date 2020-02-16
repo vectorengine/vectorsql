@@ -11,8 +11,6 @@ import (
 )
 
 func TestConfig(t *testing.T) {
-	conf, err := Load("../../conf/vectorsql-default.toml")
-
+	_, err := Load("../../conf/vectorsql-default.toml")
 	assert.Nil(t, err)
-	t.Logf("%v", conf)
 }

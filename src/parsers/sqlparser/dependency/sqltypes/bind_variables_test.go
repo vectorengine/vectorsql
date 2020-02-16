@@ -616,7 +616,6 @@ func TestBindVariablesFormat(t *testing.T) {
 	}
 
 	formattedStr = FormatBindVariables(bindVariables, true /* full */, true /* asJSON */)
-	t.Logf("%q", formattedStr)
 	if !strings.Contains(formattedStr, "\"key_1\": {\"type\": \"VARCHAR\", \"value\": \"val_1\"}") {
 		t.Fatalf("bind variable 'key_1' is not formatted")
 	}

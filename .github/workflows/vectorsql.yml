@@ -39,7 +39,6 @@ jobs:
       run: |
         export PATH=$PATH:$(go env GOPATH)/bin
         make test
-        
 
   coverage:
     name: Coverage
@@ -59,4 +58,4 @@ jobs:
       run: |
         export PATH=$PATH:$(go env GOPATH)/bin
         make coverage
-        bash <(curl -s https://codecov.io/bash) -f "!mock.go"
+        bash <(curl -s https://codecov.io/bash) -f "!mock.go" -t b04d57e6-8738-4297-8a0d-2b627885630f

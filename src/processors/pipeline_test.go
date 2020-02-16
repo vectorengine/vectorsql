@@ -128,8 +128,6 @@ func TestPipelinePauseAndResume(t *testing.T) {
 
 	pipeline1.Run()
 
-	t.Logf("%s", pipeline1)
-
 	go func() {
 		out := source1.Out()
 		defer out.Close()
