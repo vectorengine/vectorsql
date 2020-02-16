@@ -8,9 +8,8 @@ import (
 	"expvar"
 	"time"
 
-	"datavalues"
-
 	"base/metric"
+	"datavalues"
 )
 
 func (block *DataBlock) Filter(checks []*datavalues.Value) error {

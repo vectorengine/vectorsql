@@ -11,13 +11,13 @@ import (
 )
 
 var (
-	metric_datablock_split_sec  = "datablock:split:sec"
-	metric_datablock_sort_sec   = "datablock:sort:sec"
-	metric_datablock_filter_sec = "datablock:filter:sec"
+	metric_datablock_split_sec   = "datablock:split:sec"
+	metric_datablock_orderby_sec = "datablock:orderby:sec"
+	metric_datablock_filter_sec  = "datablock:filter:sec"
 )
 
 func init() {
 	expvar.Publish(metric_datablock_split_sec, metric.NewGauge("120s1s", "15m10s", "1h1m"))
-	expvar.Publish(metric_datablock_sort_sec, metric.NewGauge("120s1s", "15m10s", "1h1m"))
+	expvar.Publish(metric_datablock_orderby_sec, metric.NewGauge("120s1s", "15m10s", "1h1m"))
 	expvar.Publish(metric_datablock_filter_sec, metric.NewGauge("120s1s", "15m10s", "1h1m"))
 }

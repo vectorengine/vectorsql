@@ -8,11 +8,16 @@ import (
 	"expvar"
 	"time"
 
+	"base/errors"
 	"base/metric"
 	"datavalues"
 )
 
 func (block *DataBlock) Append(blocks ...*DataBlock) error {
+	if block.immutable {
+		return errors.New("Block is immutable")
+	}
+
 	// TODO(BohuTANG): Check column
 	for j := range blocks {
 		for i := range blocks[j].values {

@@ -5,15 +5,19 @@
 package datablocks
 
 import (
+	"expvar"
+	"sort"
+	"time"
+
+	"base/metric"
 	"datavalues"
 	"expressions"
 	"planners"
-	"sort"
-	"strings"
 )
 
 func (block *DataBlock) OrderByPlan(plan *planners.OrderByPlan) error {
 	var fields []string
+	defer expvar.Get(metric_datablock_filter_sec).(metric.Metric).Record(time.Now())
 
 	// Find the column name which all the orderby used.
 	if err := plan.Walk(func(p planners.IPlan) (bool, error) {
@@ -37,16 +41,23 @@ func (block *DataBlock) OrderByPlan(plan *planners.OrderByPlan) error {
 	}
 
 	// Orderby column value.
+	numRows := block.NumRows()
 	tuples := make([]interface{}, len(fields))
 	for i, name := range fields {
 		it, err := block.ColumnIterator(name)
 		if err != nil {
 			return err
 		}
-		tuples[i] = datavalues.MakeTuple(it.cv.values...)
+
+		k := 0
+		colvals := make([]*datavalues.Value, numRows)
+		for it.Next() {
+			colvals[k] = it.Value()
+			k++
+		}
+		tuples[i] = datavalues.MakeTuple(colvals...)
 	}
 	// Append the Seqs column.
-	numRows := block.NumRows()
 	seqs := make([]*datavalues.Value, numRows)
 	for i := 0; i < numRows; i++ {
 		seqs[i] = datavalues.ToValue(i)
@@ -94,10 +105,8 @@ func (block *DataBlock) OrderByPlan(plan *planners.OrderByPlan) error {
 			if cmp == datavalues.Equal {
 				continue
 			}
-			switch strings.ToUpper(order.Direction) {
-			case "ASC":
-				return cmp == datavalues.LessThan
-			case "DESC":
+			switch order.Direction {
+			case "desc":
 				return cmp == datavalues.GreaterThan
 			default:
 				return cmp == datavalues.LessThan

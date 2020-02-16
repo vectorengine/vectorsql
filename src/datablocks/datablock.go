@@ -5,10 +5,9 @@
 package datablocks
 
 import (
+	"base/errors"
 	"columns"
 	"datavalues"
-
-	"base/errors"
 )
 
 type DataBlock struct {
