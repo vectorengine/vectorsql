@@ -42,6 +42,7 @@ var (
 	}
 
 	scalarExprTable = map[string]scalarExprCreator{
+		"LOGMOCK":    LOGMOCK,
 		"RANGETABLE": RANGETABLE,
 		"RANDTABLE":  RANDTABLE,
 		"ZIP":        ZIP,

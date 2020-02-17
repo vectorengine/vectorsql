@@ -175,7 +175,7 @@ func TestFilterTransform(t *testing.T) {
 		err = pipeline.Wait(func(x interface{}) error {
 			expect := test.expect
 			actual := x.(*datablocks.DataBlock)
-			assert.Equal(t, expect, actual)
+			assert.True(t, mocks.DataBlockEqual(expect, actual))
 			return nil
 		})
 		assert.Nil(t, err)

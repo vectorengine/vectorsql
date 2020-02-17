@@ -16,16 +16,14 @@ func (block *DataBlock) Filter(checks []*datavalues.Value) error {
 	defer expvar.Get(metric_datablock_filter_sec).(metric.Metric).Record(time.Now())
 
 	// In place filter.
-	for _, cv := range block.values {
-		n := 0
-		values := cv.values
-		for i, check := range checks {
-			if check.AsBool() {
-				values[n] = values[i]
-				n++
-			}
+	n := 0
+	seqs := block.seqs
+	for i, check := range checks {
+		if check.AsBool() {
+			seqs[n] = seqs[i]
+			n++
 		}
-		cv.values = values[:n]
 	}
+	block.seqs = seqs[:n]
 	return nil
 }

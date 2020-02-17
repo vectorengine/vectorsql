@@ -43,10 +43,6 @@ func (block *DataBlock) ProjectByPlan(plan *planners.MapPlan) (*DataBlock, error
 			}
 			columnValues[i] = columnValue
 		}
-		return &DataBlock{
-			seqs:      block.seqs,
-			values:    columnValues,
-			immutable: true,
-		}, nil
+		return newDataBlock(block.seqs, columnValues), nil
 	}
 }

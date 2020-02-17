@@ -230,6 +230,20 @@ LIKE.
 
 ---
 
+## LOGMOCK
+### Calling
+
+
+
+### Arguments
+
+
+
+### Description
+Returns a mock log table.
+
+---
+
 ## MAX
 ### Calling
 

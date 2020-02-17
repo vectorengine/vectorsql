@@ -114,3 +114,52 @@ func ZIP(args ...interface{}) IExpression {
 		},
 	}
 }
+
+func LOGMOCK(args ...interface{}) IExpression {
+	exprs := expressionsFor(args...)
+	return &ScalarExpression{
+		name:          "LOGMOCK",
+		argumentNames: [][]string{},
+		description:   docs.Text("Returns a mock log table."),
+		validate:      All(),
+		exprs:         exprs,
+		evalFn: func(args ...*datavalues.Value) (*datavalues.Value, error) {
+			servera := "192.168.0.1"
+			serverb := "192.168.0.2"
+
+			values := make([]*datavalues.Value, 15)
+			i := 0
+			values[i] = datavalues.MakeTuple(datavalues.MakeString(servera), datavalues.MakeString("/login"), datavalues.MakeString("POST"), datavalues.MakeInt(200), datavalues.MakeInt(10))
+			i++
+			values[i] = datavalues.MakeTuple(datavalues.MakeString(servera), datavalues.MakeString("/login"), datavalues.MakeString("POST"), datavalues.MakeInt(500), datavalues.MakeInt(13))
+			i++
+			values[i] = datavalues.MakeTuple(datavalues.MakeString(servera), datavalues.MakeString("/login"), datavalues.MakeString("POST"), datavalues.MakeInt(500), datavalues.MakeInt(13))
+			i++
+			values[i] = datavalues.MakeTuple(datavalues.MakeString(servera), datavalues.MakeString("/index"), datavalues.MakeString("GET"), datavalues.MakeInt(200), datavalues.MakeInt(10))
+			i++
+			values[i] = datavalues.MakeTuple(datavalues.MakeString(servera), datavalues.MakeString("/index"), datavalues.MakeString("GET"), datavalues.MakeInt(200), datavalues.MakeInt(11))
+			i++
+			values[i] = datavalues.MakeTuple(datavalues.MakeString(servera), datavalues.MakeString("/index"), datavalues.MakeString("GET"), datavalues.MakeInt(200), datavalues.MakeInt(12))
+			i++
+			values[i] = datavalues.MakeTuple(datavalues.MakeString(servera), datavalues.MakeString("/index"), datavalues.MakeString("GET"), datavalues.MakeInt(200), datavalues.MakeInt(12))
+			i++
+			values[i] = datavalues.MakeTuple(datavalues.MakeString(servera), datavalues.MakeString("/index"), datavalues.MakeString("GET"), datavalues.MakeInt(200), datavalues.MakeInt(12))
+			i++
+			values[i] = datavalues.MakeTuple(datavalues.MakeString(servera), datavalues.MakeString("/index"), datavalues.MakeString("GET"), datavalues.MakeInt(500), datavalues.MakeInt(10))
+			i++
+
+			values[i] = datavalues.MakeTuple(datavalues.MakeString(serverb), datavalues.MakeString("/login"), datavalues.MakeString("POST"), datavalues.MakeInt(200), datavalues.MakeInt(10))
+			i++
+			values[i] = datavalues.MakeTuple(datavalues.MakeString(serverb), datavalues.MakeString("/login"), datavalues.MakeString("POST"), datavalues.MakeInt(500), datavalues.MakeInt(12))
+			i++
+			values[i] = datavalues.MakeTuple(datavalues.MakeString(serverb), datavalues.MakeString("/index"), datavalues.MakeString("GET"), datavalues.MakeInt(200), datavalues.MakeInt(10))
+			i++
+			values[i] = datavalues.MakeTuple(datavalues.MakeString(serverb), datavalues.MakeString("/index"), datavalues.MakeString("GET"), datavalues.MakeInt(200), datavalues.MakeInt(14))
+			i++
+			values[i] = datavalues.MakeTuple(datavalues.MakeString(serverb), datavalues.MakeString("/index"), datavalues.MakeString("GET"), datavalues.MakeInt(200), datavalues.MakeInt(10))
+			i++
+			values[i] = datavalues.MakeTuple(datavalues.MakeString(serverb), datavalues.MakeString("/index"), datavalues.MakeString("GET"), datavalues.MakeInt(500), datavalues.MakeInt(11))
+			return datavalues.MakeTuple(values...), nil
+		},
+	}
+}

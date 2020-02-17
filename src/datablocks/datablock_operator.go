@@ -8,59 +8,51 @@ import (
 	"expvar"
 	"time"
 
-	"base/errors"
 	"base/metric"
-	"datavalues"
 )
 
 func (block *DataBlock) Append(blocks ...*DataBlock) error {
-	if block.immutable {
-		return errors.New("Block is immutable")
-	}
-
 	// TODO(BohuTANG): Check column
 	for j := range blocks {
-		for i := range blocks[j].values {
-			block.values[i].values = append(block.values[i].values, blocks[j].values[i].values...)
+		appendBlock := blocks[j]
+		it := appendBlock.RowIterator()
+		for it.Next() {
+			if err := block.WriteRow(it.Value()); err != nil {
+				return err
+			}
 		}
 	}
 	return nil
 }
 
-func (block *DataBlock) Split(chunksize int) []*DataBlock {
+func (block *DataBlock) Split(chunksize int) ([]*DataBlock, error) {
 	defer expvar.Get(metric_datablock_split_sec).(metric.Metric).Record(time.Now())
 
-	cols := block.Columns()
-	nums := block.NumRows()
-	chunks := (nums / chunksize) + 1
-	blocks := make([]*DataBlock, chunks)
-	for i := range blocks {
-		blocks[i] = NewDataBlock(cols)
-	}
+	var blk *DataBlock
+	var blocks []*DataBlock
 
-	for i := range cols {
-		it := newDataBlockColumnIterator(block, i)
-		for j := 0; j < len(blocks); j++ {
-			begin := j * chunksize
-			end := (j + 1) * chunksize
-			if end > nums {
-				end = nums
-			}
-			blocks[j].values[i].values = make([]*datavalues.Value, (end - begin))
-			for k := begin; k < end; k++ {
-				it.Next()
-				blocks[j].values[i].values[k-begin] = it.Value()
-			}
+	cols := block.Columns()
+	it := block.RowIterator()
+
+	i := 0
+	for it.Next() {
+		if i == 0 {
+			blk = NewDataBlock(cols)
+			blocks = append(blocks, blk)
+		}
+		if err := blk.WriteRow(it.Value()); err != nil {
+			return nil, err
+		}
+		i++
+		if i > chunksize {
+			i = 0
 		}
 	}
-	return blocks
+	return blocks, nil
 }
 
 func (block *DataBlock) SetToLast() {
-	if block.seqs == nil {
-		block.seqs = make([]*datavalues.Value, 1)
-		block.seqs[0] = datavalues.MakeInt(block.NumRows() - 1)
-	} else {
+	if len(block.seqs) > 0 {
 		block.seqs = block.seqs[len(block.seqs)-1:]
 	}
 }

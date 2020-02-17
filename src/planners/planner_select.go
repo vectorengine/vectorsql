@@ -73,6 +73,16 @@ func (plan *SelectPlan) Build() error {
 		tree.Add(groupByPlan)
 	}
 
+	// Having.
+	if ast.Having != nil {
+		logic, err := parseWhere(nil, ast.Having.Expr)
+		if err != nil {
+			return err
+		}
+		havingPlan := NewFilterPlan(logic)
+		tree.Add(havingPlan)
+	}
+
 	// OrderBy.
 	if ast.OrderBy != nil {
 		orders, err := parseOrderBy(ast.OrderBy)

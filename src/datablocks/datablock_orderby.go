@@ -60,7 +60,7 @@ func (block *DataBlock) OrderByPlan(plan *planners.OrderByPlan) error {
 	// Append the Seqs column.
 	seqs := make([]*datavalues.Value, numRows)
 	for i := 0; i < numRows; i++ {
-		seqs[i] = datavalues.ToValue(i)
+		seqs[i] = block.seqs[i]
 	}
 	tuples = append(tuples, datavalues.MakeTuple(seqs...))
 
@@ -120,6 +120,6 @@ func (block *DataBlock) OrderByPlan(plan *planners.OrderByPlan) error {
 	for i, tuple := range matrix {
 		finalSeqs[i] = tuple.AsSlice()[len(fields)]
 	}
-	block.setSeqs(finalSeqs)
+	block.seqs = finalSeqs
 	return nil
 }

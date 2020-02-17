@@ -4,8 +4,6 @@
 
 package datablocks
 
-import "datavalues"
-
 func (block *DataBlock) Limit(offset, limit int) (cutOffset, cutLimit int) {
 	preRows := block.NumRows()
 
@@ -17,12 +15,6 @@ func (block *DataBlock) Limit(offset, limit int) (cutOffset, cutLimit int) {
 	}
 	if st > preRows {
 		st = preRows
-	}
-	if block.seqs == nil {
-		block.seqs = make([]*datavalues.Value, preRows)
-		for i := 0; i < len(block.seqs); i++ {
-			block.seqs[i] = datavalues.MakeInt(i)
-		}
 	}
 	block.seqs = block.seqs[st:ed]
 

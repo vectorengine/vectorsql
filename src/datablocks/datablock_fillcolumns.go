@@ -24,6 +24,11 @@ func (block *DataBlock) FillColumnsByPlan(plan *planners.MapPlan) (*DataBlock, e
 		exprs[i] = expr
 	}
 
+	columnmap := make(map[string]struct{})
+	for i := range block.values {
+		columnmap[block.values[i].column.Name] = struct{}{}
+	}
+
 	rows := block.NumRows()
 	if rows == 0 {
 		// If empty, returns header only.
@@ -43,7 +48,7 @@ func (block *DataBlock) FillColumnsByPlan(plan *planners.MapPlan) (*DataBlock, e
 			name := expr.String()
 
 			// Check exists.
-			if _, ok := block.valuesmap[name]; ok {
+			if _, ok := columnmap[name]; ok {
 				continue
 			}
 
@@ -78,9 +83,8 @@ func (block *DataBlock) FillColumnsByPlan(plan *planners.MapPlan) (*DataBlock, e
 			columnValues = append(columnValues, columnValue)
 		}
 		return &DataBlock{
-			seqs:      block.seqs,
-			values:    columnValues,
-			immutable: true,
+			seqs:   block.seqs,
+			values: columnValues,
 		}, nil
 	}
 }

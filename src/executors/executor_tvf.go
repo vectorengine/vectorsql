@@ -71,6 +71,14 @@ func (executor *TableValuedFunctionExecutor) Execute() (processors.IProcessor, e
 			}
 			cols = append(cols, columns.NewColumn(variables[i].AsString(), datatype))
 		}
+	case "LOGMOCK":
+		cols = []*columns.Column{
+			columns.NewColumn("server", datatypes.NewStringDataType()),
+			columns.NewColumn("path", datatypes.NewStringDataType()),
+			columns.NewColumn("method", datatypes.NewStringDataType()),
+			columns.NewColumn("status", datatypes.NewInt32DataType()),
+			columns.NewColumn("response_time", datatypes.NewInt32DataType()),
+		}
 	}
 
 	// Block.

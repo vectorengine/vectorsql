@@ -17,16 +17,12 @@ type DataBlockColumnIterator struct {
 }
 
 func newDataBlockColumnIterator(block *DataBlock, idx int) *DataBlockColumnIterator {
+	rows := block.NumRows()
 	cv := block.values[idx]
-	seqs := block.Seqs()
-	rows := cv.NumRows()
-	if seqs != nil {
-		rows = len(seqs)
-	}
 	return &DataBlockColumnIterator{
 		cv:      cv,
 		rows:    rows,
-		seqs:    seqs,
+		seqs:    block.seqs,
 		current: -1,
 	}
 }
@@ -41,9 +37,5 @@ func (it *DataBlockColumnIterator) Next() bool {
 }
 
 func (it *DataBlockColumnIterator) Value() *datavalues.Value {
-	if it.seqs != nil {
-		return it.cv.values[it.seqs[it.current].AsInt()]
-	} else {
-		return it.cv.values[it.current]
-	}
+	return it.cv.values[it.seqs[it.current].AsInt()]
 }

@@ -26,7 +26,7 @@ func TestSelectExecutor(t *testing.T) {
 		expect *datablocks.DataBlock
 	}{
 		{
-			name:  "simple",
+			name:  "simple-pass",
 			query: "select name, `engine`,data_path, metadata_path from system.databases where name='db1'",
 			expect: mocks.NewBlockFromSlice(
 				[]*columns.Column{
@@ -43,7 +43,7 @@ func TestSelectExecutor(t *testing.T) {
 		},
 
 		{
-			name:  "tvf-rangetable",
+			name:  "tvf-rangetable-pass",
 			query: "SELECT i FROM rangetable(rows->5, i->'Int32')",
 			expect: mocks.NewBlockFromSlice(
 				[]*columns.Column{
@@ -57,7 +57,7 @@ func TestSelectExecutor(t *testing.T) {
 			),
 		},
 		{
-			name:  "filter",
+			name:  "filter-pass",
 			query: "SELECT i FROM rangetable(rows->5, i->'Int32') WHERE i>2",
 			expect: mocks.NewBlockFromSlice(
 				[]*columns.Column{
@@ -68,7 +68,7 @@ func TestSelectExecutor(t *testing.T) {
 			),
 		},
 		{
-			name:  "orderby",
+			name:  "orderby-pass",
 			query: "SELECT i FROM rangetable(rows->5, i->'Int32') WHERE i>2 order by i desc",
 			expect: mocks.NewBlockFromSlice(
 				[]*columns.Column{

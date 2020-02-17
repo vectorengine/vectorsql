@@ -16,12 +16,8 @@ type DataBlockRowIterator struct {
 }
 
 func newDataBlockRowIterator(block *DataBlock) *DataBlockRowIterator {
-	rows := block.values[0].NumRows()
-	if block.seqs != nil {
-		rows = len(block.seqs)
-	}
 	return &DataBlockRowIterator{
-		rows:    rows,
+		rows:    len(block.seqs),
 		block:   block,
 		current: -1,
 	}
@@ -45,14 +41,8 @@ func (it *DataBlockRowIterator) Value() []*datavalues.Value {
 	block := it.block
 	values := make([]*datavalues.Value, it.block.NumColumns())
 
-	if block.seqs != nil {
-		for i := range values {
-			values[i] = block.values[i].values[block.seqs[it.current].AsInt()]
-		}
-	} else {
-		for i := range values {
-			values[i] = block.values[i].values[it.current]
-		}
+	for i := range values {
+		values[i] = block.values[i].values[block.seqs[it.current].AsInt()]
 	}
 	return values
 }

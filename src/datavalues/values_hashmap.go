@@ -60,12 +60,6 @@ func (hm *HashMap) Set(key *Value, value interface{}) error {
 
 func (hm *HashMap) SetByHash(key *Value, hash uint64, value interface{}) error {
 	list := hm.container[hash]
-	for i := range list {
-		if AreEqual(list[i].key, key) {
-			list[i].value = value
-			return nil
-		}
-	}
 	hm.container[hash] = append(list, entry{
 		key:   key,
 		value: value,

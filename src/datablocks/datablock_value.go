@@ -33,10 +33,6 @@ func NewDataBlockValueWithCapacity(col *columns.Column, capacity int) *DataBlock
 	}
 }
 
-func (v *DataBlockValue) NumRows() int {
-	return len(v.values)
-}
-
 func (v *DataBlockValue) ColumnName() string {
 	return v.column.Name
 }

@@ -33,49 +33,63 @@ $./bin/vectorsql-server -c conf/vectorsql-default.toml
 
 ```
 $clickhouse-client --compression=0
-VectorSQL :) select sum(c1) as c1_sum, count(c1) as c1_count, c1_sum/c1_count as c1_avg, c2, c3 from randtable(rows->1000, c1->'UInt32', c2->'UInt32', c3->'String') where c1>80 and (c1+c2)<500 group by c3 order by c1_count desc, c3 asc limit 10;
+VectorSQL :) select count(server) as count, sum(response_time) as resp_time, (resp_time/count) as load_avg, path,server from logmock(rows->15) where status=200 group by server,path having resp_time>5 order by server asc, load_avg desc;
 
 SELECT 
-    sum(c1) AS c1_sum, 
-    count(c1) AS c1_count, 
-    c1_sum / c1_count AS c1_avg, 
-    c2, 
-    c3
-FROM randtable(rows -> 1000, c1 -> 'UInt32', c2 -> 'UInt32', c3 -> 'String')
-WHERE (c1 > 80) AND ((c1 + c2) < 500)
-GROUP BY c3
+    count(server) AS count, 
+    sum(response_time) AS resp_time, 
+    resp_time / count AS load_avg, 
+    path, 
+    server
+FROM logmock(rows -> 15)
+WHERE status = 200
+GROUP BY 
+    server, 
+    path
+HAVING resp_time > 5
 ORDER BY 
-    c1_count DESC, 
-    c3 ASC
-LIMIT 10
+    server ASC, 
+    load_avg DESC
 
-┌─c1_sum─┬─c1_count─┬─c1_avg─┬──c2─┬─c3─────────┐
-│    660 │        3 │    220 │ 326 │ string-363 │
-│    295 │        1 │    295 │ 175 │ string-1   │
-│    110 │        1 │    110 │ 302 │ string-100 │
-│    165 │        1 │    165 │ 273 │ string-112 │
-│    105 │        1 │    105 │ 241 │ string-125 │
-│    132 │        1 │    132 │ 252 │ string-126 │
-│    283 │        1 │    283 │  60 │ string-131 │
-│    207 │        1 │    207 │ 194 │ string-143 │
-│    116 │        1 │    116 │ 251 │ string-144 │
-│    125 │        1 │    125 │  67 │ string-15  │
-└────────┴──────────┴────────┴─────┴────────────┘
-← Progress: 0.00 rows, 0.00 B (0.00 rows/s., 0.00 B/s.) 
-10 rows in set. Elapsed: 0.006 sec. 
+┌─count─┬─resp_time─┬───────────load_avg─┬─path───┬─server──────┐
+│     5 │        57 │               11.4 │ /index │ 192.168.0.1 │
+│     1 │        10 │                 10 │ /login │ 192.168.0.1 │
+│     3 │        34 │ 11.333333333333334 │ /index │ 192.168.0.2 │
+│     1 │        10 │                 10 │ /login │ 192.168.0.2 │
+└───────┴───────────┴────────────────────┴────────┴─────────────┘
+↓ Progress: 0.00 rows, 0.00 B (0.00 rows/s., 0.00 B/s.) 
+4 rows in set. Elapsed: 0.004 sec. 
 ```
 
 * http-client
 
 ```
- curl -XPOST http://127.0.0.1:8123 -d "select sum(c1) as c1_sum, count(c1) as c1_count, c1_sum/c1_count as c1_avg, c2, c3 from randtable(rows->1000, c1->'UInt32', c2->'UInt32', c3->'String') where c1>80 and (c1+c2)<500 group by c3 order by c1_count desc, c3 asc limit 5"
-590	2	295	90	string-431
-243	2	121.5	346	string-433
-239	1	239	255	string-13
-108	1	108	318	string-15
-187	1	187	78	string-173
+curl -XPOST http://127.0.0.1:8123 -d "select count(server) as count, sum(response_time) as resp_time, (resp_time/count) as load_avg, path,server from logmock(rows->15) where status=200 group by server,path having resp_time>5 order by server asc, load_avg desc"
+5	57	11.4	/index	192.168.0.1
+1	10	10	/login	192.168.0.1
+3	34	11.333333333333334	/index	192.168.0.2
+1	10	10	/login	192.168.0.2
 ```
+
+## Query Language Features
+
+|Query language                 |Current version|Future versions|Example                   |
+|-------------------------------|---------------|---------------|--------------------------|
+|Scans by Value                 |+              |+              |SELECT a,b                |
+|Scans by Expression            |+              |+              |SELECT IF(a>2,a,b),SUM(a) |
+|Filter by Value                |+              |+              |WHERE a>10                |
+|Filter by Expression           |+              |+              |WHERE a>(b+10)            |
+|Group-Aggregate by Value       |+              |+              |GROUP BY a                |
+|Group-Aggregate by Expression  |+              |+              |GROUP BY (a+1)            |
+|Group-Having by Value          |+              |+              |HAVING count_a>2          |
+|Group-Having by Expression     |+              |+              |HAVING (count_a+1)>2      |
+|Order by Value                 |+              |+              |ORDER BY a desc           |
+|Order by Expression            |+              |+              |ORDER BY (a+b)            |
+|Window Functions               |-              |+              |                          |
+|Join                           |-              |+              |                          |
+
 
 ## Metrics
 
 http://localhost:8080/debug/metrics
+
