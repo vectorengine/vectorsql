@@ -35,6 +35,7 @@ var (
 		"<":        LT,
 		"<=":       LTE,
 		"<>":       NEQ,
+		"!=":       NEQ,
 		"AND":      AND,
 		"OR":       OR,
 		"LIKE":     LIKE,

@@ -7,12 +7,12 @@ package datatypes
 import (
 	"fmt"
 	"io"
+	"math"
 	"reflect"
-
-	"datavalues"
 
 	"base/binary"
 	"base/errors"
+	"datavalues"
 )
 
 const (
@@ -28,7 +28,7 @@ func NewFloat64DataType() IDataType {
 }
 
 func (datatype *Float64DataType) Type() reflect.Type {
-	return reflect.ValueOf(int64(0)).Type()
+	return reflect.ValueOf(float64(0)).Type()
 }
 
 func (datatype *Float64DataType) Name() string {
@@ -36,14 +36,15 @@ func (datatype *Float64DataType) Name() string {
 }
 
 func (datatype *Float64DataType) Serialize(writer *binary.Writer, v *datavalues.Value) error {
-	if err := writer.Float64(v.GetFloat()); err != nil {
+	round := math.Round(v.GetFloat()*10000) / 10000
+	if err := writer.Float64(round); err != nil {
 		return errors.Wrap(err)
 	}
 	return nil
 }
 
 func (datatype *Float64DataType) SerializeText(writer io.Writer, v *datavalues.Value) error {
-	if _, err := writer.Write([]byte(fmt.Sprintf("%v", float64(v.GetFloat())))); err != nil {
+	if _, err := writer.Write([]byte(fmt.Sprintf("%.4f", float64(v.GetFloat())))); err != nil {
 		return errors.Wrap(err)
 	}
 	return nil

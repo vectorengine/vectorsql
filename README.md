@@ -33,42 +33,45 @@ $./bin/vectorsql-server -c conf/vectorsql-default.toml
 
 ```
 $clickhouse-client --compression=0
-VectorSQL :) select count(server) as count, sum(response_time) as resp_time, (resp_time/count) as load_avg, path,server from logmock(rows->15) where status=200 group by server,path having resp_time>5 order by server asc, load_avg desc;
+VectorSQL :) SELECT SUM(IF(status!=200, 1, 0)) AS errors, SUM(IF(status=200, 1, 0)) as success, (errors/COUNT(server)) AS error_rate,(success/COUNT(server)) as success_rate, (SUM(response_time)/COUNT(server)) AS load_avg, MIN(response_time), MAX(response_time), path, server FROM logmock(rows->15) GROUP BY server, path HAVING errors>0 ORDER BY server ASC, load_avg DESC;
 
 SELECT 
-    count(server) AS count, 
-    sum(response_time) AS resp_time, 
-    resp_time / count AS load_avg, 
+    SUM(IF(status != 200, 1, 0)) AS errors, 
+    SUM(IF(status = 200, 1, 0)) AS success, 
+    errors / COUNT(server) AS error_rate, 
+    success / COUNT(server) AS success_rate, 
+    SUM(response_time) / COUNT(server) AS load_avg, 
+    MIN(response_time), 
+    MAX(response_time), 
     path, 
     server
 FROM logmock(rows -> 15)
-WHERE status = 200
 GROUP BY 
     server, 
     path
-HAVING resp_time > 5
+HAVING errors > 0
 ORDER BY 
     server ASC, 
     load_avg DESC
 
-┌─count─┬─resp_time─┬───────────load_avg─┬─path───┬─server──────┐
-│     5 │        57 │               11.4 │ /index │ 192.168.0.1 │
-│     1 │        10 │                 10 │ /login │ 192.168.0.1 │
-│     3 │        34 │ 11.333333333333334 │ /index │ 192.168.0.2 │
-│     1 │        10 │                 10 │ /login │ 192.168.0.2 │
-└───────┴───────────┴────────────────────┴────────┴─────────────┘
+┌─errors─┬─success─┬─error_rate─┬─success_rate─┬─load_avg─┬─MIN(response_time)─┬─MAX(response_time)─┬─path───┬─server──────┐
+│      2 │       1 │     0.6667 │       0.3333 │       12 │                 10 │                 13 │ /login │ 192.168.0.1 │
+│      1 │       5 │     0.1667 │       0.8333 │  11.1667 │                 10 │                 12 │ /index │ 192.168.0.1 │
+│      1 │       3 │       0.25 │         0.75 │    11.25 │                 10 │                 14 │ /index │ 192.168.0.2 │
+│      1 │       1 │        0.5 │          0.5 │       11 │                 10 │                 12 │ /login │ 192.168.0.2 │
+└────────┴─────────┴────────────┴──────────────┴──────────┴────────────────────┴────────────────────┴────────┴─────────────┘
 ↓ Progress: 0.00 rows, 0.00 B (0.00 rows/s., 0.00 B/s.) 
-4 rows in set. Elapsed: 0.004 sec. 
+4 rows in set. Elapsed: 0.005 sec. 
 ```
 
 * http-client
 
 ```
-curl -XPOST http://127.0.0.1:8123 -d "select count(server) as count, sum(response_time) as resp_time, (resp_time/count) as load_avg, path,server from logmock(rows->15) where status=200 group by server,path having resp_time>5 order by server asc, load_avg desc"
-5	57	11.4	/index	192.168.0.1
-1	10	10	/login	192.168.0.1
-3	34	11.333333333333334	/index	192.168.0.2
-1	10	10	/login	192.168.0.2
+curl -XPOST http://127.0.0.1:8123 -d "SELECT SUM(IF(status!=200, 1, 0)) AS errors, SUM(IF(status=200, 1, 0)) as success, (errors/COUNT(server)) AS error_rate,(success/COUNT(server)) as success_rate, (SUM(response_time)/COUNT(server)) AS load_avg, MIN(response_time), MAX(response_time), path, server FROM logmock(rows->15) GROUP BY server, path HAVING errors>0 ORDER BY server ASC, load_avg DESC"
+2	1	0.6667	0.3333	12.0000	10	13	/login	192.168.0.1
+1	5	0.1667	0.8333	11.1667	10	12	/index	192.168.0.1
+1	3	0.2500	0.7500	11.2500	10	14	/index	192.168.0.2
+1	1	0.5000	0.5000	11.0000	10	12	/login	192.168.0.2
 ```
 
 ## Query Language Features

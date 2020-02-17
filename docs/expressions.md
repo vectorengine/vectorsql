@@ -1,4 +1,19 @@
 # Expression Documentation
+## !=
+### Calling
+
+
+* !=(left, right)
+
+### Arguments
+
+
+
+### Description
+Not equal.
+
+---
+
 ## *
 ### Calling
 
