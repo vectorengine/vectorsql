@@ -38,7 +38,13 @@ func (t *GroupByTransform) Execute() {
 		switch y := x.(type) {
 		case *datablocks.DataBlock:
 			if plan.GroupBys.Length() == 0 {
-				out.Send(y)
+				if blocks, err := y.GroupByPlan(t.plan); err != nil {
+					out.Send(err)
+				} else {
+					for _, x := range blocks {
+						out.Send(x)
+					}
+				}
 			} else {
 				if block == nil {
 					block = y
