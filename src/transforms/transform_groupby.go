@@ -5,10 +5,11 @@
 package transforms
 
 import (
+	"sync"
+
 	"datablocks"
 	"planners"
 	"processors"
-	"sync"
 )
 
 type GroupByTransform struct {
@@ -29,17 +30,22 @@ func (t *GroupByTransform) Execute() {
 	var wg sync.WaitGroup
 	var block *datablocks.DataBlock
 
+	plan := t.plan
 	out := t.Out()
 	defer out.Close()
 
 	onNext := func(x interface{}) {
 		switch y := x.(type) {
 		case *datablocks.DataBlock:
-			if block == nil {
-				block = y
+			if plan.GroupBys.Length() == 0 {
+				out.Send(y)
 			} else {
-				if err := block.Append(y); err != nil {
-					out.Send(err)
+				if block == nil {
+					block = y
+				} else {
+					if err := block.Append(y); err != nil {
+						out.Send(err)
+					}
 				}
 			}
 		case error:
@@ -48,7 +54,7 @@ func (t *GroupByTransform) Execute() {
 	}
 	onDone := func() {
 		defer wg.Done()
-		if block != nil {
+		if block != nil && plan.GroupBys.Length() > 0 {
 			if blocks, err := block.GroupByPlan(t.plan); err != nil {
 				out.Send(err)
 			} else {
