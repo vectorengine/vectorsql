@@ -6,8 +6,6 @@ package transforms
 
 import (
 	"datablocks"
-	"datavalues"
-	"expressions"
 	"planners"
 	"processors"
 )
@@ -33,38 +31,11 @@ func (t *FilterTransform) Execute() {
 	onNext := func(x interface{}) {
 		switch y := x.(type) {
 		case *datablocks.DataBlock:
-			if err := t.check(y); err != nil {
+			if err := y.FilterByPlan(t.filter); err != nil {
 				x = err
 			}
 		}
 		out.Send(x)
 	}
 	t.Subscribe(onNext)
-}
-
-func (t *FilterTransform) check(x *datablocks.DataBlock) error {
-	filterPlan := t.filter
-
-	expr, err := planners.BuildExpressions(filterPlan.SubPlan)
-	if err != nil {
-		return err
-	}
-
-	i := 0
-	checks := make([]*datavalues.Value, x.NumRows())
-	params := make(expressions.Map)
-	it := x.RowIterator()
-	for it.Next() {
-		row := it.Value()
-		for k := range row {
-			params[it.Column(k).Name] = row[k]
-		}
-		v, err := expr.Eval(params)
-		if err != nil {
-			return err
-		}
-		checks[i] = v
-		i++
-	}
-	return x.Filter(checks)
 }

@@ -104,6 +104,10 @@ func (block *DataBlock) ColumnIterators() []*DataBlockColumnIterator {
 	return iterators
 }
 
+func (block *DataBlock) MixsIterator(columns []string) (*DataBlockMixsIterator, error) {
+	return newDataBlockColsRowIterator(block, columns)
+}
+
 func (block *DataBlock) WriteRow(values []*datavalues.Value) error {
 	cols := block.NumColumns()
 	if len(values) != cols {

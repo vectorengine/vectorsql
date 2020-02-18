@@ -24,6 +24,12 @@ func (block *DataBlock) FillColumnsByPlan(plan *planners.MapPlan) (*DataBlock, e
 		exprs[i] = expr
 	}
 
+	// Get all base fields.
+	fields, err := expressions.VariableValues(exprs...)
+	if err != nil {
+		return nil, err
+	}
+
 	columnmap := make(map[string]struct{})
 	for i := range block.values {
 		columnmap[block.values[i].column.Name] = struct{}{}
@@ -55,7 +61,10 @@ func (block *DataBlock) FillColumnsByPlan(plan *planners.MapPlan) (*DataBlock, e
 			// Compute the column.
 			k := 0
 			seqs := block.seqs
-			it := block.RowIterator()
+			it, err := block.MixsIterator(fields)
+			if err != nil {
+				return nil, err
+			}
 			for it.Next() {
 				row := it.Value()
 				for j := range row {

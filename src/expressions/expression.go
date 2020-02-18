@@ -38,6 +38,27 @@ func Walk(visit Visit, exprs ...IExpression) error {
 	return nil
 }
 
+func VariableValues(exprs ...IExpression) ([]string, error) {
+	varMap := make(map[string]struct{})
+	if err := Walk(func(exp IExpression) (bool, error) {
+		switch exp.(type) {
+		case *VariableExpression:
+			varMap[exp.String()] = struct{}{}
+		}
+		return true, nil
+	}, exprs...); err != nil {
+		return nil, err
+	}
+
+	fields := make([]string, len(varMap))
+	n := 0
+	for k := range varMap {
+		fields[n] = k
+		n++
+	}
+	return fields, nil
+}
+
 func expressionsFor(exprs ...interface{}) []IExpression {
 	results := make([]IExpression, len(exprs))
 	for i, expr := range exprs {
