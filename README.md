@@ -1,6 +1,9 @@
 
-[![Github Actions Status](https://github.com/vectorengine/vectorsql/workflows/VectorSQL%20CI/badge.svg)](https://github.com/vectorengine/vectorsql/actions?query=workflow%3A%22VectorSQL+CI%22)
+[![Github Actions Status](https://github.com/vectorengine/vectorsql/workflows/VectorSQL%20Build/badge.svg)](https://github.com/vectorengine/vectorsql/actions?query=workflow%3A%22VectorSQL+Build%22)
+[![Github Actions Status](https://github.com/vectorengine/vectorsql/workflows/VectorSQL%20Test/badge.svg)](https://github.com/vectorengine/vectorsql/actions?query=workflow%3A%22VectorSQL+Test%22)
+[![Github Actions Status](https://github.com/vectorengine/vectorsql/workflows/VectorSQL%20Coverage/badge.svg)](https://github.com/vectorengine/vectorsql/actions?query=workflow%3A%22VectorSQL+Coverage%22)
 [![codecov.io](https://codecov.io/gh/vectorengine/vectorsql/branch/master/graph/badge.svg)](https://codecov.io/gh/vectorengine/vectorsql/branch/master)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 # VectorSQL
 
