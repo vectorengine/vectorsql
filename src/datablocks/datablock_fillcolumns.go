@@ -11,21 +11,16 @@ import (
 	"planners"
 )
 
-func (block *DataBlock) FillColumnsByPlan(plan *planners.MapPlan) (*DataBlock, error) {
+func (block *DataBlock) FillColumnsByPlan(hasAggregate bool, plan *planners.MapPlan) (*DataBlock, error) {
 	projects := plan
 
-	// Build the project exprs.
-	exprs := make([]expressions.IExpression, projects.Length())
-	for i, plan := range projects.SubPlans {
-		expr, err := planners.BuildExpressions(plan)
-		if err != nil {
-			return nil, err
-		}
-		exprs[i] = expr
+	projectExprs, err := planners.BuildExpressions(projects)
+	if err != nil {
+		return nil, err
 	}
 
 	// Get all base fields.
-	fields, err := expressions.VariableValues(exprs...)
+	fields, err := expressions.VariableValues(projectExprs...)
 	if err != nil {
 		return nil, err
 	}
@@ -38,8 +33,8 @@ func (block *DataBlock) FillColumnsByPlan(plan *planners.MapPlan) (*DataBlock, e
 	rows := block.NumRows()
 	if rows == 0 {
 		// If empty, returns header only.
-		cols := make([]*columns.Column, len(exprs))
-		for i, expr := range exprs {
+		cols := make([]*columns.Column, len(projectExprs))
+		for i, expr := range projectExprs {
 			cols[i] = columns.NewColumn(expr.String(), datatypes.NewStringDataType())
 		}
 		return NewDataBlock(cols), nil
@@ -49,7 +44,7 @@ func (block *DataBlock) FillColumnsByPlan(plan *planners.MapPlan) (*DataBlock, e
 
 		// Copy the colums from old.
 		columnValues = append(columnValues, block.values...)
-		for _, expr := range exprs {
+		for _, expr := range projectExprs {
 			var columnValue *DataBlockValue
 			name := expr.String()
 
@@ -91,9 +86,13 @@ func (block *DataBlock) FillColumnsByPlan(plan *planners.MapPlan) (*DataBlock, e
 			}
 			columnValues = append(columnValues, columnValue)
 		}
-		return &DataBlock{
+		result := &DataBlock{
 			seqs:   block.seqs,
 			values: columnValues,
-		}, nil
+		}
+		if hasAggregate {
+			result.SetToLast()
+		}
+		return result, nil
 	}
 }

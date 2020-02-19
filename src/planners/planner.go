@@ -5,9 +5,8 @@
 package planners
 
 import (
-	"expressions"
-
 	"base/errors"
+	"expressions"
 )
 
 type IPlan interface {
@@ -37,30 +36,42 @@ func Walk(visit Visit, plans ...IPlan) error {
 	return nil
 }
 
-func BuildExpressions(plan IPlan) (expressions.IExpression, error) {
+func BuildExpressions(plan *MapPlan) ([]expressions.IExpression, error) {
+	exps := make([]expressions.IExpression, plan.Length())
+	for i, p := range plan.SubPlans {
+		expr, err := BuildExpression(p)
+		if err != nil {
+			return nil, err
+		}
+		exps[i] = expr
+	}
+	return exps, nil
+}
+
+func BuildExpression(plan IPlan) (expressions.IExpression, error) {
 	switch t := plan.(type) {
 	case *VariablePlan:
 		return expressions.VAR(string(t.Value)), nil
 	case *ConstantPlan:
 		return expressions.CONST(t.Value), nil
 	case *AliasedExpressionPlan:
-		expr, err := BuildExpressions(t.Expr)
+		expr, err := BuildExpression(t.Expr)
 		if err != nil {
 			return nil, err
 		}
 		return expressions.ALIASED(t.As, expr), nil
 	case *UnaryExpressionPlan:
-		expr, err := BuildExpressions(t.Expr)
+		expr, err := BuildExpression(t.Expr)
 		if err != nil {
 			return nil, err
 		}
 		return expressions.ExpressionFactory(t.FuncName, []interface{}{expr})
 	case *BinaryExpressionPlan:
-		left, err := BuildExpressions(t.Left)
+		left, err := BuildExpression(t.Left)
 		if err != nil {
 			return nil, err
 		}
-		right, err := BuildExpressions(t.Right)
+		right, err := BuildExpression(t.Right)
 		if err != nil {
 			return nil, err
 		}
@@ -68,7 +79,7 @@ func BuildExpressions(plan IPlan) (expressions.IExpression, error) {
 	case *FunctionExpressionPlan:
 		exprArgs := make([]interface{}, len(t.Args))
 		for i, arg := range t.Args {
-			expr, err := BuildExpressions(arg)
+			expr, err := BuildExpression(arg)
 			if err != nil {
 				return nil, err
 			}

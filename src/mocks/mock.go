@@ -26,7 +26,7 @@ type Mock struct {
 }
 
 func NewMock() (*Mock, func()) {
-	log := xlog.NewStdLog(xlog.Level(xlog.DEBUG))
+	log := xlog.NewStdLog(xlog.Level(xlog.ERROR))
 	conf := config.DefaultConfig()
 	session := sessions.NewSession()
 	ctx, cancel := context.WithCancel(context.Background())

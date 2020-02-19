@@ -108,7 +108,7 @@ func TestGroupByTransform(t *testing.T) {
 				)),
 			expect: mocks.NewBlockFromSlice(
 				[]*columns.Column{
-					{Name: "xage", DataType: datatypes.NewInt32DataType()},
+					{Name: "xage", DataType: datatypes.NewInt64DataType()},
 				},
 				[]interface{}{11},
 				[]interface{}{15},

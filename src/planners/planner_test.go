@@ -62,7 +62,7 @@ func TestPlanner(t *testing.T) {
 
 	for _, test := range tests {
 		plan := test.plan
-		exprs, err := BuildExpressions(plan)
+		exprs, err := BuildExpression(plan)
 		if test.errString == "" {
 			assert.Nil(t, err)
 		} else {

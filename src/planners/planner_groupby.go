@@ -43,6 +43,10 @@ func (plan *GroupByPlan) Build() error {
 	return nil
 }
 
+func (plan *GroupByPlan) NeedMerge() bool {
+	return (plan.GroupBys.Length() > 0) || plan.HasAggregate
+}
+
 func (plan *GroupByPlan) Walk(visit Visit) error {
 	return Walk(visit, plan.Projects, plan.GroupBys)
 }

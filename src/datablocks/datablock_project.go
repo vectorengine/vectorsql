@@ -7,7 +7,6 @@ package datablocks
 import (
 	"columns"
 	"datatypes"
-	"expressions"
 	"planners"
 )
 
@@ -15,13 +14,9 @@ func (block *DataBlock) ProjectByPlan(plan *planners.MapPlan) (*DataBlock, error
 	projects := plan
 
 	// Build the project exprs.
-	exprs := make([]expressions.IExpression, projects.Length())
-	for i, plan := range projects.SubPlans {
-		expr, err := planners.BuildExpressions(plan)
-		if err != nil {
-			return nil, err
-		}
-		exprs[i] = expr
+	exprs, err := planners.BuildExpressions(projects)
+	if err != nil {
+		return nil, err
 	}
 
 	rows := block.NumRows()
@@ -35,9 +30,7 @@ func (block *DataBlock) ProjectByPlan(plan *planners.MapPlan) (*DataBlock, error
 	} else {
 		columnValues := make([]*DataBlockValue, len(exprs))
 		for i, expr := range exprs {
-			name := expr.String()
-			// Check exists.
-			columnValue, err := block.DataBlockValue(name)
+			columnValue, err := block.DataBlockValue(expr.String())
 			if err != nil {
 				return nil, err
 			}

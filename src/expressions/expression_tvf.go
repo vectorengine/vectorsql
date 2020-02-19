@@ -72,7 +72,7 @@ func RANDTABLE(args ...interface{}) IExpression {
 					switch args[j].AsString() {
 					case "String":
 						row[j-1] = datavalues.MakeString(fmt.Sprintf("string-%v", rand.Intn(count)))
-					case "UInt32", "Int32":
+					case "UInt32", "Int32", "UInt64", "Int64":
 						row[j-1] = datavalues.MakeInt(rand.Intn(count))
 					default:
 						return nil, errors.Errorf("Unsupported type:%v", arg)

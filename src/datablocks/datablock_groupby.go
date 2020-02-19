@@ -17,26 +17,18 @@ func (block *DataBlock) GroupByPlan(groupby *planners.GroupByPlan) ([]*DataBlock
 
 	// GroupBy all.
 	if groupbys.Length() == 0 {
-		group, err := block.FillColumnsByPlan(projects)
+		group, err := block.FillColumnsByPlan(hasAggregate, projects)
 		if err != nil {
 			return nil, err
-		}
-		if hasAggregate {
-			group.SetToLast()
 		}
 		return []*DataBlock{group}, nil
 	} else {
 		params := make(expressions.Map)
 		hashmap := datavalues.NewHashMap()
 
-		// Build the project groupbyExprs.
-		groupbyExprs := make([]expressions.IExpression, groupbys.Length())
-		for i, plan := range groupbys.SubPlans {
-			expr, err := planners.BuildExpressions(plan)
-			if err != nil {
-				return nil, err
-			}
-			groupbyExprs[i] = expr
+		groupbyExprs, err := planners.BuildExpressions(groupbys)
+		if err != nil {
+			return nil, err
 		}
 
 		// Build the groups.
@@ -81,12 +73,9 @@ func (block *DataBlock) GroupByPlan(groupby *planners.GroupByPlan) ([]*DataBlock
 			if !ok {
 				break
 			}
-			group, err := v.(*DataBlock).FillColumnsByPlan(groupby.Projects)
+			group, err := v.(*DataBlock).FillColumnsByPlan(hasAggregate, groupby.Projects)
 			if err != nil {
 				return nil, err
-			}
-			if hasAggregate {
-				group.SetToLast()
 			}
 			groups[i] = group
 			i++

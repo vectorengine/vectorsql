@@ -16,28 +16,21 @@ import (
 )
 
 func (block *DataBlock) OrderByPlan(plan *planners.OrderByPlan) error {
-	var fields []string
 	defer expvar.Get(metric_datablock_filter_sec).(metric.Metric).Record(time.Now())
-
-	// Find the column name which all the orderby used.
-	if err := plan.Walk(func(p planners.IPlan) (bool, error) {
-		switch p := p.(type) {
-		case *planners.VariablePlan:
-			fields = append(fields, string(p.Value))
-		}
-		return true, nil
-	}); err != nil {
-		return err
-	}
 
 	// Build the orderby to IExpression.
 	exprs := make([]expressions.IExpression, len(plan.Orders))
 	for i, order := range plan.Orders {
-		expr, err := planners.BuildExpressions(order.Expression)
+		expr, err := planners.BuildExpression(order.Expression)
 		if err != nil {
 			return err
 		}
 		exprs[i] = expr
+	}
+
+	fields, err := expressions.VariableValues(exprs...)
+	if err != nil {
+		return err
 	}
 
 	// Orderby column value.

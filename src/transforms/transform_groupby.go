@@ -37,7 +37,7 @@ func (t *GroupByTransform) Execute() {
 	onNext := func(x interface{}) {
 		switch y := x.(type) {
 		case *datablocks.DataBlock:
-			if plan.GroupBys.Length() == 0 {
+			if !plan.NeedMerge() {
 				if blocks, err := y.GroupByPlan(t.plan); err != nil {
 					out.Send(err)
 				} else {
@@ -60,7 +60,7 @@ func (t *GroupByTransform) Execute() {
 	}
 	onDone := func() {
 		defer wg.Done()
-		if block != nil && plan.GroupBys.Length() > 0 {
+		if block != nil {
 			if blocks, err := block.GroupByPlan(t.plan); err != nil {
 				out.Send(err)
 			} else {

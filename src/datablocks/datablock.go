@@ -5,6 +5,8 @@
 package datablocks
 
 import (
+	"fmt"
+
 	"base/errors"
 	"columns"
 	"datavalues"
@@ -120,4 +122,22 @@ func (block *DataBlock) WriteRow(values []*datavalues.Value) error {
 	}
 	block.seqs = append(block.seqs, datavalues.MakeInt(offset))
 	return nil
+}
+
+func (block *DataBlock) Dump() {
+	header := "\n| "
+	for _, cv := range block.values {
+		header += fmt.Sprintf("%v(%T)", cv.column.Name, cv.column.DataType)
+		header += " | "
+	}
+	fmt.Print(header)
+
+	body := "\n"
+	it := block.RowIterator()
+	for it.Next() {
+		value := it.Value()
+		body += fmt.Sprintf("%+v", value)
+		body += "\n"
+	}
+	fmt.Print(body)
 }
