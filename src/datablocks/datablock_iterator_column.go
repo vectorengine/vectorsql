@@ -11,7 +11,7 @@ import (
 
 type DataBlockColumnIterator struct {
 	cv      *DataBlockValue
-	seqs    []*datavalues.Value
+	seqs    []int
 	rows    int
 	current int
 }
@@ -37,5 +37,5 @@ func (it *DataBlockColumnIterator) Next() bool {
 }
 
 func (it *DataBlockColumnIterator) Value() *datavalues.Value {
-	return it.cv.values[it.seqs[it.current].AsInt()]
+	return it.cv.values[it.seqs[it.current]]
 }

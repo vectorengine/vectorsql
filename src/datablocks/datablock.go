@@ -13,15 +13,15 @@ import (
 )
 
 type DataBlock struct {
+	seqs   []int
 	info   *DataBlockInfo
-	seqs   []*datavalues.Value
 	values []*DataBlockValue
 }
 
 func NewDataBlock(cols []*columns.Column) *DataBlock {
 	block := &DataBlock{
 		info:   &DataBlockInfo{},
-		seqs:   make([]*datavalues.Value, 0),
+		seqs:   make([]int, 0),
 		values: make([]*DataBlockValue, len(cols)),
 	}
 
@@ -32,7 +32,7 @@ func NewDataBlock(cols []*columns.Column) *DataBlock {
 	return block
 }
 
-func newDataBlock(seqs []*datavalues.Value, values []*DataBlockValue) *DataBlock {
+func newDataBlock(seqs []int, values []*DataBlockValue) *DataBlock {
 	return &DataBlock{
 		info:   &DataBlockInfo{},
 		seqs:   seqs,
@@ -120,7 +120,7 @@ func (block *DataBlock) WriteRow(values []*datavalues.Value) error {
 	for i := 0; i < cols; i++ {
 		block.values[i].values = append(block.values[i].values, values[i])
 	}
-	block.seqs = append(block.seqs, datavalues.MakeInt(offset))
+	block.seqs = append(block.seqs, offset)
 	return nil
 }
 

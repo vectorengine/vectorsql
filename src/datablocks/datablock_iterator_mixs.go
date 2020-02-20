@@ -66,7 +66,7 @@ func (it *DataBlockMixsIterator) Value() []*datavalues.Value {
 	values := make([]*datavalues.Value, len(it.indexs))
 
 	for i := range it.indexs {
-		values[i] = block.values[it.indexs[i]].values[block.seqs[it.current].AsInt()]
+		values[i] = block.values[it.indexs[i]].values[block.seqs[it.current]]
 	}
 	return values
 }

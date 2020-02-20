@@ -78,7 +78,7 @@ func (block *DataBlock) FillColumnsByPlan(hasAggregate bool, plan *planners.MapP
 					columnValue = NewDataBlockValueWithCapacity(columns.NewColumn(name, dtype), rows)
 				}
 				if seqs != nil {
-					columnValue.values[seqs[k].AsInt()] = val
+					columnValue.values[seqs[k]] = val
 				} else {
 					columnValue.values[k] = val
 				}

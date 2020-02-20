@@ -42,7 +42,7 @@ func (it *DataBlockRowIterator) Value() []*datavalues.Value {
 	values := make([]*datavalues.Value, it.block.NumColumns())
 
 	for i := range values {
-		values[i] = block.values[i].values[block.seqs[it.current].AsInt()]
+		values[i] = block.values[i].values[block.seqs[it.current]]
 	}
 	return values
 }
