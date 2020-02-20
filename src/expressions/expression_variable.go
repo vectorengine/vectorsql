@@ -24,7 +24,11 @@ func NewVariableExpression(v string) *VariableExpression {
 	}
 }
 
-func (e *VariableExpression) Eval(params IParams) (*datavalues.Value, error) {
+func (e *VariableExpression) Get() (*datavalues.Value, error) {
+	return datavalues.MakePhantom(), nil
+}
+
+func (e *VariableExpression) Update(params IParams) (*datavalues.Value, error) {
 	if params != nil {
 		v, ok := params.Get(e.value)
 		if !ok {

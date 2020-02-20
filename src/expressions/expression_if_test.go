@@ -42,7 +42,7 @@ func TestIFExpression(t *testing.T) {
 			"b": datavalues.ToValue(2),
 			"c": datavalues.ToValue(4),
 		}
-		actual, err := test.expr.Eval(params)
+		actual, err := test.expr.Update(params)
 		if test.errstring != "" {
 			assert.NotNil(t, err)
 		} else {

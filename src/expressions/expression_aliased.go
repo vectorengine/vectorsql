@@ -25,8 +25,12 @@ func NewAliasedExpression(name string, expr IExpression) *AliasedExpression {
 	}
 }
 
-func (e *AliasedExpression) Eval(params IParams) (*datavalues.Value, error) {
-	return e.expr.Eval(params)
+func (e *AliasedExpression) Get() (*datavalues.Value, error) {
+	return e.expr.Get()
+}
+
+func (e *AliasedExpression) Update(params IParams) (*datavalues.Value, error) {
+	return e.expr.Update(params)
 }
 
 func (e *AliasedExpression) Walk(visit Visit) error {

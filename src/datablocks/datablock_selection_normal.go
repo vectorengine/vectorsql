@@ -11,7 +11,7 @@ import (
 	"planners"
 )
 
-func (block *DataBlock) FillColumnsByPlan(hasAggregate bool, plan *planners.MapPlan) (*DataBlock, error) {
+func (block *DataBlock) NormalSelectionByPlan(plan *planners.MapPlan) (*DataBlock, error) {
 	projects := plan
 
 	projectExprs, err := planners.BuildExpressions(projects)
@@ -65,7 +65,7 @@ func (block *DataBlock) FillColumnsByPlan(hasAggregate bool, plan *planners.MapP
 				for j := range row {
 					params[it.Column(j).Name] = row[j]
 				}
-				val, err := expr.Eval(params)
+				val, err := expr.Update(params)
 				if err != nil {
 					return nil, err
 				}
@@ -86,13 +86,9 @@ func (block *DataBlock) FillColumnsByPlan(hasAggregate bool, plan *planners.MapP
 			}
 			columnValues = append(columnValues, columnValue)
 		}
-		result := &DataBlock{
+		return &DataBlock{
 			seqs:   block.seqs,
 			values: columnValues,
-		}
-		if hasAggregate {
-			result.SetToLast()
-		}
-		return result, nil
+		}, nil
 	}
 }

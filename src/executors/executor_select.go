@@ -44,8 +44,8 @@ func (executor *SelectExecutor) Execute() (processors.IProcessor, error) {
 		case *planners.FilterPlan:
 			executor := NewFilterExecutor(ectx, plan)
 			tree.Add(executor)
-		case *planners.GroupByPlan:
-			executor := NewGroupByExecutor(ectx, plan)
+		case *planners.SelectionPlan:
+			executor := NewSelectionExecutor(ectx, plan)
 			tree.Add(executor)
 		case *planners.OrderByPlan:
 			executor := NewOrderByExecutor(ectx, plan)
@@ -60,7 +60,7 @@ func (executor *SelectExecutor) Execute() (processors.IProcessor, error) {
 			executor := NewSinkExecutor(ectx, plan)
 			tree.Add(executor)
 		default:
-			return nil, errors.Errorf("Unsupport plan:%T", plan)
+			return nil, errors.Errorf("Unsupported plan:%T", plan)
 		}
 	}
 	pipeline, err := tree.BuildPipeline()

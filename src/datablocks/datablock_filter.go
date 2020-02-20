@@ -34,7 +34,7 @@ func (block *DataBlock) FilterByPlan(plan *planners.FilterPlan) error {
 		for k := range row {
 			params[it.Column(k).Name] = row[k]
 		}
-		v, err := expr.Eval(params)
+		v, err := expr.Update(params)
 		if err != nil {
 			return err
 		}

@@ -10,7 +10,7 @@ import (
 	"planners"
 )
 
-func (block *DataBlock) ProjectByPlan(plan *planners.MapPlan) (*DataBlock, error) {
+func (block *DataBlock) ProjectionByPlan(plan *planners.MapPlan) (*DataBlock, error) {
 	projects := plan
 
 	// Build the project exprs.

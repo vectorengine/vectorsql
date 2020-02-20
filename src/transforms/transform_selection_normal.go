@@ -10,34 +10,34 @@ import (
 	"processors"
 )
 
-type ProjectionTransform struct {
+type NormalSelectionTransform struct {
 	ctx  *TransformContext
-	plan *planners.ProjectionPlan
+	plan *planners.SelectionPlan
 	processors.BaseProcessor
 }
 
-func NewProjectionTransform(ctx *TransformContext, plan *planners.ProjectionPlan) processors.IProcessor {
-	return &ProjectionTransform{
+func NewNormalSelectionTransform(ctx *TransformContext, plan *planners.SelectionPlan) processors.IProcessor {
+	return &NormalSelectionTransform{
 		ctx:           ctx,
 		plan:          plan,
-		BaseProcessor: processors.NewBaseProcessor("transform_projection"),
+		BaseProcessor: processors.NewBaseProcessor("transform_normal_selection"),
 	}
 }
 
-func (t *ProjectionTransform) Execute() {
+func (t *NormalSelectionTransform) Execute() {
 	out := t.Out()
-
 	defer out.Close()
+
 	onNext := func(x interface{}) {
 		switch y := x.(type) {
 		case *datablocks.DataBlock:
-			if block, err := y.ProjectionByPlan(t.plan.Projections); err != nil {
+			if block, err := y.NormalSelectionByPlan(t.plan.Projects); err != nil {
 				out.Send(err)
 			} else {
 				out.Send(block)
 			}
-		default:
-			out.Send(x)
+		case error:
+			out.Send(y)
 		}
 	}
 	t.Subscribe(onNext)

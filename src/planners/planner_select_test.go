@@ -35,14 +35,14 @@ func TestSelectPlan(t *testing.T) {
                 "Schema": ""
             },
             {
-                "Name": "GroupByPlan",
-                "HasAggregate": false,
+                "Name": "SelectionPlan",
                 "Projects": {
                     "Name": "MapPlan"
                 },
                 "GroupBys": {
                     "Name": "MapPlan"
-                }
+                },
+                "SelectionMode": "NormalSelection"
             },
             {
                 "Name": "SinkPlan"
@@ -52,23 +52,22 @@ func TestSelectPlan(t *testing.T) {
 }`,
 		},
 		{
-			name: "filter",
+			name: "complex",
 			query: `SELECT 
-    IF(c1>10, c2, c2),
-    sum(c1) AS c1_sum, 
-    count(c1) AS c1_count, 
-    c1_sum / c1_count AS c1_avg, 
-    c2, 
-    c2+1,
-    c3
-FROM randtable(rows -> 1000, c1 -> 'UInt32', c2 -> 'UInt32', c3 -> 'String')
-WHERE (c1 > 80) AND ((c1 + c2) < 500) OR (c2>10)
-GROUP BY c3
-ORDER BY 
-    c1_count DESC, 
-    c3 ASC
-LIMIT 10
-`,
+    COUNT(server) as count,
+    SUM(IF(status != 200, 1, 0)) AS errors, 
+    SUM(IF(status = 200, 1, 0)) AS success, 
+    errors / COUNT(server) AS error_rate, 
+    success / COUNT(server) AS success_rate, 
+    SUM(response_time) / COUNT(server) AS load_avg, 
+    MIN(response_time), 
+    MAX(response_time), 
+    server
+FROM logmock(rows -> 15)
+GROUP BY server
+HAVING errors > 0
+ORDER BY server ASC, load_avg DESC
+LIMIT 10`,
 			expect: `{
     "Name": "SelectPlan",
     "SubPlan": {
@@ -77,7 +76,7 @@ LIMIT 10
             {
                 "Name": "TableValuedFunctionPlan",
                 "As": "",
-                "FuncName": "randtable",
+                "FuncName": "logmock",
                 "SubPlan": {
                     "Name": "MapPlan",
                     "SubPlans": [
@@ -93,55 +92,7 @@ LIMIT 10
                                 },
                                 "Right": {
                                     "Name": "ConstantPlan",
-                                    "Value": 1000
-                                }
-                            }
-                        },
-                        {
-                            "Name": "TableValuedFunctionExpressionPlan",
-                            "FuncName": "",
-                            "SubPlan": {
-                                "Name": "BinaryExpressionPlan",
-                                "FuncName": "-\u003e",
-                                "Left": {
-                                    "Name": "VariablePlan",
-                                    "Value": "c1"
-                                },
-                                "Right": {
-                                    "Name": "ConstantPlan",
-                                    "Value": "UInt32"
-                                }
-                            }
-                        },
-                        {
-                            "Name": "TableValuedFunctionExpressionPlan",
-                            "FuncName": "",
-                            "SubPlan": {
-                                "Name": "BinaryExpressionPlan",
-                                "FuncName": "-\u003e",
-                                "Left": {
-                                    "Name": "VariablePlan",
-                                    "Value": "c2"
-                                },
-                                "Right": {
-                                    "Name": "ConstantPlan",
-                                    "Value": "UInt32"
-                                }
-                            }
-                        },
-                        {
-                            "Name": "TableValuedFunctionExpressionPlan",
-                            "FuncName": "",
-                            "SubPlan": {
-                                "Name": "BinaryExpressionPlan",
-                                "FuncName": "-\u003e",
-                                "Left": {
-                                    "Name": "VariablePlan",
-                                    "Value": "c3"
-                                },
-                                "Right": {
-                                    "Name": "ConstantPlan",
-                                    "Value": "String"
+                                    "Value": 15
                                 }
                             }
                         }
@@ -149,119 +100,185 @@ LIMIT 10
                 }
             },
             {
-                "Name": "FilterPlan",
-                "SubPlan": {
-                    "Name": "BinaryExpressionPlan",
-                    "FuncName": "OR",
-                    "Left": {
-                        "Name": "BinaryExpressionPlan",
-                        "FuncName": "AND",
-                        "Left": {
-                            "Name": "BinaryExpressionPlan",
-                            "FuncName": "\u003e",
-                            "Left": {
-                                "Name": "VariablePlan",
-                                "Value": "c1"
-                            },
-                            "Right": {
-                                "Name": "ConstantPlan",
-                                "Value": 80
-                            }
-                        },
-                        "Right": {
-                            "Name": "BinaryExpressionPlan",
-                            "FuncName": "\u003c",
-                            "Left": {
-                                "Name": "BinaryExpressionPlan",
-                                "FuncName": "+",
-                                "Left": {
-                                    "Name": "VariablePlan",
-                                    "Value": "c1"
-                                },
-                                "Right": {
-                                    "Name": "VariablePlan",
-                                    "Value": "c2"
-                                }
-                            },
-                            "Right": {
-                                "Name": "ConstantPlan",
-                                "Value": 500
-                            }
-                        }
-                    },
-                    "Right": {
-                        "Name": "BinaryExpressionPlan",
-                        "FuncName": "\u003e",
-                        "Left": {
-                            "Name": "VariablePlan",
-                            "Value": "c2"
-                        },
-                        "Right": {
-                            "Name": "ConstantPlan",
-                            "Value": 10
-                        }
-                    }
-                }
-            },
-            {
-                "Name": "GroupByPlan",
-                "HasAggregate": true,
+                "Name": "SelectionPlan",
                 "Projects": {
                     "Name": "MapPlan",
                     "SubPlans": [
                         {
-                            "Name": "FunctionExpressionPlan",
-                            "FuncName": "IF",
-                            "Args": [
-                                {
-                                    "Name": "BinaryExpressionPlan",
-                                    "FuncName": "\u003e",
-                                    "Left": {
-                                        "Name": "VariablePlan",
-                                        "Value": "c1"
-                                    },
-                                    "Right": {
-                                        "Name": "ConstantPlan",
-                                        "Value": 10
-                                    }
-                                },
-                                {
-                                    "Name": "VariablePlan",
-                                    "Value": "c2"
-                                },
-                                {
-                                    "Name": "VariablePlan",
-                                    "Value": "c2"
-                                }
-                            ]
-                        },
-                        {
                             "Name": "AliasedExpressionPlan",
-                            "As": "c1_sum",
-                            "Expr": {
-                                "Name": "UnaryExpressionPlan",
-                                "FuncName": "SUM",
-                                "Expr": {
-                                    "Name": "VariablePlan",
-                                    "Value": "c1"
-                                }
-                            }
-                        },
-                        {
-                            "Name": "AliasedExpressionPlan",
-                            "As": "c1_count",
+                            "As": "count",
                             "Expr": {
                                 "Name": "UnaryExpressionPlan",
                                 "FuncName": "COUNT",
                                 "Expr": {
                                     "Name": "VariablePlan",
-                                    "Value": "c1"
+                                    "Value": "server"
                                 }
                             }
                         },
                         {
                             "Name": "AliasedExpressionPlan",
-                            "As": "c1_avg",
+                            "As": "errors",
+                            "Expr": {
+                                "Name": "UnaryExpressionPlan",
+                                "FuncName": "SUM",
+                                "Expr": {
+                                    "Name": "FunctionExpressionPlan",
+                                    "FuncName": "IF",
+                                    "Args": [
+                                        {
+                                            "Name": "BinaryExpressionPlan",
+                                            "FuncName": "!=",
+                                            "Left": {
+                                                "Name": "VariablePlan",
+                                                "Value": "status"
+                                            },
+                                            "Right": {
+                                                "Name": "ConstantPlan",
+                                                "Value": 200
+                                            }
+                                        },
+                                        {
+                                            "Name": "ConstantPlan",
+                                            "Value": 1
+                                        },
+                                        {
+                                            "Name": "ConstantPlan",
+                                            "Value": 0
+                                        }
+                                    ]
+                                }
+                            }
+                        },
+                        {
+                            "Name": "AliasedExpressionPlan",
+                            "As": "success",
+                            "Expr": {
+                                "Name": "UnaryExpressionPlan",
+                                "FuncName": "SUM",
+                                "Expr": {
+                                    "Name": "FunctionExpressionPlan",
+                                    "FuncName": "IF",
+                                    "Args": [
+                                        {
+                                            "Name": "BinaryExpressionPlan",
+                                            "FuncName": "=",
+                                            "Left": {
+                                                "Name": "VariablePlan",
+                                                "Value": "status"
+                                            },
+                                            "Right": {
+                                                "Name": "ConstantPlan",
+                                                "Value": 200
+                                            }
+                                        },
+                                        {
+                                            "Name": "ConstantPlan",
+                                            "Value": 1
+                                        },
+                                        {
+                                            "Name": "ConstantPlan",
+                                            "Value": 0
+                                        }
+                                    ]
+                                }
+                            }
+                        },
+                        {
+                            "Name": "AliasedExpressionPlan",
+                            "As": "error_rate",
+                            "Expr": {
+                                "Name": "BinaryExpressionPlan",
+                                "FuncName": "/",
+                                "Left": {
+                                    "Name": "UnaryExpressionPlan",
+                                    "FuncName": "SUM",
+                                    "Expr": {
+                                        "Name": "FunctionExpressionPlan",
+                                        "FuncName": "IF",
+                                        "Args": [
+                                            {
+                                                "Name": "BinaryExpressionPlan",
+                                                "FuncName": "!=",
+                                                "Left": {
+                                                    "Name": "VariablePlan",
+                                                    "Value": "status"
+                                                },
+                                                "Right": {
+                                                    "Name": "ConstantPlan",
+                                                    "Value": 200
+                                                }
+                                            },
+                                            {
+                                                "Name": "ConstantPlan",
+                                                "Value": 1
+                                            },
+                                            {
+                                                "Name": "ConstantPlan",
+                                                "Value": 0
+                                            }
+                                        ]
+                                    }
+                                },
+                                "Right": {
+                                    "Name": "UnaryExpressionPlan",
+                                    "FuncName": "COUNT",
+                                    "Expr": {
+                                        "Name": "VariablePlan",
+                                        "Value": "server"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "Name": "AliasedExpressionPlan",
+                            "As": "success_rate",
+                            "Expr": {
+                                "Name": "BinaryExpressionPlan",
+                                "FuncName": "/",
+                                "Left": {
+                                    "Name": "UnaryExpressionPlan",
+                                    "FuncName": "SUM",
+                                    "Expr": {
+                                        "Name": "FunctionExpressionPlan",
+                                        "FuncName": "IF",
+                                        "Args": [
+                                            {
+                                                "Name": "BinaryExpressionPlan",
+                                                "FuncName": "=",
+                                                "Left": {
+                                                    "Name": "VariablePlan",
+                                                    "Value": "status"
+                                                },
+                                                "Right": {
+                                                    "Name": "ConstantPlan",
+                                                    "Value": 200
+                                                }
+                                            },
+                                            {
+                                                "Name": "ConstantPlan",
+                                                "Value": 1
+                                            },
+                                            {
+                                                "Name": "ConstantPlan",
+                                                "Value": 0
+                                            }
+                                        ]
+                                    }
+                                },
+                                "Right": {
+                                    "Name": "UnaryExpressionPlan",
+                                    "FuncName": "COUNT",
+                                    "Expr": {
+                                        "Name": "VariablePlan",
+                                        "Value": "server"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "Name": "AliasedExpressionPlan",
+                            "As": "load_avg",
                             "Expr": {
                                 "Name": "BinaryExpressionPlan",
                                 "FuncName": "/",
@@ -270,7 +287,7 @@ LIMIT 10
                                     "FuncName": "SUM",
                                     "Expr": {
                                         "Name": "VariablePlan",
-                                        "Value": "c1"
+                                        "Value": "response_time"
                                     }
                                 },
                                 "Right": {
@@ -278,30 +295,30 @@ LIMIT 10
                                     "FuncName": "COUNT",
                                     "Expr": {
                                         "Name": "VariablePlan",
-                                        "Value": "c1"
+                                        "Value": "server"
                                     }
                                 }
                             }
                         },
                         {
-                            "Name": "VariablePlan",
-                            "Value": "c2"
+                            "Name": "UnaryExpressionPlan",
+                            "FuncName": "MIN",
+                            "Expr": {
+                                "Name": "VariablePlan",
+                                "Value": "response_time"
+                            }
                         },
                         {
-                            "Name": "BinaryExpressionPlan",
-                            "FuncName": "+",
-                            "Left": {
+                            "Name": "UnaryExpressionPlan",
+                            "FuncName": "MAX",
+                            "Expr": {
                                 "Name": "VariablePlan",
-                                "Value": "c2"
-                            },
-                            "Right": {
-                                "Name": "ConstantPlan",
-                                "Value": 1
+                                "Value": "response_time"
                             }
                         },
                         {
                             "Name": "VariablePlan",
-                            "Value": "c3"
+                            "Value": "server"
                         }
                     ]
                 },
@@ -310,9 +327,25 @@ LIMIT 10
                     "SubPlans": [
                         {
                             "Name": "VariablePlan",
-                            "Value": "c3"
+                            "Value": "server"
                         }
                     ]
+                },
+                "SelectionMode": "GroupBySelection"
+            },
+            {
+                "Name": "FilterPlan",
+                "SubPlan": {
+                    "Name": "BinaryExpressionPlan",
+                    "FuncName": "\u003e",
+                    "Left": {
+                        "Name": "VariablePlan",
+                        "Value": "errors"
+                    },
+                    "Right": {
+                        "Name": "ConstantPlan",
+                        "Value": 0
+                    }
                 }
             },
             {
@@ -321,16 +354,16 @@ LIMIT 10
                     {
                         "Expression": {
                             "Name": "VariablePlan",
-                            "Value": "c1_count"
+                            "Value": "server"
                         },
-                        "Direction": "desc"
+                        "Direction": "asc"
                     },
                     {
                         "Expression": {
                             "Name": "VariablePlan",
-                            "Value": "c3"
+                            "Value": "load_avg"
                         },
-                        "Direction": "asc"
+                        "Direction": "desc"
                     }
                 ]
             },
@@ -351,58 +384,180 @@ LIMIT 10
                     "Name": "MapPlan",
                     "SubPlans": [
                         {
-                            "Name": "FunctionExpressionPlan",
-                            "FuncName": "IF",
-                            "Args": [
-                                {
-                                    "Name": "BinaryExpressionPlan",
-                                    "FuncName": "\u003e",
-                                    "Left": {
-                                        "Name": "VariablePlan",
-                                        "Value": "c1"
-                                    },
-                                    "Right": {
-                                        "Name": "ConstantPlan",
-                                        "Value": 10
-                                    }
-                                },
-                                {
-                                    "Name": "VariablePlan",
-                                    "Value": "c2"
-                                },
-                                {
-                                    "Name": "VariablePlan",
-                                    "Value": "c2"
-                                }
-                            ]
-                        },
-                        {
                             "Name": "AliasedExpressionPlan",
-                            "As": "c1_sum",
-                            "Expr": {
-                                "Name": "UnaryExpressionPlan",
-                                "FuncName": "SUM",
-                                "Expr": {
-                                    "Name": "VariablePlan",
-                                    "Value": "c1"
-                                }
-                            }
-                        },
-                        {
-                            "Name": "AliasedExpressionPlan",
-                            "As": "c1_count",
+                            "As": "count",
                             "Expr": {
                                 "Name": "UnaryExpressionPlan",
                                 "FuncName": "COUNT",
                                 "Expr": {
                                     "Name": "VariablePlan",
-                                    "Value": "c1"
+                                    "Value": "server"
                                 }
                             }
                         },
                         {
                             "Name": "AliasedExpressionPlan",
-                            "As": "c1_avg",
+                            "As": "errors",
+                            "Expr": {
+                                "Name": "UnaryExpressionPlan",
+                                "FuncName": "SUM",
+                                "Expr": {
+                                    "Name": "FunctionExpressionPlan",
+                                    "FuncName": "IF",
+                                    "Args": [
+                                        {
+                                            "Name": "BinaryExpressionPlan",
+                                            "FuncName": "!=",
+                                            "Left": {
+                                                "Name": "VariablePlan",
+                                                "Value": "status"
+                                            },
+                                            "Right": {
+                                                "Name": "ConstantPlan",
+                                                "Value": 200
+                                            }
+                                        },
+                                        {
+                                            "Name": "ConstantPlan",
+                                            "Value": 1
+                                        },
+                                        {
+                                            "Name": "ConstantPlan",
+                                            "Value": 0
+                                        }
+                                    ]
+                                }
+                            }
+                        },
+                        {
+                            "Name": "AliasedExpressionPlan",
+                            "As": "success",
+                            "Expr": {
+                                "Name": "UnaryExpressionPlan",
+                                "FuncName": "SUM",
+                                "Expr": {
+                                    "Name": "FunctionExpressionPlan",
+                                    "FuncName": "IF",
+                                    "Args": [
+                                        {
+                                            "Name": "BinaryExpressionPlan",
+                                            "FuncName": "=",
+                                            "Left": {
+                                                "Name": "VariablePlan",
+                                                "Value": "status"
+                                            },
+                                            "Right": {
+                                                "Name": "ConstantPlan",
+                                                "Value": 200
+                                            }
+                                        },
+                                        {
+                                            "Name": "ConstantPlan",
+                                            "Value": 1
+                                        },
+                                        {
+                                            "Name": "ConstantPlan",
+                                            "Value": 0
+                                        }
+                                    ]
+                                }
+                            }
+                        },
+                        {
+                            "Name": "AliasedExpressionPlan",
+                            "As": "error_rate",
+                            "Expr": {
+                                "Name": "BinaryExpressionPlan",
+                                "FuncName": "/",
+                                "Left": {
+                                    "Name": "UnaryExpressionPlan",
+                                    "FuncName": "SUM",
+                                    "Expr": {
+                                        "Name": "FunctionExpressionPlan",
+                                        "FuncName": "IF",
+                                        "Args": [
+                                            {
+                                                "Name": "BinaryExpressionPlan",
+                                                "FuncName": "!=",
+                                                "Left": {
+                                                    "Name": "VariablePlan",
+                                                    "Value": "status"
+                                                },
+                                                "Right": {
+                                                    "Name": "ConstantPlan",
+                                                    "Value": 200
+                                                }
+                                            },
+                                            {
+                                                "Name": "ConstantPlan",
+                                                "Value": 1
+                                            },
+                                            {
+                                                "Name": "ConstantPlan",
+                                                "Value": 0
+                                            }
+                                        ]
+                                    }
+                                },
+                                "Right": {
+                                    "Name": "UnaryExpressionPlan",
+                                    "FuncName": "COUNT",
+                                    "Expr": {
+                                        "Name": "VariablePlan",
+                                        "Value": "server"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "Name": "AliasedExpressionPlan",
+                            "As": "success_rate",
+                            "Expr": {
+                                "Name": "BinaryExpressionPlan",
+                                "FuncName": "/",
+                                "Left": {
+                                    "Name": "UnaryExpressionPlan",
+                                    "FuncName": "SUM",
+                                    "Expr": {
+                                        "Name": "FunctionExpressionPlan",
+                                        "FuncName": "IF",
+                                        "Args": [
+                                            {
+                                                "Name": "BinaryExpressionPlan",
+                                                "FuncName": "=",
+                                                "Left": {
+                                                    "Name": "VariablePlan",
+                                                    "Value": "status"
+                                                },
+                                                "Right": {
+                                                    "Name": "ConstantPlan",
+                                                    "Value": 200
+                                                }
+                                            },
+                                            {
+                                                "Name": "ConstantPlan",
+                                                "Value": 1
+                                            },
+                                            {
+                                                "Name": "ConstantPlan",
+                                                "Value": 0
+                                            }
+                                        ]
+                                    }
+                                },
+                                "Right": {
+                                    "Name": "UnaryExpressionPlan",
+                                    "FuncName": "COUNT",
+                                    "Expr": {
+                                        "Name": "VariablePlan",
+                                        "Value": "server"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "Name": "AliasedExpressionPlan",
+                            "As": "load_avg",
                             "Expr": {
                                 "Name": "BinaryExpressionPlan",
                                 "FuncName": "/",
@@ -411,7 +566,7 @@ LIMIT 10
                                     "FuncName": "SUM",
                                     "Expr": {
                                         "Name": "VariablePlan",
-                                        "Value": "c1"
+                                        "Value": "response_time"
                                     }
                                 },
                                 "Right": {
@@ -419,30 +574,30 @@ LIMIT 10
                                     "FuncName": "COUNT",
                                     "Expr": {
                                         "Name": "VariablePlan",
-                                        "Value": "c1"
+                                        "Value": "server"
                                     }
                                 }
                             }
                         },
                         {
-                            "Name": "VariablePlan",
-                            "Value": "c2"
+                            "Name": "UnaryExpressionPlan",
+                            "FuncName": "MIN",
+                            "Expr": {
+                                "Name": "VariablePlan",
+                                "Value": "response_time"
+                            }
                         },
                         {
-                            "Name": "BinaryExpressionPlan",
-                            "FuncName": "+",
-                            "Left": {
+                            "Name": "UnaryExpressionPlan",
+                            "FuncName": "MAX",
+                            "Expr": {
                                 "Name": "VariablePlan",
-                                "Value": "c2"
-                            },
-                            "Right": {
-                                "Name": "ConstantPlan",
-                                "Value": 1
+                                "Value": "response_time"
                             }
                         },
                         {
                             "Name": "VariablePlan",
-                            "Value": "c3"
+                            "Value": "server"
                         }
                     ]
                 }

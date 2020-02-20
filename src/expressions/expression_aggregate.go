@@ -5,29 +5,34 @@
 package expressions
 
 import (
-	"base/docs"
-	"datavalues"
 	"fmt"
 	"strings"
+
+	"base/docs"
+	"datavalues"
 )
 
-type aggregateEvalFunc func(current, next *datavalues.Value) (*datavalues.Value, error)
+type aggregateUpdateFunc func(current, next *datavalues.Value) (*datavalues.Value, error)
 
 type AggregateExpression struct {
 	name          string
 	expr          IExpression
-	evalFn        aggregateEvalFunc
+	updateFn      aggregateUpdateFunc
 	saved         *datavalues.Value
 	validate      IValidator
 	argumentNames [][]string
 	description   docs.Documentation
 }
 
-func (e *AggregateExpression) Eval(params IParams) (*datavalues.Value, error) {
+func (e *AggregateExpression) Get() (*datavalues.Value, error) {
+	return e.saved, nil
+}
+
+func (e *AggregateExpression) Update(params IParams) (*datavalues.Value, error) {
 	var err error
 	var updated *datavalues.Value
 
-	if updated, err = e.expr.Eval(params); err != nil {
+	if updated, err = e.expr.Update(params); err != nil {
 		return nil, err
 	}
 	if e.validate != nil {
@@ -35,7 +40,7 @@ func (e *AggregateExpression) Eval(params IParams) (*datavalues.Value, error) {
 			return nil, err
 		}
 	}
-	if e.saved, err = e.evalFn(e.saved, updated); err != nil {
+	if e.saved, err = e.updateFn(e.saved, updated); err != nil {
 		return nil, err
 	}
 	return e.saved, nil

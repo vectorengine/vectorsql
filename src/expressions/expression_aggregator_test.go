@@ -89,9 +89,9 @@ func TestAggregatorsExpression(t *testing.T) {
 			"a": datavalues.ToValue(3),
 			"b": datavalues.ToValue(5),
 		}
-		_, err := test.expr.Eval(params1)
+		_, err := test.expr.Update(params1)
 		assert.Nil(t, err)
-		actual, err := test.expr.Eval(params2)
+		actual, err := test.expr.Update(params2)
 		assert.Nil(t, err)
 		assert.Equal(t, test.expect.AsFloat(), actual.AsFloat())
 

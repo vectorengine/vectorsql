@@ -14,10 +14,13 @@ type dataTypeCreator func() IDataType
 
 var (
 	table = map[string]dataTypeCreator{
-		DataTypeStringName: NewStringDataType,
-		DataTypeInt32Name:  NewInt32DataType,
-		DataTypeUInt32Name: NewUInt32DataType,
-		DataTypeUInt64Name: NewUInt64DataType,
+		DataTypeStringName:  NewStringDataType,
+		DataTypeInt32Name:   NewInt32DataType,
+		DataTypeUInt32Name:  NewUInt32DataType,
+		DataTypeInt64Name:   NewInt64DataType,
+		DataTypeUInt64Name:  NewUInt64DataType,
+		DataTypeFloat32Name: NewFloat32DataType,
+		DataTypeFloat64Name: NewFloat64DataType,
 	}
 )
 
@@ -25,7 +28,7 @@ func DataTypeFactory(name string) (IDataType, error) {
 	dt, ok := table[name]
 	if !ok {
 		if dt2, ok := table[strings.ToUpper(name)]; !ok {
-			return nil, errors.Errorf("Couldn't get the data type:%s", name)
+			return nil, errors.Errorf("Unsupported data type:%s", name)
 		} else {
 			return dt2(), nil
 		}

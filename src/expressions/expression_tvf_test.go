@@ -75,7 +75,7 @@ func TestTVFExpression(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		actual, err := test.expr.Eval(nil)
+		actual, err := test.expr.Update(nil)
 		if test.errstring != "" {
 			assert.NotNil(t, err)
 		} else {

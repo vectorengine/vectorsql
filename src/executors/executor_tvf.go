@@ -56,7 +56,7 @@ func (executor *TableValuedFunctionExecutor) Execute() (processors.IProcessor, e
 	if err != nil {
 		return nil, err
 	}
-	result, err := function.Eval(nil)
+	result, err := function.Update(nil)
 	if err != nil {
 		return nil, err
 	}

@@ -62,7 +62,7 @@ func (block *DataBlock) OrderByPlan(plan *planners.OrderByPlan) error {
 	if err != nil {
 		return err
 	}
-	result, err := zipFunc.Eval(nil)
+	result, err := zipFunc.Update(nil)
 	if err != nil {
 		return err
 	}
@@ -82,11 +82,11 @@ func (block *DataBlock) OrderByPlan(plan *planners.OrderByPlan) error {
 		}
 
 		for k, order := range plan.Orders {
-			ival, err := exprs[k].Eval(iparams)
+			ival, err := exprs[k].Update(iparams)
 			if err != nil {
 				return false
 			}
-			jval, err := exprs[k].Eval(jparams)
+			jval, err := exprs[k].Update(jparams)
 			if err != nil {
 				return false
 			}

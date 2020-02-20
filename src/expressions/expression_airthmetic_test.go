@@ -77,7 +77,7 @@ func TestAirthmeticsExpression(t *testing.T) {
 			"b": datavalues.ToValue(2),
 			"c": datavalues.ToValue("c"),
 		}
-		actual, err := test.expr.Eval(params)
+		actual, err := test.expr.Update(params)
 		if test.errstring != "" {
 			assert.NotNil(t, err)
 		} else {
@@ -112,7 +112,7 @@ func TestAirthmeticsParamsExpression(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		actual, err := test.expr.Eval(nil)
+		actual, err := test.expr.Update(nil)
 		if test.errstring != "" {
 			assert.NotNil(t, err)
 		} else {

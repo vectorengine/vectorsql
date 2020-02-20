@@ -12,21 +12,21 @@ import (
 	"datavalues"
 )
 
-type scalarEvalFunc func(args ...*datavalues.Value) (*datavalues.Value, error)
+type scalarUpdateFunc func(args ...*datavalues.Value) (*datavalues.Value, error)
 type ScalarExpression struct {
 	name          string
 	exprs         []IExpression
-	evalFn        scalarEvalFunc
+	updateFn      scalarUpdateFunc
 	validate      IValidator
 	argumentNames [][]string
 	description   docs.Documentation
 }
 
-func (e *ScalarExpression) Eval(params IParams) (*datavalues.Value, error) {
+func (e *ScalarExpression) Get() (*datavalues.Value, error) {
 	values := make([]*datavalues.Value, len(e.exprs))
 
 	for i, expr := range e.exprs {
-		val, err := expr.Eval(params)
+		val, err := expr.Get()
 		if err != nil {
 			return nil, err
 		}
@@ -37,7 +37,25 @@ func (e *ScalarExpression) Eval(params IParams) (*datavalues.Value, error) {
 			return nil, err
 		}
 	}
-	return e.evalFn(values...)
+	return e.updateFn(values...)
+}
+
+func (e *ScalarExpression) Update(params IParams) (*datavalues.Value, error) {
+	values := make([]*datavalues.Value, len(e.exprs))
+
+	for i, expr := range e.exprs {
+		val, err := expr.Update(params)
+		if err != nil {
+			return nil, err
+		}
+		values[i] = val
+	}
+	if e.validate != nil {
+		if err := e.validate.Validate(values...); err != nil {
+			return nil, err
+		}
+	}
+	return e.updateFn(values...)
 }
 
 func (e *ScalarExpression) Walk(visit Visit) error {

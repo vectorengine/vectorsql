@@ -25,7 +25,11 @@ func NewConstantExpression(v *datavalues.Value) *ConstantExpression {
 	}
 }
 
-func (e *ConstantExpression) Eval(params IParams) (*datavalues.Value, error) {
+func (e *ConstantExpression) Get() (*datavalues.Value, error) {
+	return e.value, nil
+}
+
+func (e *ConstantExpression) Update(params IParams) (*datavalues.Value, error) {
 	return e.value, nil
 }
 

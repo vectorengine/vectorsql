@@ -63,14 +63,14 @@ func (plan *SelectPlan) Build() error {
 		tree.Add(filterPlan)
 	}
 
-	// GroupBy.
+	// Selection.
 	{
-		groupBy, err := parseGroupBy(aliases, ast.GroupBy)
+		groupby, err := parseGroupBy(aliases, ast.GroupBy)
 		if err != nil {
 			return err
 		}
-		groupByPlan := NewGroupByPlan(fields, groupBy)
-		tree.Add(groupByPlan)
+		selectionPlan := NewSelectionPlan(fields, groupby)
+		tree.Add(selectionPlan)
 	}
 
 	// Having.

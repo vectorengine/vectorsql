@@ -5,9 +5,8 @@
 package expressions
 
 import (
-	"datavalues"
-
 	"base/docs"
+	"datavalues"
 )
 
 func SUM(arg interface{}) IExpression {
@@ -22,7 +21,7 @@ func SUM(arg interface{}) IExpression {
 			),
 		),
 		expr: expressionsFor(arg)[0],
-		evalFn: func(current *datavalues.Value, next *datavalues.Value) (*datavalues.Value, error) {
+		updateFn: func(current *datavalues.Value, next *datavalues.Value) (*datavalues.Value, error) {
 			if current == nil {
 				return next, nil
 			} else {
@@ -44,7 +43,7 @@ func MIN(arg interface{}) IExpression {
 			),
 		),
 		expr: expressionsFor(arg)[0],
-		evalFn: func(current *datavalues.Value, next *datavalues.Value) (*datavalues.Value, error) {
+		updateFn: func(current *datavalues.Value, next *datavalues.Value) (*datavalues.Value, error) {
 			if current == nil {
 				return next, nil
 			}
@@ -65,7 +64,7 @@ func MAX(arg interface{}) IExpression {
 			),
 		),
 		expr: expressionsFor(arg)[0],
-		evalFn: func(current *datavalues.Value, next *datavalues.Value) (*datavalues.Value, error) {
+		updateFn: func(current *datavalues.Value, next *datavalues.Value) (*datavalues.Value, error) {
 			if current == nil {
 				return next, nil
 			}
@@ -81,7 +80,7 @@ func COUNT(arg interface{}) IExpression {
 		description:   docs.Text("Averages elements in the group."),
 		validate:      All(),
 		expr:          expressionsFor(arg)[0],
-		evalFn: func(current *datavalues.Value, next *datavalues.Value) (*datavalues.Value, error) {
+		updateFn: func(current *datavalues.Value, next *datavalues.Value) (*datavalues.Value, error) {
 			if current == nil {
 				return datavalues.ToValue(1), nil
 			} else {

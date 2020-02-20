@@ -8,31 +8,30 @@ import (
 	"fmt"
 	"strings"
 
-	"datavalues"
-
 	"base/docs"
+	"datavalues"
 )
 
-type binaryEvalFunc func(left, right *datavalues.Value) (*datavalues.Value, error)
+type binaryUpdateFunc func(left, right *datavalues.Value) (*datavalues.Value, error)
 
 type BinaryExpression struct {
 	name          string
 	left          IExpression
 	right         IExpression
-	evalFn        binaryEvalFunc
+	updateFn      binaryUpdateFunc
 	validate      IValidator
 	argumentNames [][]string
 	description   docs.Documentation
 }
 
-func (e *BinaryExpression) Eval(params IParams) (*datavalues.Value, error) {
+func (e *BinaryExpression) Get() (*datavalues.Value, error) {
 	var err error
 	var left, right *datavalues.Value
 
-	if left, err = e.left.Eval(params); err != nil {
+	if left, err = e.left.Get(); err != nil {
 		return nil, err
 	}
-	if right, err = e.right.Eval(params); err != nil {
+	if right, err = e.right.Get(); err != nil {
 		return nil, err
 	}
 	if e.validate != nil {
@@ -40,7 +39,25 @@ func (e *BinaryExpression) Eval(params IParams) (*datavalues.Value, error) {
 			return nil, err
 		}
 	}
-	return e.evalFn(left, right)
+	return e.updateFn(left, right)
+}
+
+func (e *BinaryExpression) Update(params IParams) (*datavalues.Value, error) {
+	var err error
+	var left, right *datavalues.Value
+
+	if left, err = e.left.Update(params); err != nil {
+		return nil, err
+	}
+	if right, err = e.right.Update(params); err != nil {
+		return nil, err
+	}
+	if e.validate != nil {
+		if err := e.validate.Validate(left, right); err != nil {
+			return nil, err
+		}
+	}
+	return e.updateFn(left, right)
 }
 
 func (e *BinaryExpression) Walk(visit Visit) error {

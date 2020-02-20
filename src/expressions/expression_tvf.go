@@ -5,10 +5,10 @@
 package expressions
 
 import (
-	"base/docs"
 	"fmt"
 	"math/rand"
 
+	"base/docs"
 	"base/errors"
 	"datavalues"
 )
@@ -26,7 +26,7 @@ func RANGETABLE(args ...interface{}) IExpression {
 			IfArgPresent(2, Arg(2, TypeOf(datavalues.ZeroString()))),
 		),
 		exprs: exprs,
-		evalFn: func(args ...*datavalues.Value) (*datavalues.Value, error) {
+		updateFn: func(args ...*datavalues.Value) (*datavalues.Value, error) {
 			count := args[0].AsInt()
 			values := make([]*datavalues.Value, count)
 			for i := 0; i < count; i++ {
@@ -62,7 +62,7 @@ func RANDTABLE(args ...interface{}) IExpression {
 			IfArgPresent(2, Arg(2, TypeOf(datavalues.ZeroString()))),
 		),
 		exprs: exprs,
-		evalFn: func(args ...*datavalues.Value) (*datavalues.Value, error) {
+		updateFn: func(args ...*datavalues.Value) (*datavalues.Value, error) {
 			count := args[0].AsInt()
 			values := make([]*datavalues.Value, count)
 			for i := 0; i < count; i++ {
@@ -98,7 +98,7 @@ func ZIP(args ...interface{}) IExpression {
 			),
 		),
 		exprs: exprs,
-		evalFn: func(args ...*datavalues.Value) (*datavalues.Value, error) {
+		updateFn: func(args ...*datavalues.Value) (*datavalues.Value, error) {
 			argsize := len(args)
 			tuplesize := len(args[0].AsSlice())
 			values := make([]*datavalues.Value, tuplesize)
@@ -123,7 +123,7 @@ func LOGMOCK(args ...interface{}) IExpression {
 		description:   docs.Text("Returns a mock log table."),
 		validate:      All(),
 		exprs:         exprs,
-		evalFn: func(args ...*datavalues.Value) (*datavalues.Value, error) {
+		updateFn: func(args ...*datavalues.Value) (*datavalues.Value, error) {
 			servera := "192.168.0.1"
 			serverb := "192.168.0.2"
 

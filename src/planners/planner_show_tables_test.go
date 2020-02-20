@@ -40,14 +40,14 @@ func TestShowTablesPlan(t *testing.T) {
                     "Schema": "system"
                 },
                 {
-                    "Name": "GroupByPlan",
-                    "HasAggregate": false,
+                    "Name": "SelectionPlan",
                     "Projects": {
                         "Name": "MapPlan"
                     },
                     "GroupBys": {
                         "Name": "MapPlan"
-                    }
+                    },
+                    "SelectionMode": "NormalSelection"
                 },
                 {
                     "Name": "SinkPlan"
