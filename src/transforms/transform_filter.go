@@ -32,10 +32,15 @@ func (t *FilterTransform) Execute() {
 		switch y := x.(type) {
 		case *datablocks.DataBlock:
 			if err := y.FilterByPlan(t.filter); err != nil {
-				x = err
+				out.Send(err)
+			} else {
+				if y.NumRows() > 0 {
+					out.Send(y)
+				}
 			}
+		default:
+			out.Send(x)
 		}
-		out.Send(x)
 	}
 	t.Subscribe(onNext)
 }

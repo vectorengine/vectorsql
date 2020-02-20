@@ -5,6 +5,8 @@
 package datablocks
 
 import (
+	"sync"
+
 	"columns"
 	"datatypes"
 	"datavalues"
@@ -40,28 +42,43 @@ func (block *DataBlock) AggregateSelectionByPlan(plan *planners.MapPlan) (*DataB
 		}
 		return NewDataBlock(cols), nil
 	} else {
+		var errs []error
+		var wg sync.WaitGroup
+
 		// Update.
-		params := make(expressions.Map)
 		for _, expr := range projectExprs {
 			name := expr.String()
 			if _, ok := columnmap[name]; ok {
 				continue
 			}
 
-			// Compute the column.
-			it, err := block.MixsIterator(fields)
-			if err != nil {
-				return nil, err
-			}
-			for it.Next() {
-				mixed := it.Value()
-				for j := range mixed {
-					params[it.Column(j).Name] = mixed[j]
+			wg.Add(1)
+			go func(expr expressions.IExpression) {
+				defer wg.Done()
+
+				// Compute the column.
+				it, err := block.MixsIterator(fields)
+				if err != nil {
+					errs = append(errs, err)
+					return
 				}
-				if _, err := expr.Update(params); err != nil {
-					return nil, err
+
+				params := make(expressions.Map)
+				for it.Next() {
+					mixed := it.Value()
+					for j := range mixed {
+						params[it.Column(j).Name] = mixed[j]
+					}
+					if _, err := expr.Update(params); err != nil {
+						errs = append(errs, err)
+						return
+					}
 				}
-			}
+			}(expr)
+		}
+		wg.Wait()
+		if len(errs) > 0 {
+			return nil, errs[0]
 		}
 
 		// Final.

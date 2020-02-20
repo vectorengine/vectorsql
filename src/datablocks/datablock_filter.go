@@ -23,8 +23,8 @@ func (block *DataBlock) FilterByPlan(plan *planners.FilterPlan) error {
 	}
 
 	i := 0
-	checks := make([]*datavalues.Value, block.NumRows())
 	params := make(expressions.Map)
+	checks := make([]*datavalues.Value, block.NumRows())
 	it, err := block.MixsIterator(fields)
 	if err != nil {
 		return err
