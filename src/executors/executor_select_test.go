@@ -92,6 +92,17 @@ func TestSelectExecutor(t *testing.T) {
 			),
 		},
 		{
+			name:  "simple-pass",
+			query: "SELECT server,sum(response_time) as time FROM logmock(rows->15) order by time desc",
+			expect: mocks.NewBlockFromSlice(
+				[]*columns.Column{
+					{Name: "server", DataType: datatypes.NewStringDataType()},
+					{Name: "time", DataType: datatypes.NewInt64DataType()},
+				},
+				[]interface{}{"192.168.0.2", 170},
+			),
+		},
+		{
 			name: "aggregate-pass",
 			query: `SELECT 
     COUNT(server) as count,
