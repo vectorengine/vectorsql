@@ -5,8 +5,6 @@
 package transforms
 
 import (
-	"sync"
-
 	"datablocks"
 	"planners"
 	"processors"
@@ -28,7 +26,6 @@ func NewLimitransform(ctx *TransformContext, plan *planners.LimitPlan) processor
 
 func (t *Limitransform) Execute() {
 	var (
-		wg     sync.WaitGroup
 		limit  int
 		offset int
 	)
@@ -57,7 +54,5 @@ func (t *Limitransform) Execute() {
 			return
 		}
 	}
-	wg.Add(1)
 	t.Subscribe(onNext)
-	wg.Wait()
 }

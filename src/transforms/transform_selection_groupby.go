@@ -5,9 +5,11 @@
 package transforms
 
 import (
-	"sync"
-
+	"columns"
 	"datablocks"
+	"datatypes"
+	"datavalues"
+	"expressions"
 	"planners"
 	"processors"
 )
@@ -27,21 +29,86 @@ func NewGroupBySelectionTransform(ctx *TransformContext, plan *planners.Selectio
 }
 
 func (t *GroupBySelectionTransform) Execute() {
-	var wg sync.WaitGroup
-	var block *datablocks.DataBlock
-
+	plan := t.plan
 	out := t.Out()
 	defer out.Close()
-	plan := t.plan
+
+	params := make(expressions.Map)
+	hashmap := datavalues.NewHashMap()
+
+	groupbyExprs, err := planners.BuildExpressions(plan.GroupBys)
+	if err != nil {
+		out.Send(err)
+		return
+	}
+
+	mergeFn := func(p expressions.Map) error {
+		groupbyValues := make([]*datavalues.Value, len(groupbyExprs))
+		for i, expr := range groupbyExprs {
+			val, err := expr.Update(p)
+			if err != nil {
+				return err
+			}
+			groupbyValues[i] = val
+		}
+		key := datavalues.MakeTuple(groupbyValues...)
+		projectExprs, hash, ok, err := hashmap.Get(key)
+		if err != nil {
+			return err
+		}
+		if !ok {
+			projectExprs, err = planners.BuildExpressions(plan.Projects)
+			if err != nil {
+				return err
+			}
+			if err := hashmap.SetByHash(key, hash, projectExprs); err != nil {
+				return err
+			}
+		}
+
+		for _, expr := range projectExprs.([]expressions.IExpression) {
+			if _, err := expr.Update(p); err != nil {
+				return err
+			}
+		}
+		return nil
+	}
+
+	buildFn := func(exprs []expressions.IExpression) (*datablocks.DataBlock, error) {
+		row := make([]*datavalues.Value, len(exprs))
+		column := make([]*columns.Column, len(exprs))
+		for i, expr := range exprs {
+			if res, err := expr.Get(); err != nil {
+				return nil, err
+			} else {
+				row[i] = res
+				// Get the column type via the expression value.
+				dtype, err := datatypes.GetDataTypeByValue(res)
+				if err != nil {
+					return nil, err
+				}
+				column[i] = columns.NewColumn(expr.String(), dtype)
+			}
+		}
+		group := datablocks.NewDataBlock(column)
+		if err := group.WriteRow(row); err != nil {
+			return nil, err
+		}
+		return group, nil
+	}
 
 	onNext := func(x interface{}) {
 		switch y := x.(type) {
 		case *datablocks.DataBlock:
-			if block == nil {
-				block = y
-			} else {
-				if err := block.Append(y); err != nil {
+			it := y.RowIterator()
+			for it.Next() {
+				row := it.Value()
+				for i := range row {
+					params[it.Column(i).Name] = row[i]
+				}
+				if err := mergeFn(params); err != nil {
 					out.Send(err)
+					return
 				}
 			}
 		case error:
@@ -49,18 +116,18 @@ func (t *GroupBySelectionTransform) Execute() {
 		}
 	}
 	onDone := func() {
-		defer wg.Done()
-		if block != nil {
-			if filler, err := block.GroupBySelectionByPlan(plan); err != nil {
+		iter := hashmap.GetIterator()
+		for {
+			v, ok := iter.Next()
+			if !ok {
+				break
+			}
+			if group, err := buildFn(v.([]expressions.IExpression)); err != nil {
 				out.Send(err)
 			} else {
-				for _, blk := range filler {
-					out.Send(blk)
-				}
+				out.Send(group)
 			}
 		}
 	}
-	wg.Add(1)
 	t.Subscribe(onNext, onDone)
-	wg.Wait()
 }

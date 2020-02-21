@@ -30,7 +30,7 @@ type entry struct {
 
 func fastHash(key *Value) (uint64, error) {
 	hashes := fnv.New64()
-	err := binary.Write(hashes, binary.LittleEndian, []byte(key.String()))
+	err := binary.Write(hashes, binary.LittleEndian, []byte(key.Show()))
 	if err != nil {
 		return 0, errors.Wrap(err)
 	}

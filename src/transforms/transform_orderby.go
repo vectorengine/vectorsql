@@ -5,8 +5,6 @@
 package transforms
 
 import (
-	"sync"
-
 	"datablocks"
 	"planners"
 	"processors"
@@ -27,7 +25,6 @@ func NewOrderByTransform(ctx *TransformContext, plan *planners.OrderByPlan) proc
 }
 
 func (t *OrderByTransform) Execute() {
-	var wg sync.WaitGroup
 	var block *datablocks.DataBlock
 
 	out := t.Out()
@@ -48,7 +45,6 @@ func (t *OrderByTransform) Execute() {
 		}
 	}
 	onDone := func() {
-		defer wg.Done()
 		if block != nil {
 			if err := block.OrderByPlan(t.plan); err != nil {
 				out.Send(err)
@@ -57,7 +53,5 @@ func (t *OrderByTransform) Execute() {
 			}
 		}
 	}
-	wg.Add(1)
 	t.Subscribe(onNext, onDone)
-	wg.Wait()
 }

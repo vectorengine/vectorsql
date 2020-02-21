@@ -28,11 +28,6 @@ func (block *DataBlock) AggregateSelectionByPlan(plan *planners.MapPlan) (*DataB
 		return nil, err
 	}
 
-	columnmap := make(map[string]struct{})
-	for i := range block.values {
-		columnmap[block.values[i].column.Name] = struct{}{}
-	}
-
 	rows := block.NumRows()
 	if rows == 0 {
 		// If empty, returns header only.
@@ -47,11 +42,6 @@ func (block *DataBlock) AggregateSelectionByPlan(plan *planners.MapPlan) (*DataB
 
 		// Update.
 		for _, expr := range projectExprs {
-			name := expr.String()
-			if _, ok := columnmap[name]; ok {
-				continue
-			}
-
 			wg.Add(1)
 			go func(expr expressions.IExpression) {
 				defer wg.Done()
@@ -82,33 +72,22 @@ func (block *DataBlock) AggregateSelectionByPlan(plan *planners.MapPlan) (*DataB
 		}
 
 		// Final.
-		lastidx := block.NumRows() - 1
 		row := make([]*datavalues.Value, len(projectExprs))
 		column := make([]*columns.Column, len(projectExprs))
 		for i, expr := range projectExprs {
 			name := expr.String()
-			_, ok := columnmap[name]
-			if ok {
-				cv, err := block.DataBlockValue(expr.String())
-				if err != nil {
-					return nil, err
-				}
-				column[i] = cv.column
-				row[i] = cv.values[block.seqs[lastidx]]
-			} else {
-				val, err := expr.Get()
-				if err != nil {
-					return nil, err
-				}
-				row[i] = val
-
-				// Get the column type via the expression value.
-				dtype, err := datatypes.GetDataTypeByValue(val)
-				if err != nil {
-					return nil, err
-				}
-				column[i] = columns.NewColumn(name, dtype)
+			val, err := expr.Get()
+			if err != nil {
+				return nil, err
 			}
+			row[i] = val
+
+			// Get the column type via the expression value.
+			dtype, err := datatypes.GetDataTypeByValue(val)
+			if err != nil {
+				return nil, err
+			}
+			column[i] = columns.NewColumn(name, dtype)
 		}
 
 		result := NewDataBlock(column)
