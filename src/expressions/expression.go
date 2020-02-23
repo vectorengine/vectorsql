@@ -13,8 +13,8 @@ import (
 type IExpression interface {
 	String() string
 	Walk(visit Visit) error
-	Get() (*datavalues.Value, error)
-	Update(params IParams) (*datavalues.Value, error)
+	Get() (datavalues.IDataValue, error)
+	Update(params IParams) (datavalues.IDataValue, error)
 	Document() docs.Documentation
 }
 
@@ -74,7 +74,7 @@ func expressionFor(expr interface{}) IExpression {
 		return e
 	case string:
 		return VAR(e)
-	case *datavalues.Value:
+	case datavalues.IDataValue:
 		return CONST(e)
 	case int:
 		return CONST(e)

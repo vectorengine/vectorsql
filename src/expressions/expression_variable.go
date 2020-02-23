@@ -12,7 +12,7 @@ import (
 
 type VariableExpression struct {
 	value string
-	saved *datavalues.Value
+	saved datavalues.IDataValue
 }
 
 func VAR(v string) IExpression {
@@ -25,11 +25,11 @@ func NewVariableExpression(v string) *VariableExpression {
 	}
 }
 
-func (e *VariableExpression) Get() (*datavalues.Value, error) {
+func (e *VariableExpression) Get() (datavalues.IDataValue, error) {
 	return e.saved, nil
 }
 
-func (e *VariableExpression) Update(params IParams) (*datavalues.Value, error) {
+func (e *VariableExpression) Update(params IParams) (datavalues.IDataValue, error) {
 	if params != nil {
 		v, ok := params.Get(e.value)
 		if !ok {
@@ -38,7 +38,7 @@ func (e *VariableExpression) Update(params IParams) (*datavalues.Value, error) {
 		e.saved = v
 		return v, nil
 	}
-	return datavalues.MakePhantom(), nil
+	return nil, nil
 }
 
 func (e *VariableExpression) Walk(visit Visit) error {

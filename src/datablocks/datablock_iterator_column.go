@@ -36,6 +36,6 @@ func (it *DataBlockColumnIterator) Next() bool {
 	return it.current < it.rows
 }
 
-func (it *DataBlockColumnIterator) Value() *datavalues.Value {
+func (it *DataBlockColumnIterator) Value() datavalues.IDataValue {
 	return it.cv.values[it.seqs[it.current]]
 }

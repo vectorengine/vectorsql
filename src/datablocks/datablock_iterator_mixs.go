@@ -52,7 +52,7 @@ func (it *DataBlockMixsIterator) Next() bool {
 	return it.current < it.rows
 }
 
-func (it *DataBlockMixsIterator) Last() []*datavalues.Value {
+func (it *DataBlockMixsIterator) Last() []datavalues.IDataValue {
 	it.current = it.rows - 1
 	return it.Value()
 }
@@ -61,9 +61,9 @@ func (it *DataBlockMixsIterator) Column(idx int) *columns.Column {
 	return it.block.values[it.indexs[idx]].column
 }
 
-func (it *DataBlockMixsIterator) Value() []*datavalues.Value {
+func (it *DataBlockMixsIterator) Value() []datavalues.IDataValue {
 	block := it.block
-	values := make([]*datavalues.Value, len(it.indexs))
+	values := make([]datavalues.IDataValue, len(it.indexs))
 
 	for i := range it.indexs {
 		values[i] = block.values[it.indexs[i]].values[block.seqs[it.current]]

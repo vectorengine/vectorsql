@@ -5,31 +5,29 @@
 package expressions
 
 import (
-	"fmt"
-
 	"base/docs"
 	"datavalues"
 )
 
 type ConstantExpression struct {
-	value *datavalues.Value
+	value datavalues.IDataValue
 }
 
 func CONST(v interface{}) IExpression {
 	return NewConstantExpression(datavalues.ToValue(v))
 }
 
-func NewConstantExpression(v *datavalues.Value) *ConstantExpression {
+func NewConstantExpression(v datavalues.IDataValue) *ConstantExpression {
 	return &ConstantExpression{
 		value: v,
 	}
 }
 
-func (e *ConstantExpression) Get() (*datavalues.Value, error) {
+func (e *ConstantExpression) Get() (datavalues.IDataValue, error) {
 	return e.value, nil
 }
 
-func (e *ConstantExpression) Update(params IParams) (*datavalues.Value, error) {
+func (e *ConstantExpression) Update(params IParams) (datavalues.IDataValue, error) {
 	return e.value, nil
 }
 
@@ -38,7 +36,7 @@ func (e *ConstantExpression) Walk(visit Visit) error {
 }
 
 func (e *ConstantExpression) String() string {
-	return fmt.Sprintf("%v", e.value)
+	return string(e.value.Show())
 }
 
 func (e *ConstantExpression) Document() docs.Documentation {

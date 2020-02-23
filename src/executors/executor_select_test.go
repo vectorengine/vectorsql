@@ -12,9 +12,8 @@ import (
 	"datablocks"
 	"datatypes"
 	"parsers"
-	"planners"
-
 	"parsers/sqlparser"
+	"planners"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -41,7 +40,6 @@ func TestSelectExecutor(t *testing.T) {
 				[]interface{}{},
 			),
 		},
-
 		{
 			name:  "tvf-rangetable-pass",
 			query: "SELECT i FROM rangetable(rows->5, i->'Int32')",
@@ -84,13 +82,14 @@ func TestSelectExecutor(t *testing.T) {
 			expect: mocks.NewBlockFromSlice(
 				[]*columns.Column{
 					{Name: "number", DataType: datatypes.NewUInt64DataType()},
-					{Name: "(number+int:1 )", DataType: datatypes.NewInt64DataType()},
+					{Name: "(number+1)", DataType: datatypes.NewInt64DataType()},
 				},
 				[]interface{}{0, 1},
 				[]interface{}{1, 2},
 				[]interface{}{2, 3},
 			),
 		},
+
 		{
 			name:  "simple-pass",
 			query: "SELECT server,sum(response_time) as time FROM logmock(rows->15) order by time desc",
@@ -157,6 +156,7 @@ ORDER BY
 		for x := range transform.In().Recv() {
 			expect := test.expect
 			actual := x.(*datablocks.DataBlock)
+			//actual.Dump()
 			assert.True(t, mocks.DataBlockEqual(expect, actual))
 		}
 	}

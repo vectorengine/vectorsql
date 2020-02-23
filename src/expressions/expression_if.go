@@ -21,8 +21,8 @@ func IF(args ...interface{}) IExpression {
 			SameType(1, 2),
 		),
 		exprs: exprs,
-		updateFn: func(args ...*datavalues.Value) (*datavalues.Value, error) {
-			cond := args[0].AsBool()
+		updateFn: func(args ...datavalues.IDataValue) (datavalues.IDataValue, error) {
+			cond := args[0].(*datavalues.ValueBool).AsBool()
 			cond1 := args[1]
 			cond2 := args[2]
 			if cond {

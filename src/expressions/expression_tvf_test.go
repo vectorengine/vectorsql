@@ -16,7 +16,7 @@ func TestTVFExpression(t *testing.T) {
 	tests := []struct {
 		name      string
 		expr      IExpression
-		expect    *datavalues.Value
+		expect    datavalues.IDataValue
 		errstring string
 	}{
 		{

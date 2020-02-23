@@ -67,7 +67,7 @@ func (stream *SystemNumbersBlockIntputStream) Read() (*datablocks.DataBlock, err
 	block := stream.block.Clone()
 
 	for rows < stream.maxBlockSize {
-		if err := block.WriteRow([]*datavalues.Value{datavalues.MakeInt(stream.current)}); err != nil {
+		if err := block.WriteRow([]datavalues.IDataValue{datavalues.ToValue(stream.current)}); err != nil {
 			return nil, err
 		}
 		stream.current++

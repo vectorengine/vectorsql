@@ -43,7 +43,7 @@ func (t *GroupBySelectionTransform) Execute() {
 	}
 
 	mergeFn := func(p expressions.Map) error {
-		groupbyValues := make([]*datavalues.Value, len(groupbyExprs))
+		groupbyValues := make([]datavalues.IDataValue, len(groupbyExprs))
 		for i, expr := range groupbyExprs {
 			val, err := expr.Update(p)
 			if err != nil {
@@ -75,7 +75,7 @@ func (t *GroupBySelectionTransform) Execute() {
 	}
 
 	buildFn := func(exprs []expressions.IExpression) (*datablocks.DataBlock, error) {
-		row := make([]*datavalues.Value, len(exprs))
+		row := make([]datavalues.IDataValue, len(exprs))
 		column := make([]*columns.Column, len(exprs))
 		for i, expr := range exprs {
 			if res, err := expr.Get(); err != nil {

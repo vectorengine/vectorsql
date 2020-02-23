@@ -16,7 +16,7 @@ func NewBlockFromSlice(cols []*columns.Column, datas ...[]interface{}) *databloc
 	block := datablocks.NewDataBlock(cols)
 	for _, data := range datas {
 		if len(data) > 0 {
-			var row []*datavalues.Value
+			var row []datavalues.IDataValue
 			for i := range cols {
 				row = append(row, datavalues.ToValue(data[i]))
 			}
@@ -49,7 +49,7 @@ func DataBlockEqual(a *datablocks.DataBlock, b *datablocks.DataBlock) bool {
 
 		for aiter.Next() {
 			biter.Next()
-			if cmp, err := datavalues.Compare(aiter.Value(), biter.Value()); err != nil || cmp != datavalues.Equal {
+			if cmp, err := aiter.Value().Compare(biter.Value()); err != nil || cmp != datavalues.Equal {
 				return false
 			}
 		}

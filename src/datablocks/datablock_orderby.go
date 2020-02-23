@@ -43,7 +43,7 @@ func (block *DataBlock) OrderByPlan(plan *planners.OrderByPlan) error {
 		}
 
 		k := 0
-		colvals := make([]*datavalues.Value, numRows)
+		colvals := make([]datavalues.IDataValue, numRows)
 		for it.Next() {
 			colvals[k] = it.Value()
 			k++
@@ -51,9 +51,9 @@ func (block *DataBlock) OrderByPlan(plan *planners.OrderByPlan) error {
 		tuples[i] = datavalues.MakeTuple(colvals...)
 	}
 	// Append the Seqs column.
-	seqs := make([]*datavalues.Value, numRows)
+	seqs := make([]datavalues.IDataValue, numRows)
 	for i := 0; i < numRows; i++ {
-		seqs[i] = datavalues.MakeInt(block.seqs[i])
+		seqs[i] = datavalues.ToValue(block.seqs[i])
 	}
 	tuples = append(tuples, datavalues.MakeTuple(seqs...))
 
@@ -72,10 +72,10 @@ func (block *DataBlock) OrderByPlan(plan *planners.OrderByPlan) error {
 	jparams := make(expressions.Map, len(fields))
 
 	// Sort.
-	matrix := result.AsSlice()
+	matrix := result.(*datavalues.ValueTuple).AsSlice()
 	sort.Slice(matrix[:], func(i, j int) bool {
-		irows := matrix[i].AsSlice()
-		jrows := matrix[j].AsSlice()
+		irows := matrix[i].(*datavalues.ValueTuple).AsSlice()
+		jrows := matrix[j].(*datavalues.ValueTuple).AsSlice()
 		for k := 0; k < len(fields); k++ {
 			iparams[fields[k]] = irows[k]
 			jparams[fields[k]] = jrows[k]
@@ -91,7 +91,7 @@ func (block *DataBlock) OrderByPlan(plan *planners.OrderByPlan) error {
 				return false
 			}
 
-			cmp, err := datavalues.Compare(ival, jval)
+			cmp, err := ival.Compare(jval)
 			if err != nil {
 				return false
 			}
@@ -111,7 +111,7 @@ func (block *DataBlock) OrderByPlan(plan *planners.OrderByPlan) error {
 	// Final.
 	finalSeqs := make([]int, numRows)
 	for i, tuple := range matrix {
-		finalSeqs[i] = tuple.AsSlice()[len(fields)].AsInt()
+		finalSeqs[i] = int(tuple.(*datavalues.ValueTuple).AsSlice()[len(fields)].(*datavalues.ValueInt).AsInt())
 	}
 	block.seqs = finalSeqs
 	return nil

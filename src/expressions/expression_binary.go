@@ -12,7 +12,7 @@ import (
 	"datavalues"
 )
 
-type binaryUpdateFunc func(left, right *datavalues.Value) (*datavalues.Value, error)
+type binaryUpdateFunc func(left, right datavalues.IDataValue) (datavalues.IDataValue, error)
 
 type BinaryExpression struct {
 	name          string
@@ -24,9 +24,9 @@ type BinaryExpression struct {
 	description   docs.Documentation
 }
 
-func (e *BinaryExpression) Get() (*datavalues.Value, error) {
+func (e *BinaryExpression) Get() (datavalues.IDataValue, error) {
 	var err error
-	var left, right *datavalues.Value
+	var left, right datavalues.IDataValue
 
 	if left, err = e.left.Get(); err != nil {
 		return nil, err
@@ -42,9 +42,9 @@ func (e *BinaryExpression) Get() (*datavalues.Value, error) {
 	return e.updateFn(left, right)
 }
 
-func (e *BinaryExpression) Update(params IParams) (*datavalues.Value, error) {
+func (e *BinaryExpression) Update(params IParams) (datavalues.IDataValue, error) {
 	var err error
-	var left, right *datavalues.Value
+	var left, right datavalues.IDataValue
 
 	if left, err = e.left.Update(params); err != nil {
 		return nil, err

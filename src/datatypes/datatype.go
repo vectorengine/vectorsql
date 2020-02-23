@@ -17,11 +17,11 @@ import (
 type IDataType interface {
 	Name() string
 	Type() reflect.Type
-	Serialize(*binary.Writer, *datavalues.Value) error
-	SerializeText(io.Writer, *datavalues.Value) error
+	Serialize(*binary.Writer, datavalues.IDataValue) error
+	SerializeText(io.Writer, datavalues.IDataValue) error
 }
 
-func GetDataTypeByValue(val *datavalues.Value) (IDataType, error) {
+func GetDataTypeByValue(val datavalues.IDataValue) (IDataType, error) {
 	switch val.GetType() {
 	case datavalues.TypeString:
 		return NewStringDataType(), nil

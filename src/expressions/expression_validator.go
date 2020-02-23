@@ -15,12 +15,12 @@ import (
 
 type IValidator interface {
 	docs.Documented
-	Validate(args ...*datavalues.Value) error
+	Validate(args ...datavalues.IDataValue) error
 }
 
 type ISingleArgumentValidator interface {
 	docs.Documented
-	Validate(arg *datavalues.Value) error
+	Validate(arg datavalues.IDataValue) error
 }
 
 type all struct {
@@ -31,7 +31,7 @@ func All(validators ...IValidator) *all {
 	return &all{validators: validators}
 }
 
-func (v *all) Validate(args ...*datavalues.Value) error {
+func (v *all) Validate(args ...datavalues.IDataValue) error {
 	for _, validator := range v.validators {
 		err := validator.Validate(args...)
 		if err != nil {
@@ -57,7 +57,7 @@ func OneOf(validators ...IValidator) *oneOf {
 	return &oneOf{validators: validators}
 }
 
-func (v *oneOf) Validate(args ...*datavalues.Value) error {
+func (v *oneOf) Validate(args ...datavalues.IDataValue) error {
 	errs := make([]error, len(v.validators))
 	for i, validator := range v.validators {
 		errs[i] = validator.Validate(args...)
@@ -85,7 +85,7 @@ func SingleOneOf(validators ...ISingleArgumentValidator) *singleOneOf {
 	return &singleOneOf{validators: validators}
 }
 
-func (v *singleOneOf) Validate(arg *datavalues.Value) error {
+func (v *singleOneOf) Validate(arg datavalues.IDataValue) error {
 	errs := make([]error, len(v.validators))
 	for i, validator := range v.validators {
 		errs[i] = validator.Validate(arg)
@@ -113,7 +113,7 @@ func ExactlyNArgs(n int) *exactlyNArgs {
 	return &exactlyNArgs{n: n}
 }
 
-func (v *exactlyNArgs) Validate(args ...*datavalues.Value) error {
+func (v *exactlyNArgs) Validate(args ...datavalues.IDataValue) error {
 	if len(args) != v.n {
 		return errors.Errorf("expected exactly %s, but got %v", argumentCount(v.n), len(args))
 	}
@@ -125,14 +125,14 @@ func (v *exactlyNArgs) Document() docs.Documentation {
 }
 
 type typeOf struct {
-	wantedType *datavalues.Value
+	wantedType datavalues.IDataValue
 }
 
-func TypeOf(wantedType *datavalues.Value) *typeOf {
+func TypeOf(wantedType datavalues.IDataValue) *typeOf {
 	return &typeOf{wantedType: wantedType}
 }
 
-func (v *typeOf) Validate(arg *datavalues.Value) error {
+func (v *typeOf) Validate(arg datavalues.IDataValue) error {
 	if v.wantedType.GetType() != arg.GetType() {
 		return errors.Errorf("expected type %v but got %v", v.wantedType.Document(), arg.Document())
 	}
@@ -152,7 +152,7 @@ func IfArgPresent(i int, validator IValidator) *ifArgPresent {
 	return &ifArgPresent{i: i, validator: validator}
 }
 
-func (v *ifArgPresent) Validate(args ...*datavalues.Value) error {
+func (v *ifArgPresent) Validate(args ...datavalues.IDataValue) error {
 	if len(args) < v.i+1 {
 		return nil
 	}
@@ -174,7 +174,7 @@ func AtLeastNArgs(n int) *atLeastNArgs {
 	return &atLeastNArgs{n: n}
 }
 
-func (v *atLeastNArgs) Validate(args ...*datavalues.Value) error {
+func (v *atLeastNArgs) Validate(args ...datavalues.IDataValue) error {
 	if len(args) < v.n {
 		return errors.Errorf("expected at least %s, but got %v", argumentCount(v.n), len(args))
 	}
@@ -193,7 +193,7 @@ func AtMostNArgs(n int) *atMostNArgs {
 	return &atMostNArgs{n: n}
 }
 
-func (v *atMostNArgs) Validate(args ...*datavalues.Value) error {
+func (v *atMostNArgs) Validate(args ...datavalues.IDataValue) error {
 	if len(args) > v.n {
 		return errors.Errorf("expected at most %s, but got %v", argumentCount(v.n), len(args))
 	}
@@ -213,7 +213,7 @@ func Arg(i int, validator ISingleArgumentValidator) *arg {
 	return &arg{i: i, validator: validator}
 }
 
-func (v *arg) Validate(args ...*datavalues.Value) error {
+func (v *arg) Validate(args ...datavalues.IDataValue) error {
 	if err := v.validator.Validate(args[v.i]); err != nil {
 		return fmt.Errorf("bad argument at index %v: %v", v.i, err)
 	}
@@ -235,8 +235,8 @@ func SameType(idx ...int) *sameType {
 	return &sameType{idxs: idx}
 }
 
-func (v *sameType) Validate(args ...*datavalues.Value) error {
-	var current *datavalues.Value
+func (v *sameType) Validate(args ...datavalues.IDataValue) error {
+	var current datavalues.IDataValue
 	for i, idx := range v.idxs {
 		arg := args[idx]
 		if current == nil {
@@ -261,7 +261,7 @@ func AllArgs(validator ISingleArgumentValidator) *allArgs {
 	return &allArgs{validator: validator}
 }
 
-func (v *allArgs) Validate(args ...*datavalues.Value) error {
+func (v *allArgs) Validate(args ...datavalues.IDataValue) error {
 	for i := range args {
 		if err := v.validator.Validate(args[i]); err != nil {
 			return errors.Errorf("bad argument at index %v: %v", i, err)

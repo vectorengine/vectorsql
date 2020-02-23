@@ -35,15 +35,15 @@ func (datatype *Float32DataType) Name() string {
 	return DataTypeFloat32Name
 }
 
-func (datatype *Float32DataType) Serialize(writer *binary.Writer, v *datavalues.Value) error {
-	if err := writer.Float32(float32(v.GetFloat())); err != nil {
+func (datatype *Float32DataType) Serialize(writer *binary.Writer, v datavalues.IDataValue) error {
+	if err := writer.Float32(float32(v.(*datavalues.ValueFloat).AsFloat())); err != nil {
 		return errors.Wrap(err)
 	}
 	return nil
 }
 
-func (datatype *Float32DataType) SerializeText(writer io.Writer, v *datavalues.Value) error {
-	if _, err := writer.Write([]byte(fmt.Sprintf("%v", float32(v.GetFloat())))); err != nil {
+func (datatype *Float32DataType) SerializeText(writer io.Writer, v datavalues.IDataValue) error {
+	if _, err := writer.Write([]byte(fmt.Sprintf("%v", float32(v.(*datavalues.ValueFloat).AsFloat())))); err != nil {
 		return errors.Wrap(err)
 	}
 	return nil

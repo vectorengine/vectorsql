@@ -21,7 +21,7 @@ func SUM(arg interface{}) IExpression {
 			),
 		),
 		expr: expressionsFor(arg)[0],
-		updateFn: func(current *datavalues.Value, next *datavalues.Value) (*datavalues.Value, error) {
+		updateFn: func(current datavalues.IDataValue, next datavalues.IDataValue) (datavalues.IDataValue, error) {
 			if current == nil {
 				return next, nil
 			} else {
@@ -43,7 +43,7 @@ func MIN(arg interface{}) IExpression {
 			),
 		),
 		expr: expressionsFor(arg)[0],
-		updateFn: func(current *datavalues.Value, next *datavalues.Value) (*datavalues.Value, error) {
+		updateFn: func(current datavalues.IDataValue, next datavalues.IDataValue) (datavalues.IDataValue, error) {
 			if current == nil {
 				return next, nil
 			}
@@ -64,7 +64,7 @@ func MAX(arg interface{}) IExpression {
 			),
 		),
 		expr: expressionsFor(arg)[0],
-		updateFn: func(current *datavalues.Value, next *datavalues.Value) (*datavalues.Value, error) {
+		updateFn: func(current datavalues.IDataValue, next datavalues.IDataValue) (datavalues.IDataValue, error) {
 			if current == nil {
 				return next, nil
 			}
@@ -80,11 +80,11 @@ func COUNT(arg interface{}) IExpression {
 		description:   docs.Text("Averages elements in the group."),
 		validate:      All(),
 		expr:          expressionsFor(arg)[0],
-		updateFn: func(current *datavalues.Value, next *datavalues.Value) (*datavalues.Value, error) {
+		updateFn: func(current datavalues.IDataValue, next datavalues.IDataValue) (datavalues.IDataValue, error) {
 			if current == nil {
-				return datavalues.ToValue(1), nil
+				return datavalues.MakeInt(1), nil
 			} else {
-				return datavalues.Add(current, datavalues.ToValue(1))
+				return datavalues.Add(current, datavalues.MakeInt(1))
 			}
 		},
 	}

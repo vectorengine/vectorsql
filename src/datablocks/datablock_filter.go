@@ -24,7 +24,7 @@ func (block *DataBlock) FilterByPlan(plan *planners.FilterPlan) error {
 
 	i := 0
 	params := make(expressions.Map)
-	checks := make([]*datavalues.Value, block.NumRows())
+	checks := make([]datavalues.IDataValue, block.NumRows())
 	it, err := block.MixsIterator(fields)
 	if err != nil {
 		return err
@@ -46,7 +46,7 @@ func (block *DataBlock) FilterByPlan(plan *planners.FilterPlan) error {
 	n := 0
 	seqs := block.seqs
 	for i, check := range checks {
-		if check.AsBool() {
+		if check.(*datavalues.ValueBool).AsBool() {
 			seqs[n] = seqs[i]
 			n++
 		}

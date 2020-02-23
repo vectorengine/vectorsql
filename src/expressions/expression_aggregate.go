@@ -12,25 +12,25 @@ import (
 	"datavalues"
 )
 
-type aggregateUpdateFunc func(current, next *datavalues.Value) (*datavalues.Value, error)
+type aggregateUpdateFunc func(current, next datavalues.IDataValue) (datavalues.IDataValue, error)
 
 type AggregateExpression struct {
 	name          string
 	expr          IExpression
 	updateFn      aggregateUpdateFunc
-	saved         *datavalues.Value
+	saved         datavalues.IDataValue
 	validate      IValidator
 	argumentNames [][]string
 	description   docs.Documentation
 }
 
-func (e *AggregateExpression) Get() (*datavalues.Value, error) {
+func (e *AggregateExpression) Get() (datavalues.IDataValue, error) {
 	return e.saved, nil
 }
 
-func (e *AggregateExpression) Update(params IParams) (*datavalues.Value, error) {
+func (e *AggregateExpression) Update(params IParams) (datavalues.IDataValue, error) {
 	var err error
-	var updated *datavalues.Value
+	var updated datavalues.IDataValue
 
 	if updated, err = e.expr.Update(params); err != nil {
 		return nil, err

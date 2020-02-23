@@ -35,15 +35,15 @@ func (datatype *UInt32DataType) Name() string {
 	return DataTypeUInt32Name
 }
 
-func (datatype *UInt32DataType) Serialize(writer *binary.Writer, v *datavalues.Value) error {
-	if err := writer.UInt32(uint32(v.AsInt())); err != nil {
+func (datatype *UInt32DataType) Serialize(writer *binary.Writer, v datavalues.IDataValue) error {
+	if err := writer.UInt32(uint32(v.(*datavalues.ValueInt).AsInt())); err != nil {
 		return errors.Wrap(err)
 	}
 	return nil
 }
 
-func (datatype *UInt32DataType) SerializeText(writer io.Writer, v *datavalues.Value) error {
-	if _, err := writer.Write([]byte(fmt.Sprintf("%d", uint32(v.AsInt())))); err != nil {
+func (datatype *UInt32DataType) SerializeText(writer io.Writer, v datavalues.IDataValue) error {
+	if _, err := writer.Write([]byte(fmt.Sprintf("%d", uint32(v.(*datavalues.ValueInt).AsInt())))); err != nil {
 		return errors.Wrap(err)
 	}
 	return nil

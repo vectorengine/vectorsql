@@ -25,7 +25,7 @@ func TestPlanner(t *testing.T) {
 		{
 			name:   "planner-pass",
 			plan:   NewConstantPlan(1),
-			expect: "int:1 ",
+			expect: "1",
 		},
 		{
 			name: "planner-pass",
@@ -36,12 +36,12 @@ func TestPlanner(t *testing.T) {
 		{
 			name:   "planner-pass",
 			plan:   NewUnaryExpressionPlan("SUM", NewConstantPlan(1)),
-			expect: "SUM(int:1 )",
+			expect: "SUM(1)",
 		},
 		{
 			name:   "planner-pass",
 			plan:   NewBinaryExpressionPlan("+", NewConstantPlan(1), NewConstantPlan(2)),
-			expect: "(int:1 +int:2 )",
+			expect: "(1+2)",
 		},
 		{
 			name: "planner-pass",
@@ -49,7 +49,7 @@ func TestPlanner(t *testing.T) {
 				NewBinaryExpressionPlan(">", NewConstantPlan(1), NewConstantPlan(2)),
 				NewConstantPlan(1),
 				NewConstantPlan(2)),
-			expect: "IF([(int:1 >int:2 ) int:1  int:2 ])",
+			expect: "IF([(1>2) 1 2])",
 		},
 		{
 			name: "planner-pass",

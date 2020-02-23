@@ -110,7 +110,7 @@ func (block *DataBlock) MixsIterator(columns []string) (*DataBlockMixsIterator, 
 	return newDataBlockColsRowIterator(block, columns)
 }
 
-func (block *DataBlock) WriteRow(values []*datavalues.Value) error {
+func (block *DataBlock) WriteRow(values []datavalues.IDataValue) error {
 	cols := block.NumColumns()
 	if len(values) != cols {
 		return errors.Errorf("Can't append row, expect column length:%v", cols)
@@ -135,8 +135,11 @@ func (block *DataBlock) Dump() {
 	body := "\n"
 	it := block.RowIterator()
 	for it.Next() {
-		value := it.Value()
-		body += fmt.Sprintf("%+v", value)
+		row := it.Value()
+		for _, v := range row {
+			body += fmt.Sprintf("%s", v.Show())
+			body += " "
+		}
 		body += "\n"
 	}
 	fmt.Print(body)

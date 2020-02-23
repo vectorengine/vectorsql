@@ -24,20 +24,31 @@ func NewHashMap() *HashMap {
 }
 
 type entry struct {
-	key   *Value
+	key   IDataValue
 	value interface{}
 }
 
-func fastHash(key *Value) (uint64, error) {
+func AreEqual(left, right IDataValue) bool {
+	if left.GetType() != right.GetType() {
+		return false
+	}
+	cmp, err := left.Compare(right)
+	if err != nil {
+		return false
+	}
+	return cmp == Equal
+}
+
+func fastHash(key IDataValue) (uint64, error) {
 	hashes := fnv.New64()
-	err := binary.Write(hashes, binary.LittleEndian, []byte(key.Show()))
+	err := binary.Write(hashes, binary.LittleEndian, key.Show())
 	if err != nil {
 		return 0, errors.Wrap(err)
 	}
 	return hashes.Sum64(), nil
 }
 
-func (hm *HashMap) Set(key *Value, value interface{}) error {
+func (hm *HashMap) Set(key IDataValue, value interface{}) error {
 	hash, err := fastHash(key)
 	if err != nil {
 		return errors.Wrapf(err, "couldn't hash %+v", key)
@@ -58,7 +69,7 @@ func (hm *HashMap) Set(key *Value, value interface{}) error {
 	return nil
 }
 
-func (hm *HashMap) SetByHash(key *Value, hash uint64, value interface{}) error {
+func (hm *HashMap) SetByHash(key IDataValue, hash uint64, value interface{}) error {
 	list := hm.container[hash]
 	hm.container[hash] = append(list, entry{
 		key:   key,
@@ -68,7 +79,7 @@ func (hm *HashMap) SetByHash(key *Value, hash uint64, value interface{}) error {
 	return nil
 }
 
-func (hm *HashMap) Get(key *Value) (interface{}, uint64, bool, error) {
+func (hm *HashMap) Get(key IDataValue) (interface{}, uint64, bool, error) {
 	hash, err := fastHash(key)
 	if err != nil {
 		return nil, 0, false, errors.Wrapf(err, "couldn't hash %+v", key)

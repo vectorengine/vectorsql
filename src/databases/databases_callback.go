@@ -12,7 +12,7 @@ import (
 // Handlers.
 func fillDatabasesFunc(block *datablocks.DataBlock) error {
 	for _, database := range databases.databases {
-		if err := block.WriteRow([]*datavalues.Value{
+		if err := block.WriteRow([]datavalues.IDataValue{
 			datavalues.MakeString(database.Meta().GetDBName()),
 			datavalues.MakeString(database.Meta().GetEngineName()),
 			datavalues.MakeString(database.Meta().GetDataPath()),
@@ -29,7 +29,7 @@ func fillTablesFunc(block *datablocks.DataBlock) error {
 	for _, database := range databases.databases {
 		tables := database.GetTables()
 		for _, table := range tables {
-			if err := block.WriteRow([]*datavalues.Value{
+			if err := block.WriteRow([]datavalues.IDataValue{
 				datavalues.MakeString(table.getTable()),
 				datavalues.MakeString(table.getDatabase()),
 				datavalues.MakeString(table.getEngine()),

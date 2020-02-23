@@ -14,7 +14,7 @@ import (
 func Test_exactlyNArgs(t *testing.T) {
 	type args struct {
 		n    int
-		args []*datavalues.Value
+		args []datavalues.IDataValue
 	}
 	tests := []struct {
 		name    string
@@ -25,7 +25,7 @@ func Test_exactlyNArgs(t *testing.T) {
 			name: "matching number",
 			args: args{
 				n:    2,
-				args: []*datavalues.Value{datavalues.MakeInt(7), datavalues.MakeString("a")},
+				args: []datavalues.IDataValue{datavalues.MakeInt(7), datavalues.MakeString("a")},
 			},
 			wantErr: false,
 		},
@@ -33,7 +33,7 @@ func Test_exactlyNArgs(t *testing.T) {
 			name: "non-matching number - too long",
 			args: args{
 				n:    2,
-				args: []*datavalues.Value{datavalues.MakeInt(7), datavalues.MakeString("a"), datavalues.MakeBool(true)},
+				args: []datavalues.IDataValue{datavalues.MakeInt(7), datavalues.MakeString("a"), datavalues.MakeBool(true)},
 			},
 			wantErr: true,
 		},
@@ -41,7 +41,7 @@ func Test_exactlyNArgs(t *testing.T) {
 			name: "non-matching number - too short",
 			args: args{
 				n:    4,
-				args: []*datavalues.Value{datavalues.MakeInt(7), datavalues.MakeString("a"), datavalues.MakeBool(true)},
+				args: []datavalues.IDataValue{datavalues.MakeInt(7), datavalues.MakeString("a"), datavalues.MakeBool(true)},
 			},
 			wantErr: true,
 		},
@@ -58,7 +58,7 @@ func Test_exactlyNArgs(t *testing.T) {
 func Test_atLeastNArgs(t *testing.T) {
 	type args struct {
 		n    int
-		args []*datavalues.Value
+		args []datavalues.IDataValue
 	}
 	tests := []struct {
 		name    string
@@ -69,7 +69,7 @@ func Test_atLeastNArgs(t *testing.T) {
 			name: "one arg - pass",
 			args: args{
 				1,
-				[]*datavalues.Value{datavalues.MakeInt(1)},
+				[]datavalues.IDataValue{datavalues.MakeInt(1)},
 			},
 			wantErr: false,
 		},
@@ -77,7 +77,7 @@ func Test_atLeastNArgs(t *testing.T) {
 			name: "two args - pass",
 			args: args{
 				1,
-				[]*datavalues.Value{datavalues.MakeInt(1), datavalues.MakeString("hello")},
+				[]datavalues.IDataValue{datavalues.MakeInt(1), datavalues.MakeString("hello")},
 			},
 			wantErr: false,
 		},
@@ -85,7 +85,7 @@ func Test_atLeastNArgs(t *testing.T) {
 			name: "zero args - fail",
 			args: args{
 				1,
-				[]*datavalues.Value{},
+				[]datavalues.IDataValue{},
 			},
 			wantErr: true,
 		},
@@ -93,7 +93,7 @@ func Test_atLeastNArgs(t *testing.T) {
 			name: "one arg - fail",
 			args: args{
 				2,
-				[]*datavalues.Value{datavalues.MakeInt(1)},
+				[]datavalues.IDataValue{datavalues.MakeInt(1)},
 			},
 			wantErr: true,
 		},
@@ -101,7 +101,7 @@ func Test_atLeastNArgs(t *testing.T) {
 			name: "two args - pass",
 			args: args{
 				2,
-				[]*datavalues.Value{datavalues.MakeInt(1), datavalues.MakeString("hello")},
+				[]datavalues.IDataValue{datavalues.MakeInt(1), datavalues.MakeString("hello")},
 			},
 			wantErr: false,
 		},
@@ -109,7 +109,7 @@ func Test_atLeastNArgs(t *testing.T) {
 			name: "zero args - fail",
 			args: args{
 				2,
-				[]*datavalues.Value{},
+				[]datavalues.IDataValue{},
 			},
 			wantErr: true,
 		},
@@ -126,7 +126,7 @@ func Test_atLeastNArgs(t *testing.T) {
 func Test_atMostNArgs(t *testing.T) {
 	type args struct {
 		n    int
-		args []*datavalues.Value
+		args []datavalues.IDataValue
 	}
 	tests := []struct {
 		name    string
@@ -137,7 +137,7 @@ func Test_atMostNArgs(t *testing.T) {
 			name: "one arg - pass",
 			args: args{
 				1,
-				[]*datavalues.Value{datavalues.MakeInt(1)},
+				[]datavalues.IDataValue{datavalues.MakeInt(1)},
 			},
 			wantErr: false,
 		},
@@ -145,7 +145,7 @@ func Test_atMostNArgs(t *testing.T) {
 			name: "two args - fail",
 			args: args{
 				1,
-				[]*datavalues.Value{datavalues.MakeInt(1), datavalues.MakeString("hello")},
+				[]datavalues.IDataValue{datavalues.MakeInt(1), datavalues.MakeString("hello")},
 			},
 			wantErr: true,
 		},
@@ -153,7 +153,7 @@ func Test_atMostNArgs(t *testing.T) {
 			name: "zero args - pass",
 			args: args{
 				1,
-				[]*datavalues.Value{},
+				[]datavalues.IDataValue{},
 			},
 			wantErr: false,
 		},
@@ -161,7 +161,7 @@ func Test_atMostNArgs(t *testing.T) {
 			name: "one arg - pass",
 			args: args{
 				2,
-				[]*datavalues.Value{datavalues.MakeInt(1)},
+				[]datavalues.IDataValue{datavalues.MakeInt(1)},
 			},
 			wantErr: false,
 		},
@@ -169,7 +169,7 @@ func Test_atMostNArgs(t *testing.T) {
 			name: "two args - pass",
 			args: args{
 				2,
-				[]*datavalues.Value{datavalues.MakeInt(1), datavalues.MakeString("hello")},
+				[]datavalues.IDataValue{datavalues.MakeInt(1), datavalues.MakeString("hello")},
 			},
 			wantErr: false,
 		},
@@ -177,7 +177,7 @@ func Test_atMostNArgs(t *testing.T) {
 			name: "zero args - pass",
 			args: args{
 				2,
-				[]*datavalues.Value{},
+				[]datavalues.IDataValue{},
 			},
 			wantErr: false,
 		},
@@ -193,8 +193,8 @@ func Test_atMostNArgs(t *testing.T) {
 
 func Test_wantedType(t *testing.T) {
 	type args struct {
-		wantedType *datavalues.Value
-		arg        *datavalues.Value
+		wantedType datavalues.IDataValue
+		arg        datavalues.IDataValue
 	}
 	tests := []struct {
 		name    string
@@ -305,22 +305,6 @@ func Test_wantedType(t *testing.T) {
 			},
 			wantErr: true,
 		},
-		{
-			name: "object - object - pass",
-			args: args{
-				datavalues.ZeroObject(),
-				datavalues.MakeObject(map[string]*datavalues.Value{}),
-			},
-			wantErr: false,
-		},
-		{
-			name: "object - int - fail",
-			args: args{
-				datavalues.ZeroObject(),
-				datavalues.MakeInt(4),
-			},
-			wantErr: true,
-		},
 	}
 	for _, tt := range tests {
 		if err := TypeOf(tt.args.wantedType).Validate(tt.args.arg); (err != nil) != tt.wantErr {
@@ -332,12 +316,12 @@ func Test_wantedType(t *testing.T) {
 func TestSameType(t *testing.T) {
 	tests := []struct {
 		name    string
-		args    []*datavalues.Value
+		args    []datavalues.IDataValue
 		wantErr bool
 	}{
 		{
 			name: "sametype - pass",
-			args: []*datavalues.Value{
+			args: []datavalues.IDataValue{
 				datavalues.ZeroInt(),
 				datavalues.MakeInt(7),
 			},
@@ -345,7 +329,7 @@ func TestSameType(t *testing.T) {
 		},
 		{
 			name: "sametype - fail",
-			args: []*datavalues.Value{
+			args: []datavalues.IDataValue{
 				datavalues.ZeroInt(),
 				datavalues.ZeroString(),
 			},

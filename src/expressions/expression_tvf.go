@@ -26,18 +26,18 @@ func RANGETABLE(args ...interface{}) IExpression {
 			IfArgPresent(2, Arg(2, TypeOf(datavalues.ZeroString()))),
 		),
 		exprs: exprs,
-		updateFn: func(args ...*datavalues.Value) (*datavalues.Value, error) {
-			count := args[0].AsInt()
-			values := make([]*datavalues.Value, count)
+		updateFn: func(args ...datavalues.IDataValue) (datavalues.IDataValue, error) {
+			count := int(args[0].(*datavalues.ValueInt).AsInt())
+			values := make([]datavalues.IDataValue, count)
 			for i := 0; i < count; i++ {
-				row := make([]*datavalues.Value, len(args)-1)
+				row := make([]datavalues.IDataValue, len(args)-1)
 				for j := 1; j < len(args); j++ {
-					arg := args[j].AsString()
+					arg := args[j].(*datavalues.ValueString).AsString()
 					switch arg {
 					case "String":
 						row[j-1] = datavalues.MakeString(fmt.Sprintf("string-%v", i))
 					case "UInt32", "Int32":
-						row[j-1] = datavalues.MakeInt(i)
+						row[j-1] = datavalues.ToValue(i)
 					default:
 						return nil, errors.Errorf("Unsupported type:%v", arg)
 					}
@@ -62,18 +62,18 @@ func RANDTABLE(args ...interface{}) IExpression {
 			IfArgPresent(2, Arg(2, TypeOf(datavalues.ZeroString()))),
 		),
 		exprs: exprs,
-		updateFn: func(args ...*datavalues.Value) (*datavalues.Value, error) {
-			count := args[0].AsInt()
-			values := make([]*datavalues.Value, count)
+		updateFn: func(args ...datavalues.IDataValue) (datavalues.IDataValue, error) {
+			count := int(args[0].(*datavalues.ValueInt).AsInt())
+			values := make([]datavalues.IDataValue, count)
 			for i := 0; i < count; i++ {
-				row := make([]*datavalues.Value, len(args)-1)
+				row := make([]datavalues.IDataValue, len(args)-1)
 				for j := 1; j < len(args); j++ {
-					arg := args[j].AsString()
-					switch args[j].AsString() {
+					arg := args[j].(*datavalues.ValueString).AsString()
+					switch arg {
 					case "String":
 						row[j-1] = datavalues.MakeString(fmt.Sprintf("string-%v", rand.Intn(count)))
 					case "UInt32", "Int32", "UInt64", "Int64":
-						row[j-1] = datavalues.MakeInt(rand.Intn(count))
+						row[j-1] = datavalues.ToValue(rand.Intn(count))
 					default:
 						return nil, errors.Errorf("Unsupported type:%v", arg)
 					}
@@ -98,15 +98,15 @@ func ZIP(args ...interface{}) IExpression {
 			),
 		),
 		exprs: exprs,
-		updateFn: func(args ...*datavalues.Value) (*datavalues.Value, error) {
+		updateFn: func(args ...datavalues.IDataValue) (datavalues.IDataValue, error) {
 			argsize := len(args)
-			tuplesize := len(args[0].AsSlice())
-			values := make([]*datavalues.Value, tuplesize)
+			tuplesize := len(args[0].(*datavalues.ValueTuple).AsSlice())
+			values := make([]datavalues.IDataValue, tuplesize)
 
 			for i := 0; i < tuplesize; i++ {
-				row := make([]*datavalues.Value, argsize)
+				row := make([]datavalues.IDataValue, argsize)
 				for j := 0; j < argsize; j++ {
-					row[j] = args[j].AsSlice()[i]
+					row[j] = args[j].(*datavalues.ValueTuple).AsSlice()[i]
 				}
 				values[i] = datavalues.MakeTuple(row...)
 			}
@@ -123,11 +123,11 @@ func LOGMOCK(args ...interface{}) IExpression {
 		description:   docs.Text("Returns a mock log table."),
 		validate:      All(),
 		exprs:         exprs,
-		updateFn: func(args ...*datavalues.Value) (*datavalues.Value, error) {
+		updateFn: func(args ...datavalues.IDataValue) (datavalues.IDataValue, error) {
 			servera := "192.168.0.1"
 			serverb := "192.168.0.2"
 
-			values := make([]*datavalues.Value, 15)
+			values := make([]datavalues.IDataValue, 15)
 			i := 0
 			values[i] = datavalues.MakeTuple(datavalues.MakeString(servera), datavalues.MakeString("/login"), datavalues.MakeString("POST"), datavalues.MakeInt(200), datavalues.MakeInt(10))
 			i++

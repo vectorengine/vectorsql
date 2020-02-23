@@ -8,76 +8,92 @@ import (
 	"base/errors"
 )
 
-func IsIntegral(v *Value) bool {
+func IsIntegral(v IDataValue) bool {
 	return v.GetType() == TypeInt
 }
 
-func IsFloat(v *Value) bool {
+func IsFloat(v IDataValue) bool {
 	return v.GetType() == TypeFloat
 }
 
-func IsNumber(v *Value) bool {
+func IsNumber(v IDataValue) bool {
 	return IsIntegral(v) || IsFloat(v)
 }
 
-func Add(v1 *Value, v2 *Value) (*Value, error) {
+func Add(v1 IDataValue, v2 IDataValue) (IDataValue, error) {
 	if !IsNumber(v1) || !IsNumber(v2) {
 		return nil, errors.Errorf("Unsupported type:(%v,%v)", v1.GetType(), v2.GetType())
 	}
 
 	switch v1.GetType() {
 	case TypeInt:
-		return ToValue(v1.AsInt() + v2.AsInt()), nil
+		v1 := v1.(*ValueInt)
+		v2 := v2.(*ValueInt)
+		return MakeInt(v1.dint + v2.dint), nil
 	case TypeFloat:
-		return ToValue(v1.AsFloat() + v2.AsFloat()), nil
+		v1 := v1.(*ValueFloat)
+		v2 := v2.(*ValueFloat)
+		return MakeFloat(v1.dfloat + v2.dfloat), nil
 	}
 	return nil, errors.Errorf("Unsupported type:(%v,%v)", v1.GetType(), v2.GetType())
 }
 
-func Sub(v1 *Value, v2 *Value) (*Value, error) {
+func Sub(v1 IDataValue, v2 IDataValue) (IDataValue, error) {
 	if !IsNumber(v1) || !IsNumber(v2) {
 		return nil, errors.Errorf("Unsupported type:(%v,%v)", v1.GetType(), v2.GetType())
 	}
 
 	switch v1.GetType() {
 	case TypeInt:
-		return ToValue(v1.AsInt() - v2.AsInt()), nil
+		v1 := v1.(*ValueInt)
+		v2 := v2.(*ValueInt)
+		return MakeInt(v1.dint - v2.dint), nil
 	case TypeFloat:
-		return ToValue(v1.AsFloat() - v2.AsFloat()), nil
+		v1 := v1.(*ValueFloat)
+		v2 := v2.(*ValueFloat)
+		return MakeFloat(v1.dfloat - v2.dfloat), nil
 	}
 	return nil, errors.Errorf("Unsupported type:(%v,%v)", v1.GetType(), v2.GetType())
 }
 
-func Mul(v1 *Value, v2 *Value) (*Value, error) {
+func Mul(v1 IDataValue, v2 IDataValue) (IDataValue, error) {
 	if !IsNumber(v1) || !IsNumber(v2) {
 		return nil, errors.Errorf("Unsupported type:(%v,%v)", v1.GetType(), v2.GetType())
 	}
 
 	switch v1.GetType() {
 	case TypeInt:
-		return ToValue(v1.AsInt() * v2.AsInt()), nil
+		v1 := v1.(*ValueInt)
+		v2 := v2.(*ValueInt)
+		return MakeInt(v1.dint * v2.dint), nil
 	case TypeFloat:
-		return ToValue(v1.AsFloat() * v2.AsFloat()), nil
+		v1 := v1.(*ValueFloat)
+		v2 := v2.(*ValueFloat)
+		return MakeFloat(v1.dfloat * v2.dfloat), nil
 	}
 	return nil, errors.Errorf("Unsupported type:(%v,%v)", v1.GetType(), v2.GetType())
 }
 
-func Div(v1 *Value, v2 *Value) (*Value, error) {
+func Div(v1 IDataValue, v2 IDataValue) (IDataValue, error) {
 	if !IsNumber(v1) || !IsNumber(v2) {
 		return nil, errors.Errorf("Unsupported type:(%v,%v)", v1.GetType(), v2.GetType())
 	}
 
 	switch v1.GetType() {
 	case TypeInt:
-		return ToValue(float64(v1.AsInt()) / float64(v2.AsInt())), nil
+		v1 := v1.(*ValueInt)
+		v2 := v2.(*ValueInt)
+		return MakeFloat(float64(v1.dint) / float64(v2.dint)), nil
 	case TypeFloat:
-		return ToValue(v1.AsFloat() / v2.AsFloat()), nil
+		v1 := v1.(*ValueFloat)
+		v2 := v2.(*ValueFloat)
+		return MakeFloat(v1.dfloat / v2.dfloat), nil
 	}
 	return nil, errors.Errorf("Unsupported type:(%v,%v)", v1.GetType(), v2.GetType())
 }
 
-func Min(v1 *Value, v2 *Value) (*Value, error) {
-	cmp, err := Compare(v1, v2)
+func Min(v1 IDataValue, v2 IDataValue) (IDataValue, error) {
+	cmp, err := v1.Compare(v2)
 	if err != nil {
 		return nil, err
 	}
@@ -88,8 +104,8 @@ func Min(v1 *Value, v2 *Value) (*Value, error) {
 	}
 }
 
-func Max(v1 *Value, v2 *Value) (*Value, error) {
-	cmp, err := Compare(v1, v2)
+func Max(v1 IDataValue, v2 IDataValue) (IDataValue, error) {
+	cmp, err := v1.Compare(v2)
 	if err != nil {
 		return nil, err
 	}

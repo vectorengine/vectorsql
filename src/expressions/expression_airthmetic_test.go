@@ -16,7 +16,7 @@ func TestAirthmeticsExpression(t *testing.T) {
 	tests := []struct {
 		name      string
 		expr      IExpression
-		expect    *datavalues.Value
+		expect    datavalues.IDataValue
 		errstring string
 	}{
 		{
@@ -75,7 +75,7 @@ func TestAirthmeticsExpression(t *testing.T) {
 		params := Map{
 			"a": datavalues.ToValue(1),
 			"b": datavalues.ToValue(2),
-			"c": datavalues.ToValue("c"),
+			"c": datavalues.MakeString("c"),
 		}
 		actual, err := test.expr.Update(params)
 		if test.errstring != "" {
@@ -96,7 +96,7 @@ func TestAirthmeticsParamsExpression(t *testing.T) {
 	tests := []struct {
 		name      string
 		expr      IExpression
-		expect    *datavalues.Value
+		expect    datavalues.IDataValue
 		errstring string
 	}{
 		{
@@ -104,15 +104,10 @@ func TestAirthmeticsParamsExpression(t *testing.T) {
 			expr:   ADD(1, 2),
 			expect: datavalues.ToValue(3),
 		},
-		{
-			name:      "(a+b)",
-			expr:      ADD("a", "b"),
-			errstring: "params is nil",
-		},
 	}
 
 	for _, test := range tests {
-		actual, err := test.expr.Update(nil)
+		actual, err := test.expr.Get()
 		if test.errstring != "" {
 			assert.NotNil(t, err)
 		} else {

@@ -9,12 +9,12 @@ import (
 )
 
 type IParams interface {
-	Get(name string) (*datavalues.Value, bool)
+	Get(name string) (datavalues.IDataValue, bool)
 }
 
-type Map map[string]*datavalues.Value
+type Map map[string]datavalues.IDataValue
 
-func (p Map) Get(name string) (*datavalues.Value, bool) {
+func (p Map) Get(name string) (datavalues.IDataValue, bool) {
 	v, ok := p[name]
 	return v, ok
 }

@@ -32,7 +32,7 @@ func NewTableValuedFunctionExecutor(ctx *ExecutorContext, plan *planners.TableVa
 
 func (executor *TableValuedFunctionExecutor) Execute() (processors.IProcessor, error) {
 	var constants []interface{}
-	var variables []*datavalues.Value
+	var variables []datavalues.IDataValue
 
 	plan := executor.plan
 	log := executor.ctx.log
@@ -65,11 +65,11 @@ func (executor *TableValuedFunctionExecutor) Execute() (processors.IProcessor, e
 	switch strings.ToUpper(plan.FuncName) {
 	case "RANGETABLE", "RANDTABLE":
 		for i := 1; i < len(variables); i++ {
-			datatype, err := datatypes.DataTypeFactory(constants[i].(*datavalues.Value).AsString())
+			datatype, err := datatypes.DataTypeFactory(constants[i].(*datavalues.ValueString).AsString())
 			if err != nil {
 				return nil, err
 			}
-			cols = append(cols, columns.NewColumn(variables[i].AsString(), datatype))
+			cols = append(cols, columns.NewColumn(variables[i].(*datavalues.ValueString).AsString(), datatype))
 		}
 	case "LOGMOCK":
 		cols = []*columns.Column{
@@ -83,7 +83,7 @@ func (executor *TableValuedFunctionExecutor) Execute() (processors.IProcessor, e
 
 	// Block.
 	var blocks []*datablocks.DataBlock
-	slice := result.AsSlice()
+	slice := result.(*datavalues.ValueTuple).AsSlice()
 	slicesize := len(slice)
 	blocksize := conf.Server.DefaultBlockSize
 	chunks := (slicesize / blocksize)
@@ -96,7 +96,7 @@ func (executor *TableValuedFunctionExecutor) Execute() (processors.IProcessor, e
 			end = slicesize
 		}
 		for j := begin; j < end; j++ {
-			if err := block.WriteRow(slice[j].AsSlice()); err != nil {
+			if err := block.WriteRow(slice[j].(*datavalues.ValueTuple).AsSlice()); err != nil {
 				return nil, err
 			}
 		}

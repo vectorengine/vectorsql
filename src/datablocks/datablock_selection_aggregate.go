@@ -72,7 +72,7 @@ func (block *DataBlock) AggregateSelectionByPlan(plan *planners.MapPlan) (*DataB
 		}
 
 		// Final.
-		row := make([]*datavalues.Value, len(projectExprs))
+		row := make([]datavalues.IDataValue, len(projectExprs))
 		column := make([]*columns.Column, len(projectExprs))
 		for i, expr := range projectExprs {
 			name := expr.String()

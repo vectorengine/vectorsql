@@ -12,7 +12,7 @@ import (
 	"datavalues"
 )
 
-type scalarUpdateFunc func(args ...*datavalues.Value) (*datavalues.Value, error)
+type scalarUpdateFunc func(args ...datavalues.IDataValue) (datavalues.IDataValue, error)
 type ScalarExpression struct {
 	name          string
 	exprs         []IExpression
@@ -22,8 +22,8 @@ type ScalarExpression struct {
 	description   docs.Documentation
 }
 
-func (e *ScalarExpression) Get() (*datavalues.Value, error) {
-	values := make([]*datavalues.Value, len(e.exprs))
+func (e *ScalarExpression) Get() (datavalues.IDataValue, error) {
+	values := make([]datavalues.IDataValue, len(e.exprs))
 
 	for i, expr := range e.exprs {
 		val, err := expr.Get()
@@ -40,8 +40,8 @@ func (e *ScalarExpression) Get() (*datavalues.Value, error) {
 	return e.updateFn(values...)
 }
 
-func (e *ScalarExpression) Update(params IParams) (*datavalues.Value, error) {
-	values := make([]*datavalues.Value, len(e.exprs))
+func (e *ScalarExpression) Update(params IParams) (datavalues.IDataValue, error) {
+	values := make([]datavalues.IDataValue, len(e.exprs))
 
 	for i, expr := range e.exprs {
 		val, err := expr.Update(params)

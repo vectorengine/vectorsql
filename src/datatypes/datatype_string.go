@@ -34,15 +34,15 @@ func (datatype *StringDataType) Name() string {
 	return DataTypeStringName
 }
 
-func (datatype *StringDataType) Serialize(writer *binary.Writer, v *datavalues.Value) error {
-	if err := writer.String(v.ToRawValue().(string)); err != nil {
+func (datatype *StringDataType) Serialize(writer *binary.Writer, v datavalues.IDataValue) error {
+	if err := writer.String(v.(*datavalues.ValueString).AsString()); err != nil {
 		return errors.Wrap(err)
 	}
 	return nil
 }
 
-func (datatype *StringDataType) SerializeText(writer io.Writer, v *datavalues.Value) error {
-	if _, err := writer.Write([]byte(v.ToRawValue().(string))); err != nil {
+func (datatype *StringDataType) SerializeText(writer io.Writer, v datavalues.IDataValue) error {
+	if _, err := writer.Write([]byte(v.(*datavalues.ValueString).AsString())); err != nil {
 		return errors.Wrap(err)
 	}
 	return nil
