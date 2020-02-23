@@ -43,3 +43,7 @@ func (executor *CreateTableExecutor) Execute() (processors.IProcessor, error) {
 	log.Debug("Executor->Return->Pipeline:%v", nil)
 	return nil, nil
 }
+
+func (executor *CreateTableExecutor) String() string {
+	return ""
+}

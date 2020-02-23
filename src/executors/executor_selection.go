@@ -5,6 +5,8 @@
 package executors
 
 import (
+	"fmt"
+
 	"base/errors"
 	"planners"
 	"processors"
@@ -12,8 +14,9 @@ import (
 )
 
 type SelectionExecutor struct {
-	ctx  *ExecutorContext
-	plan *planners.SelectionPlan
+	ctx         *ExecutorContext
+	plan        *planners.SelectionPlan
+	transformer processors.IProcessor
 }
 
 func NewSelectionExecutor(ctx *ExecutorContext, plan *planners.SelectionPlan) *SelectionExecutor {
@@ -42,6 +45,11 @@ func (executor *SelectionExecutor) Execute() (processors.IProcessor, error) {
 	default:
 		return nil, errors.Errorf("Unsupported filler mode:%v", plan.SelectionMode)
 	}
+	executor.transformer = transform
 	log.Debug("Executor->Return->Pipeline:%v", transform)
 	return transform, nil
+}
+
+func (executor *SelectionExecutor) String() string {
+	return fmt.Sprintf("(%v, cost:%v)", executor.transformer.Name(), executor.transformer.Duration())
 }

@@ -6,6 +6,7 @@ package processors
 
 import (
 	"context"
+	"time"
 )
 
 type IProcessor interface {
@@ -15,6 +16,7 @@ type IProcessor interface {
 	Execute()
 	In() *InPort
 	Out() *OutPort
+	Duration() time.Duration
 	To(...IProcessor)
 	From(...IProcessor)
 	SetContext(context.Context)

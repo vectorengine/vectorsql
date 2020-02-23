@@ -5,10 +5,9 @@
 package executors
 
 import (
+	"base/errors"
 	"planners"
 	"processors"
-
-	"base/errors"
 )
 
 type SelectExecutor struct {
@@ -71,4 +70,13 @@ func (executor *SelectExecutor) Execute() (processors.IProcessor, error) {
 
 	log.Debug("Executor->Return->Pipeline:%s", pipeline)
 	return pipeline.Last(), nil
+}
+
+func (executor *SelectExecutor) String() string {
+	res := ""
+	for _, t := range executor.tree.subExecutors {
+		res += t.String()
+		res += " -> "
+	}
+	return res
 }

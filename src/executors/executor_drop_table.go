@@ -44,3 +44,7 @@ func (executor *DropTableExecutor) Execute() (processors.IProcessor, error) {
 	log.Debug("Executor->Return->Pipeline:%v", nil)
 	return nil, nil
 }
+
+func (executor *DropTableExecutor) String() string {
+	return ""
+}

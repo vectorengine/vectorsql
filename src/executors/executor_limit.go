@@ -5,14 +5,17 @@
 package executors
 
 import (
+	"fmt"
+
 	"planners"
 	"processors"
 	"transforms"
 )
 
 type LimitExecutor struct {
-	ctx  *ExecutorContext
-	plan *planners.LimitPlan
+	ctx         *ExecutorContext
+	plan        *planners.LimitPlan
+	transformer processors.IProcessor
 }
 
 func NewLimitExecutor(ctx *ExecutorContext, plan *planners.LimitPlan) *LimitExecutor {
@@ -29,6 +32,11 @@ func (executor *LimitExecutor) Execute() (processors.IProcessor, error) {
 	log.Debug("Executor->Enter->LogicalPlan:%s", executor.plan)
 	transformCtx := transforms.NewTransformContext(executor.ctx.ctx, log, conf)
 	transform := transforms.NewLimitransform(transformCtx, executor.plan)
+	executor.transformer = transform
 	log.Debug("Executor->Return->Pipeline:%v", transform)
 	return transform, nil
+}
+
+func (executor *LimitExecutor) String() string {
+	return fmt.Sprintf("(%v, cost:%v)", executor.transformer.Name(), executor.transformer.Duration())
 }

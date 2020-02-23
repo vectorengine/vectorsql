@@ -39,3 +39,7 @@ func (executor *CreateDatabaseExecutor) Execute() (processors.IProcessor, error)
 	log.Debug("Executor->Return->Pipeline:%v", nil)
 	return nil, nil
 }
+
+func (executor *CreateDatabaseExecutor) String() string {
+	return ""
+}

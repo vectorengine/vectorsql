@@ -58,6 +58,7 @@ func (s *TCPHandler) processQuery(session *TCPSession) error {
 	if err := s.processOrdinaryQuery(session, sink); err != nil {
 		return err
 	}
+	log.Debug("%v", executor.String())
 	return session.sendEndOfStream()
 }
 

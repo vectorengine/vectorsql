@@ -6,6 +6,7 @@ package processors
 
 import (
 	"context"
+	"time"
 )
 
 type (
@@ -18,6 +19,7 @@ type (
 		out         *OutPort
 		name        string
 		ctx         context.Context
+		duration    time.Duration
 		pauseChan   chan struct{}
 		finishChan  chan struct{}
 		resumeChan  chan struct{}
@@ -40,6 +42,10 @@ func NewBaseProcessor(name string) BaseProcessor {
 
 func (p *BaseProcessor) Name() string {
 	return p.name
+}
+
+func (p *BaseProcessor) Duration() time.Duration {
+	return p.duration
 }
 
 func (p *BaseProcessor) In() *InPort {
@@ -123,12 +129,16 @@ func (p *BaseProcessor) Subscribe(eventHandlers ...EventHandler) {
 		case x, ok := <-in.Recv():
 			if !ok {
 				if p.doneHandler != nil {
+					start := time.Now()
 					p.doneHandler()
+					p.duration += time.Since(start)
 				}
 				return
 			}
 			if p.nextHandler != nil {
+				start := time.Now()
 				p.nextHandler(x)
+				p.duration += time.Since(start)
 			}
 		}
 	}

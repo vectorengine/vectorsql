@@ -24,3 +24,7 @@ func NewSinkExecutor(ctx *ExecutorContext, plan *planners.SinkPlan) *SinkExecuto
 func (executor *SinkExecutor) Execute() (processors.IProcessor, error) {
 	return processors.NewSink("transforms_sink"), nil
 }
+
+func (executor *SinkExecutor) String() string {
+	return ""
+}

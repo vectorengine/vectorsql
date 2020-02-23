@@ -5,6 +5,8 @@
 package executors
 
 import (
+	"fmt"
+
 	"databases"
 	"planners"
 	"processors"
@@ -12,8 +14,9 @@ import (
 )
 
 type ScanExecutor struct {
-	ctx  *ExecutorContext
-	plan *planners.ScanPlan
+	ctx         *ExecutorContext
+	plan        *planners.ScanPlan
+	transformer processors.IProcessor
 }
 
 func NewScanExecutor(ctx *ExecutorContext, plan *planners.ScanPlan) *ScanExecutor {
@@ -46,6 +49,11 @@ func (executor *ScanExecutor) Execute() (processors.IProcessor, error) {
 	}
 	transformCtx := transforms.NewTransformContext(executor.ctx.ctx, log, conf)
 	transform := transforms.NewDataSourceTransform(transformCtx, input)
+	executor.transformer = transform
 	log.Debug("Executor->Return->Pipeline:%v", transform)
 	return transform, nil
+}
+
+func (executor *ScanExecutor) String() string {
+	return fmt.Sprintf("(%v, cost:%v)", executor.transformer.Name(), executor.transformer.Duration())
 }

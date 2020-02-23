@@ -5,7 +5,9 @@
 package executors
 
 import (
+	"fmt"
 	"strings"
+	"time"
 
 	"columns"
 	"datablocks"
@@ -19,8 +21,10 @@ import (
 )
 
 type TableValuedFunctionExecutor struct {
-	ctx  *ExecutorContext
-	plan *planners.TableValuedFunctionPlan
+	ctx         *ExecutorContext
+	plan        *planners.TableValuedFunctionPlan
+	duration    time.Duration
+	transformer processors.IProcessor
 }
 
 func NewTableValuedFunctionExecutor(ctx *ExecutorContext, plan *planners.TableValuedFunctionPlan) *TableValuedFunctionExecutor {
@@ -52,6 +56,7 @@ func (executor *TableValuedFunctionExecutor) Execute() (processors.IProcessor, e
 		return nil, err
 	}
 
+	start := time.Now()
 	function, err := expressions.ExpressionFactory(plan.FuncName, constants)
 	if err != nil {
 		return nil, err
@@ -102,11 +107,17 @@ func (executor *TableValuedFunctionExecutor) Execute() (processors.IProcessor, e
 		}
 		blocks = append(blocks, block)
 	}
+	executor.duration = time.Since(start)
 
 	// Stream.
 	stream := datastreams.NewOneBlockInputStream(blocks...)
 	transformCtx := transforms.NewTransformContext(executor.ctx.ctx, executor.ctx.log, executor.ctx.conf)
 	transform := transforms.NewDataSourceTransform(transformCtx, stream)
+	executor.transformer = transform
 	log.Debug("Executor->Return->Pipeline:%s", transform.Name())
 	return transform, nil
+}
+
+func (executor *TableValuedFunctionExecutor) String() string {
+	return fmt.Sprintf("(%v, cost:%v)", executor.transformer.Name(), executor.duration)
 }

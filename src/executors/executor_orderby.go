@@ -5,14 +5,17 @@
 package executors
 
 import (
+	"fmt"
+
 	"planners"
 	"processors"
 	"transforms"
 )
 
 type OrderByExecutor struct {
-	ctx  *ExecutorContext
-	plan *planners.OrderByPlan
+	ctx         *ExecutorContext
+	plan        *planners.OrderByPlan
+	transformer processors.IProcessor
 }
 
 func NewOrderByExecutor(ctx *ExecutorContext, plan *planners.OrderByPlan) *OrderByExecutor {
@@ -29,6 +32,11 @@ func (executor *OrderByExecutor) Execute() (processors.IProcessor, error) {
 	log.Debug("Executor->Enter->LogicalPlan:%s", executor.plan)
 	transformCtx := transforms.NewTransformContext(executor.ctx.ctx, log, conf)
 	transform := transforms.NewOrderByTransform(transformCtx, executor.plan)
+	executor.transformer = transform
 	log.Debug("Executor->Return->Pipeline:%v", transform)
 	return transform, nil
+}
+
+func (executor *OrderByExecutor) String() string {
+	return fmt.Sprintf("(%v, cost:%v)", executor.transformer.Name(), executor.transformer.Duration())
 }

@@ -5,14 +5,17 @@
 package executors
 
 import (
+	"fmt"
+
 	"planners"
 	"processors"
 	"transforms"
 )
 
 type FilterExecutor struct {
-	ctx    *ExecutorContext
-	filter *planners.FilterPlan
+	ctx         *ExecutorContext
+	filter      *planners.FilterPlan
+	transformer processors.IProcessor
 }
 
 func NewFilterExecutor(ctx *ExecutorContext, filter *planners.FilterPlan) *FilterExecutor {
@@ -29,6 +32,11 @@ func (executor *FilterExecutor) Execute() (processors.IProcessor, error) {
 	log.Debug("Executor->Enter->LogicalPlan:%s", executor.filter)
 	transformCtx := transforms.NewTransformContext(executor.ctx.ctx, log, conf)
 	transform := transforms.NewFilterTransform(transformCtx, executor.filter)
-	log.Debug("Executor->Return->Pipeline:%v", transform)
+	executor.transformer = transform
+	log.Debug("Executor->Return->Pipeline:%v", executor.transformer)
 	return transform, nil
+}
+
+func (executor *FilterExecutor) String() string {
+	return fmt.Sprintf("(%v, cost:%v)", executor.transformer.Name(), executor.transformer.Duration())
 }
