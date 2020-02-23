@@ -25,7 +25,7 @@ func NewVariableExpression(v string) *VariableExpression {
 	}
 }
 
-func (e *VariableExpression) Get() (datavalues.IDataValue, error) {
+func (e *VariableExpression) Result() (datavalues.IDataValue, error) {
 	return e.saved, nil
 }
 

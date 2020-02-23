@@ -25,8 +25,8 @@ func NewAliasedExpression(name string, expr IExpression) *AliasedExpression {
 	}
 }
 
-func (e *AliasedExpression) Get() (datavalues.IDataValue, error) {
-	return e.expr.Get()
+func (e *AliasedExpression) Result() (datavalues.IDataValue, error) {
+	return e.expr.Result()
 }
 
 func (e *AliasedExpression) Update(params IParams) (datavalues.IDataValue, error) {

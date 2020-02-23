@@ -76,7 +76,7 @@ func (block *DataBlock) AggregateSelectionByPlan(plan *planners.MapPlan) (*DataB
 		column := make([]*columns.Column, len(projectExprs))
 		for i, expr := range projectExprs {
 			name := expr.String()
-			val, err := expr.Get()
+			val, err := expr.Result()
 			if err != nil {
 				return nil, err
 			}

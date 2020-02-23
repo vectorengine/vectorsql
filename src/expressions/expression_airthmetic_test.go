@@ -107,7 +107,7 @@ func TestAirthmeticsParamsExpression(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		actual, err := test.expr.Get()
+		actual, err := test.expr.Result()
 		if test.errstring != "" {
 			assert.NotNil(t, err)
 		} else {

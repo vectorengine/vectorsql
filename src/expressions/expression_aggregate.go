@@ -24,7 +24,7 @@ type AggregateExpression struct {
 	description   docs.Documentation
 }
 
-func (e *AggregateExpression) Get() (datavalues.IDataValue, error) {
+func (e *AggregateExpression) Result() (datavalues.IDataValue, error) {
 	return e.saved, nil
 }
 

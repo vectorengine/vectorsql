@@ -24,14 +24,14 @@ type BinaryExpression struct {
 	description   docs.Documentation
 }
 
-func (e *BinaryExpression) Get() (datavalues.IDataValue, error) {
+func (e *BinaryExpression) Result() (datavalues.IDataValue, error) {
 	var err error
 	var left, right datavalues.IDataValue
 
-	if left, err = e.left.Get(); err != nil {
+	if left, err = e.left.Result(); err != nil {
 		return nil, err
 	}
-	if right, err = e.right.Get(); err != nil {
+	if right, err = e.right.Result(); err != nil {
 		return nil, err
 	}
 	if e.validate != nil {

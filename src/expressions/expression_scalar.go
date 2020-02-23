@@ -22,11 +22,11 @@ type ScalarExpression struct {
 	description   docs.Documentation
 }
 
-func (e *ScalarExpression) Get() (datavalues.IDataValue, error) {
+func (e *ScalarExpression) Result() (datavalues.IDataValue, error) {
 	values := make([]datavalues.IDataValue, len(e.exprs))
 
 	for i, expr := range e.exprs {
-		val, err := expr.Get()
+		val, err := expr.Result()
 		if err != nil {
 			return nil, err
 		}

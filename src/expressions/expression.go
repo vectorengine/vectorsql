@@ -13,7 +13,7 @@ import (
 type IExpression interface {
 	String() string
 	Walk(visit Visit) error
-	Get() (datavalues.IDataValue, error)
+	Result() (datavalues.IDataValue, error)
 	Update(params IParams) (datavalues.IDataValue, error)
 	Document() docs.Documentation
 }

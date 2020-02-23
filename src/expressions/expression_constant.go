@@ -23,7 +23,7 @@ func NewConstantExpression(v datavalues.IDataValue) *ConstantExpression {
 	}
 }
 
-func (e *ConstantExpression) Get() (datavalues.IDataValue, error) {
+func (e *ConstantExpression) Result() (datavalues.IDataValue, error) {
 	return e.value, nil
 }
 

@@ -78,7 +78,7 @@ func (t *GroupBySelectionTransform) Execute() {
 		row := make([]datavalues.IDataValue, len(exprs))
 		column := make([]*columns.Column, len(exprs))
 		for i, expr := range exprs {
-			if res, err := expr.Get(); err != nil {
+			if res, err := expr.Result(); err != nil {
 				return nil, err
 			} else {
 				row[i] = res
