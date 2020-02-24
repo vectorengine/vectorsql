@@ -15,7 +15,7 @@ import (
 	"planners"
 )
 
-func (block *DataBlock) OrderByPlan(plan *planners.OrderByPlan) error {
+func (block *DataBlock) OrderByPlan(fields []string, plan *planners.OrderByPlan) error {
 	defer expvar.Get(metric_datablock_filter_sec).(metric.Metric).Record(time.Now())
 
 	// Build the orderby to IExpression.
@@ -26,11 +26,6 @@ func (block *DataBlock) OrderByPlan(plan *planners.OrderByPlan) error {
 			return err
 		}
 		exprs[i] = expr
-	}
-
-	fields, err := expressions.VariableValues(exprs...)
-	if err != nil {
-		return err
 	}
 
 	// Orderby column value.

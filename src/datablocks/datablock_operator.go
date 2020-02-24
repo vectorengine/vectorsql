@@ -9,6 +9,10 @@ import (
 	"time"
 
 	"base/metric"
+	"columns"
+	"datatypes"
+	"datavalues"
+	"expressions"
 )
 
 func (block *DataBlock) Append(blocks ...*DataBlock) error {
@@ -55,4 +59,35 @@ func (block *DataBlock) SetToLast() {
 	if len(block.seqs) > 0 {
 		block.seqs = block.seqs[len(block.seqs)-1:]
 	}
+}
+
+func BuildOneBlockFromExpressions(exprs []expressions.IExpression) (*DataBlock, error) {
+	var dtype datatypes.IDataType
+	row := make([]datavalues.IDataValue, 0, len(exprs))
+	column := make([]*columns.Column, len(exprs))
+
+	for i, expr := range exprs {
+		if res, err := expr.Result(); err != nil {
+			return nil, err
+		} else {
+			if res != nil {
+				dtype, err = datatypes.GetDataTypeByValue(res)
+				if err != nil {
+					return nil, err
+				}
+				row = append(row, res)
+			} else {
+				dtype = datatypes.NewStringDataType()
+			}
+			column[i] = columns.NewColumn(expr.String(), dtype)
+		}
+	}
+
+	group := NewDataBlock(column)
+	if len(row) > 0 {
+		if err := group.WriteRow(row); err != nil {
+			return nil, err
+		}
+	}
+	return group, nil
 }

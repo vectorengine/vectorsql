@@ -36,6 +36,22 @@ func Walk(visit Visit, plans ...IPlan) error {
 	return nil
 }
 
+func BuildVariableValues(plan IPlan) ([]string, error) {
+	var vars []string
+
+	if err := Walk(func(p IPlan) (bool, error) {
+		switch t := p.(type) {
+		case *VariablePlan:
+			vars = append(vars, t.Value)
+			return true, nil
+		}
+		return true, nil
+	}, plan); err != nil {
+		return nil, err
+	}
+	return vars, nil
+}
+
 func BuildExpressions(plan *MapPlan) ([]expressions.IExpression, error) {
 	exps := make([]expressions.IExpression, plan.Length())
 	for i, p := range plan.SubPlans {

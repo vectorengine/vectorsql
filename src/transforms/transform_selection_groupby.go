@@ -5,13 +5,15 @@
 package transforms
 
 import (
-	"columns"
+	"sync"
+
 	"datablocks"
-	"datatypes"
 	"datavalues"
 	"expressions"
 	"planners"
 	"processors"
+
+	"github.com/gammazero/workerpool"
 )
 
 type GroupBySelectionTransform struct {
@@ -29,103 +31,82 @@ func NewGroupBySelectionTransform(ctx *TransformContext, plan *planners.Selectio
 }
 
 func (t *GroupBySelectionTransform) Execute() {
+	ctx := t.ctx
 	plan := t.plan
 	out := t.Out()
 	defer out.Close()
 
-	params := make(expressions.Map)
-	hashmap := datavalues.NewHashMap()
-
-	groupbyExprs, err := planners.BuildExpressions(plan.GroupBys)
-	if err != nil {
-		out.Send(err)
-		return
-	}
-
-	mergeFn := func(p expressions.Map) error {
-		groupbyValues := make([]datavalues.IDataValue, len(groupbyExprs))
-		for i, expr := range groupbyExprs {
-			val, err := expr.Update(p)
-			if err != nil {
-				return err
-			}
-			groupbyValues[i] = val
-		}
-		key := datavalues.MakeTuple(groupbyValues...)
-		projectExprs, hash, ok, err := hashmap.Get(key)
-		if err != nil {
-			return err
-		}
-		if !ok {
-			projectExprs, err = planners.BuildExpressions(plan.Projects)
-			if err != nil {
-				return err
-			}
-			if err := hashmap.SetByHash(key, hash, projectExprs); err != nil {
-				return err
-			}
-		}
-
-		for _, expr := range projectExprs.([]expressions.IExpression) {
-			if _, err := expr.Update(p); err != nil {
-				return err
-			}
-		}
-		return nil
-	}
-
-	buildFn := func(exprs []expressions.IExpression) (*datablocks.DataBlock, error) {
-		row := make([]datavalues.IDataValue, len(exprs))
-		column := make([]*columns.Column, len(exprs))
-		for i, expr := range exprs {
-			if res, err := expr.Result(); err != nil {
-				return nil, err
-			} else {
-				row[i] = res
-				// Get the column type via the expression value.
-				dtype, err := datatypes.GetDataTypeByValue(res)
-				if err != nil {
-					return nil, err
-				}
-				column[i] = columns.NewColumn(expr.String(), dtype)
-			}
-		}
-		group := datablocks.NewDataBlock(column)
-		if err := group.WriteRow(row); err != nil {
-			return nil, err
-		}
-		return group, nil
-	}
+	var mu sync.Mutex
+	groupers := make([]*datavalues.HashMap, 0, 32)
+	workerPool := workerpool.New(ctx.conf.Runtime.ParallelWorkerNumber)
 
 	onNext := func(x interface{}) {
 		switch y := x.(type) {
 		case *datablocks.DataBlock:
-			it := y.RowIterator()
-			for it.Next() {
-				row := it.Value()
-				for i := range row {
-					params[it.Column(i).Name] = row[i]
-				}
-				if err := mergeFn(params); err != nil {
+			workerPool.Submit(func() {
+				grouper, err := y.GroupBySelectionByPlan(plan)
+				if err != nil {
 					out.Send(err)
 					return
 				}
-			}
+				mu.Lock()
+				groupers = append(groupers, grouper)
+				mu.Unlock()
+			})
 		case error:
 			out.Send(y)
 		}
 	}
+
 	onDone := func() {
-		iter := hashmap.GetIterator()
+		workerPool.StopWait()
+		final := datavalues.NewHashMap()
+		for _, grouper := range groupers {
+			iter := grouper.GetIterator()
+			for {
+				curKey, curVal, ok := iter.Next()
+				if !ok {
+					break
+				}
+
+				// Check.
+				mergeVal, mergeHash, ok, err := final.Get(curKey)
+				if err != nil {
+					out.Send(err)
+					return
+				}
+
+				// Merge state.
+				if ok {
+					curVal := curVal.([]expressions.IExpression)
+					mergeVal := mergeVal.([]expressions.IExpression)
+					for i := range mergeVal {
+						if _, err := mergeVal[i].Merge(curVal[i]); err != nil {
+							out.Send(err)
+							return
+						}
+					}
+
+				} else {
+					if err := final.SetByHash(curKey, mergeHash, curVal); err != nil {
+						out.Send(err)
+						return
+					}
+				}
+			}
+		}
+
+		// Final state.
+		iter := final.GetIterator()
 		for {
-			v, ok := iter.Next()
+			_, val, ok := iter.Next()
 			if !ok {
 				break
 			}
-			if group, err := buildFn(v.([]expressions.IExpression)); err != nil {
+			if finalBlock, err := datablocks.BuildOneBlockFromExpressions(val.([]expressions.IExpression)); err != nil {
 				out.Send(err)
 			} else {
-				out.Send(group)
+				out.Send(finalBlock)
 			}
 		}
 	}

@@ -4,5 +4,8 @@ http_port = 8123
 default_database = "default"
 calculate_text_stack_trace = true
 
+[runtime]
+parallel_worker_number = 4
+
 [logger]
 level = "debug"

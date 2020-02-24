@@ -8,6 +8,8 @@ import (
 	"datablocks"
 	"planners"
 	"processors"
+
+	"github.com/gammazero/workerpool"
 )
 
 type NormalSelectionTransform struct {
@@ -25,20 +27,35 @@ func NewNormalSelectionTransform(ctx *TransformContext, plan *planners.Selection
 }
 
 func (t *NormalSelectionTransform) Execute() {
+	ctx := t.ctx
 	out := t.Out()
 	defer out.Close()
+	plan := t.plan.Projects
 
+	// Get all base fields by the expression.
+	fields, err := planners.BuildVariableValues(plan)
+	if err != nil {
+		out.Send(err)
+		return
+	}
+
+	workerPool := workerpool.New(ctx.conf.Runtime.ParallelWorkerNumber)
 	onNext := func(x interface{}) {
 		switch y := x.(type) {
 		case *datablocks.DataBlock:
-			if block, err := y.NormalSelectionByPlan(t.plan.Projects); err != nil {
-				out.Send(err)
-			} else {
-				out.Send(block)
-			}
+			workerPool.Submit(func() {
+				if block, err := y.NormalSelectionByPlan(fields, t.plan.Projects); err != nil {
+					out.Send(err)
+				} else {
+					out.Send(block)
+				}
+			})
 		case error:
 			out.Send(y)
 		}
 	}
-	t.Subscribe(onNext)
+	onDone := func() {
+		workerPool.StopWait()
+	}
+	t.Subscribe(onNext, onDone)
 }

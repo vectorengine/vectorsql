@@ -119,9 +119,9 @@ type HashMapIterator struct {
 	listPosition   int
 }
 
-func (iter *HashMapIterator) Next() (interface{}, bool) {
+func (iter *HashMapIterator) Next() (IDataValue, interface{}, bool) {
 	if iter.hashesPosition == len(iter.hashes) {
-		return nil, false
+		return nil, nil, false
 	}
 
 	// Save current item location
@@ -137,5 +137,5 @@ func (iter *HashMapIterator) Next() (interface{}, bool) {
 	}
 
 	outEntry := iter.hm.container[iter.hashes[outHashPos]][outListPos]
-	return outEntry.value, true
+	return outEntry.key, outEntry.value, true
 }

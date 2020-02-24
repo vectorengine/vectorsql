@@ -34,7 +34,7 @@ func (e *AliasedExpression) Update(params IParams) (datavalues.IDataValue, error
 }
 
 func (e *AliasedExpression) Merge(arg IExpression) (datavalues.IDataValue, error) {
-	other := arg.(*AggregateExpression)
+	other := arg.(*AliasedExpression)
 	return e.expr.Merge(other.expr)
 }
 

@@ -27,8 +27,16 @@ func NewOrderByTransform(ctx *TransformContext, plan *planners.OrderByPlan) proc
 func (t *OrderByTransform) Execute() {
 	var block *datablocks.DataBlock
 
+	plan := t.plan
 	out := t.Out()
 	defer out.Close()
+
+	// Get all base fields by the expression.
+	fields, err := planners.BuildVariableValues(plan)
+	if err != nil {
+		out.Send(err)
+		return
+	}
 
 	onNext := func(x interface{}) {
 		switch y := x.(type) {
@@ -46,7 +54,7 @@ func (t *OrderByTransform) Execute() {
 	}
 	onDone := func() {
 		if block != nil {
-			if err := block.OrderByPlan(t.plan); err != nil {
+			if err := block.OrderByPlan(fields, t.plan); err != nil {
 				out.Send(err)
 			} else {
 				out.Send(block)

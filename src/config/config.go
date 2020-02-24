@@ -35,6 +35,16 @@ func DefaultServerConfig() Server {
 	}
 }
 
+type Runtime struct {
+	ParallelWorkerNumber int
+}
+
+func DefaultRuntimeConfig() Runtime {
+	return Runtime{
+		ParallelWorkerNumber: 4,
+	}
+}
+
 type Logger struct {
 	Level string
 }
@@ -47,14 +57,16 @@ func DefaultLoggerConfig() Logger {
 
 func DefaultConfig() *Config {
 	return &Config{
-		Server: DefaultServerConfig(),
-		Logger: DefaultLoggerConfig(),
+		Server:  DefaultServerConfig(),
+		Runtime: DefaultRuntimeConfig(),
+		Logger:  DefaultLoggerConfig(),
 	}
 }
 
 type Config struct {
-	Server Server
-	Logger Logger
+	Server  Server
+	Runtime Runtime
+	Logger  Logger
 }
 
 func Load(file string) (*Config, error) {

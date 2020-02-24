@@ -5,10 +5,14 @@
 package transforms
 
 import (
+	"sync"
+
 	"datablocks"
+	"expressions"
 	"planners"
 	"processors"
-	"sync"
+
+	"github.com/gammazero/workerpool"
 )
 
 type AggregateSelectionTransform struct {
@@ -26,38 +30,62 @@ func NewAggregateSelectionTransform(ctx *TransformContext, plan *planners.Select
 }
 
 func (t *AggregateSelectionTransform) Execute() {
-	var wg sync.WaitGroup
-	var block *datablocks.DataBlock
-
+	ctx := t.ctx
 	out := t.Out()
 	defer out.Close()
 	plan := t.plan.Projects
 
+	// Get all base fields by the expression.
+	fields, err := planners.BuildVariableValues(plan)
+	if err != nil {
+		out.Send(err)
+		return
+	}
+
+	var mu sync.Mutex
+	var exprs [][]expressions.IExpression
+	workerPool := workerpool.New(ctx.conf.Runtime.ParallelWorkerNumber)
+
 	onNext := func(x interface{}) {
 		switch y := x.(type) {
 		case *datablocks.DataBlock:
-			if block == nil {
-				block = y
-			} else {
-				if err := block.Append(y); err != nil {
+			workerPool.Submit(func() {
+				expr, err := y.AggregateSelectionByPlan(fields, plan)
+				if err != nil {
 					out.Send(err)
+					return
 				}
-			}
+				mu.Lock()
+				exprs = append(exprs, expr)
+				mu.Unlock()
+			})
 		case error:
 			out.Send(y)
 		}
 	}
 	onDone := func() {
-		defer wg.Done()
-		if block != nil {
-			if filler, err := block.AggregateSelectionByPlan(plan); err != nil {
+		workerPool.StopWait()
+		if len(exprs) > 0 {
+			var mergeExpr []expressions.IExpression
+			// Do merge.
+			for i, expr := range exprs {
+				if i == 0 {
+					mergeExpr = expr
+					continue
+				}
+				for i := range mergeExpr {
+					if _, err := mergeExpr[i].Merge(expr[i]); err != nil {
+						out.Send(err)
+						return
+					}
+				}
+			}
+			if merger, err := datablocks.BuildOneBlockFromExpressions(mergeExpr); err != nil {
 				out.Send(err)
 			} else {
-				out.Send(filler)
+				out.Send(merger)
 			}
 		}
 	}
-	wg.Add(1)
 	t.Subscribe(onNext, onDone)
-	wg.Wait()
 }

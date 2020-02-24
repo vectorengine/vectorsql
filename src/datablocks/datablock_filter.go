@@ -10,14 +10,8 @@ import (
 	"planners"
 )
 
-func (block *DataBlock) FilterByPlan(plan *planners.FilterPlan) error {
+func (block *DataBlock) FilterByPlan(fields []string, plan *planners.FilterPlan) error {
 	expr, err := planners.BuildExpression(plan.SubPlan)
-	if err != nil {
-		return err
-	}
-
-	// Get all base fields.
-	fields, err := expressions.VariableValues(expr)
 	if err != nil {
 		return err
 	}

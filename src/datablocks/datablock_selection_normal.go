@@ -11,16 +11,10 @@ import (
 	"planners"
 )
 
-func (block *DataBlock) NormalSelectionByPlan(plan *planners.MapPlan) (*DataBlock, error) {
+func (block *DataBlock) NormalSelectionByPlan(fields []string, plan *planners.MapPlan) (*DataBlock, error) {
 	projects := plan
 
 	projectExprs, err := planners.BuildExpressions(projects)
-	if err != nil {
-		return nil, err
-	}
-
-	// Get all base fields.
-	fields, err := expressions.VariableValues(projectExprs...)
 	if err != nil {
 		return nil, err
 	}
