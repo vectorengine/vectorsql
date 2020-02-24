@@ -83,7 +83,10 @@ func (e *BinaryExpression) Merge(arg IExpression) (datavalues.IDataValue, error)
 		return nil, err
 	}
 
-	return e.updateFn(left, right)
+	if e.saved, err = e.updateFn(left, right); err != nil {
+		return nil, err
+	}
+	return e.saved, nil
 }
 
 func (e *BinaryExpression) Walk(visit Visit) error {

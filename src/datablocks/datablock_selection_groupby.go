@@ -39,7 +39,12 @@ func (block *DataBlock) GroupBySelectionByPlan(plan *planners.SelectionPlan) (*d
 			}
 			groupbyValues[i] = val
 		}
-		groupKey := datavalues.MakeTuple(groupbyValues...)
+		var groupKey datavalues.IDataValue
+		if len(groupbyExprs) > 1 {
+			groupKey = datavalues.MakeTuple(groupbyValues...)
+		} else {
+			groupKey = groupbyValues[0]
+		}
 		projectExprs, hash, ok, err := hashmap.Get(groupKey)
 		if err != nil {
 			return nil, err

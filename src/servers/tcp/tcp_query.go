@@ -74,7 +74,6 @@ func (s *TCPHandler) processOrdinaryQuery(session *TCPSession, sink processors.I
 				log.Error("%+v", x)
 				return session.sendException(x, conf.Server.CalculateTextStackTrace)
 			case *datablocks.DataBlock:
-				log.Debug("TCPHandler->OrdinaryQuery->DataBlock->Enter->Send datas: rows:%+v", x.NumRows())
 				chunks, err := x.Split(conf.Server.DefaultBlockSize)
 				if err != nil {
 					return err
@@ -84,7 +83,6 @@ func (s *TCPHandler) processOrdinaryQuery(session *TCPSession, sink processors.I
 						return err
 					}
 				}
-				log.Debug("TCPHandler->OrdinaryQuery->DataBlock->Enter->Send data done")
 			}
 		}
 	}
