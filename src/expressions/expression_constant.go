@@ -31,6 +31,11 @@ func (e *ConstantExpression) Update(params IParams) (datavalues.IDataValue, erro
 	return e.value, nil
 }
 
+func (e *ConstantExpression) Merge(arg IExpression) (datavalues.IDataValue, error) {
+	other := arg.(*ConstantExpression)
+	return other.value, nil
+}
+
 func (e *ConstantExpression) Walk(visit Visit) error {
 	return nil
 }

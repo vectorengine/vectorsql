@@ -15,6 +15,7 @@ type IExpression interface {
 	Walk(visit Visit) error
 	Result() (datavalues.IDataValue, error)
 	Update(params IParams) (datavalues.IDataValue, error)
+	Merge(arg IExpression) (datavalues.IDataValue, error)
 	Document() docs.Documentation
 }
 

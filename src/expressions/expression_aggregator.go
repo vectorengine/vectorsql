@@ -28,6 +28,17 @@ func SUM(arg interface{}) IExpression {
 				return datavalues.Add(current, next)
 			}
 		},
+		mergeFn: func(arg0 datavalues.IDataValue, args ...datavalues.IDataValue) (datavalues.IDataValue, error) {
+			var err error
+			res := arg0
+
+			for _, arg := range args {
+				if res, err = datavalues.Add(res, arg); err != nil {
+					return nil, err
+				}
+			}
+			return res, nil
+		},
 	}
 }
 
@@ -48,6 +59,20 @@ func MIN(arg interface{}) IExpression {
 				return next, nil
 			}
 			return datavalues.Min(current, next)
+		},
+		mergeFn: func(arg0 datavalues.IDataValue, args ...datavalues.IDataValue) (datavalues.IDataValue, error) {
+			res := arg0
+
+			for _, arg := range args {
+				cmp, err := res.Compare(arg)
+				if err != nil {
+					return nil, err
+				}
+				if cmp == datavalues.GreaterThan {
+					res = arg
+				}
+			}
+			return res, nil
 		},
 	}
 }
@@ -70,6 +95,20 @@ func MAX(arg interface{}) IExpression {
 			}
 			return datavalues.Max(current, next)
 		},
+		mergeFn: func(arg0 datavalues.IDataValue, args ...datavalues.IDataValue) (datavalues.IDataValue, error) {
+			res := arg0
+
+			for _, arg := range args {
+				cmp, err := res.Compare(arg)
+				if err != nil {
+					return nil, err
+				}
+				if cmp == datavalues.LessThan {
+					res = arg
+				}
+			}
+			return res, nil
+		},
 	}
 }
 
@@ -86,6 +125,17 @@ func COUNT(arg interface{}) IExpression {
 			} else {
 				return datavalues.Add(current, datavalues.MakeInt(1))
 			}
+		},
+		mergeFn: func(arg0 datavalues.IDataValue, args ...datavalues.IDataValue) (datavalues.IDataValue, error) {
+			var err error
+			res := arg0
+
+			for _, arg := range args {
+				if res, err = datavalues.Add(res, arg); err != nil {
+					return nil, err
+				}
+			}
+			return res, nil
 		},
 	}
 }

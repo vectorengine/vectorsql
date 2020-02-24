@@ -12,12 +12,14 @@ import (
 	"datavalues"
 )
 
+type aggregateMergeFunc func(arg0 datavalues.IDataValue, args ...datavalues.IDataValue) (datavalues.IDataValue, error)
 type aggregateUpdateFunc func(current, next datavalues.IDataValue) (datavalues.IDataValue, error)
 
 type AggregateExpression struct {
 	name          string
 	expr          IExpression
 	updateFn      aggregateUpdateFunc
+	mergeFn       aggregateMergeFunc
 	saved         datavalues.IDataValue
 	validate      IValidator
 	argumentNames [][]string
@@ -41,6 +43,16 @@ func (e *AggregateExpression) Update(params IParams) (datavalues.IDataValue, err
 		}
 	}
 	if e.saved, err = e.updateFn(e.saved, updated); err != nil {
+		return nil, err
+	}
+	return e.saved, nil
+}
+
+func (e *AggregateExpression) Merge(arg IExpression) (datavalues.IDataValue, error) {
+	var err error
+
+	other := arg.(*AggregateExpression)
+	if e.saved, err = e.mergeFn(e.saved, other.saved); err != nil {
 		return nil, err
 	}
 	return e.saved, nil

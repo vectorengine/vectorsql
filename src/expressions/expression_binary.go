@@ -18,6 +18,7 @@ type BinaryExpression struct {
 	name          string
 	left          IExpression
 	right         IExpression
+	saved         datavalues.IDataValue
 	updateFn      binaryUpdateFunc
 	validate      IValidator
 	argumentNames [][]string
@@ -28,18 +29,23 @@ func (e *BinaryExpression) Result() (datavalues.IDataValue, error) {
 	var err error
 	var left, right datavalues.IDataValue
 
-	if left, err = e.left.Result(); err != nil {
-		return nil, err
-	}
-	if right, err = e.right.Result(); err != nil {
-		return nil, err
-	}
-	if e.validate != nil {
-		if err := e.validate.Validate(left, right); err != nil {
+	if e.saved == nil {
+		if left, err = e.left.Result(); err != nil {
+			return nil, err
+		}
+		if right, err = e.right.Result(); err != nil {
+			return nil, err
+		}
+		if e.validate != nil {
+			if err := e.validate.Validate(left, right); err != nil {
+				return nil, err
+			}
+		}
+		if e.saved, err = e.updateFn(left, right); err != nil {
 			return nil, err
 		}
 	}
-	return e.updateFn(left, right)
+	return e.saved, nil
 }
 
 func (e *BinaryExpression) Update(params IParams) (datavalues.IDataValue, error) {
@@ -57,6 +63,26 @@ func (e *BinaryExpression) Update(params IParams) (datavalues.IDataValue, error)
 			return nil, err
 		}
 	}
+	if e.saved, err = e.updateFn(left, right); err != nil {
+		return nil, err
+	}
+	return e.saved, nil
+}
+
+func (e *BinaryExpression) Merge(arg IExpression) (datavalues.IDataValue, error) {
+	var err error
+	var left, right datavalues.IDataValue
+
+	other := arg.(*BinaryExpression)
+
+	if left, err = e.left.Merge(other.left); err != nil {
+		return nil, err
+	}
+
+	if right, err = e.right.Merge(other.right); err != nil {
+		return nil, err
+	}
+
 	return e.updateFn(left, right)
 }
 

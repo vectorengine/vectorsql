@@ -41,6 +41,11 @@ func (e *VariableExpression) Update(params IParams) (datavalues.IDataValue, erro
 	return nil, nil
 }
 
+func (e *VariableExpression) Merge(arg IExpression) (datavalues.IDataValue, error) {
+	other := arg.(*VariableExpression)
+	return other.saved, nil
+}
+
 func (e *VariableExpression) Walk(visit Visit) error {
 	return nil
 }

@@ -14,90 +14,140 @@ import (
 
 func TestAggregatorsExpression(t *testing.T) {
 	tests := []struct {
-		name   string
-		expr   IExpression
-		expect datavalues.IDataValue
+		name    string
+		expr1   IExpression
+		expr2   IExpression
+		expect1 datavalues.IDataValue
+		expect2 datavalues.IDataValue
 	}{
 		{
-			name:   "sum(1)",
-			expr:   SUM(1),
-			expect: datavalues.MakeInt(2),
+			name:    "sum(1)",
+			expr1:   SUM(1),
+			expr2:   SUM(1),
+			expect1: datavalues.MakeInt(2),
+			expect2: datavalues.MakeInt(3),
 		},
 		{
-			name:   "sum(a)",
-			expr:   SUM("a"),
-			expect: datavalues.MakeInt(4),
+			name:    "sum(a)",
+			expr1:   SUM("a"),
+			expr2:   SUM("a"),
+			expect1: datavalues.MakeInt(4),
+			expect2: datavalues.MakeInt(10),
 		},
 		{
-			name:   "sum(a+1)",
-			expr:   SUM(ADD("a", 1)),
-			expect: datavalues.MakeInt(6),
+			name:    "sum(a+1)",
+			expr1:   SUM(ADD("a", 1)),
+			expr2:   SUM(ADD("a", 1)),
+			expect1: datavalues.MakeInt(6),
+			expect2: datavalues.MakeInt(13),
 		},
 		{
-			name:   "sum(b)+a",
-			expr:   ADD(SUM("b"), "a"),
-			expect: datavalues.MakeInt(10),
+			name:    "sum(b)+3+2",
+			expr1:   ADD(ADD(SUM("b"), 3), 2),
+			expr2:   ADD(ADD(SUM("b"), 3), 2),
+			expect1: datavalues.MakeInt(12),
+			expect2: datavalues.MakeInt(20),
 		},
 		{
-			name:   "sum(a+(b+1))",
-			expr:   SUM(ADD("a", ADD("b", 1))),
-			expect: datavalues.MakeInt(13),
+			name:    "SUM(b)/COUNT(b)+2",
+			expr1:   ADD(DIV(SUM("b"), COUNT("b")), 2.0),
+			expr2:   ADD(DIV(SUM("b"), COUNT("b")), 2.0),
+			expect1: datavalues.ToValue(5.5),
+			expect2: datavalues.MakeFloat(7),
 		},
 		{
-			name:   "min(a)",
-			expr:   MIN("a"),
-			expect: datavalues.MakeInt(1),
+			name:    "sum(a+(b+1))",
+			expr1:   SUM(ADD("a", ADD("b", 1))),
+			expr2:   SUM(ADD("a", ADD("b", 1))),
+			expect1: datavalues.MakeInt(13),
+			expect2: datavalues.MakeInt(28),
 		},
 		{
-			name:   "min(a+1)",
-			expr:   MIN(ADD("a", 1)),
-			expect: datavalues.MakeInt(2),
+			name:    "min(a)",
+			expr1:   MIN("a"),
+			expr2:   MIN("a"),
+			expect1: datavalues.MakeInt(1),
+			expect2: datavalues.MakeInt(1),
 		},
 		{
-			name:   "max(a)",
-			expr:   MAX("a"),
-			expect: datavalues.MakeInt(3),
+			name:    "min(a+1)",
+			expr1:   MIN(ADD("a", 1)),
+			expr2:   MIN(ADD("a", 1)),
+			expect1: datavalues.MakeInt(2),
+			expect2: datavalues.MakeInt(2),
 		},
 		{
-			name:   "max(a+1)",
-			expr:   MAX(ADD("a", 1)),
-			expect: datavalues.MakeInt(4),
+			name:    "max(a)",
+			expr1:   MAX("a"),
+			expr2:   MAX("a"),
+			expect1: datavalues.MakeInt(3),
+			expect2: datavalues.MakeInt(6),
 		},
 		{
-			name:   "count(b)",
-			expr:   COUNT("b"),
-			expect: datavalues.MakeInt(2),
+			name:    "max(a+1)",
+			expr1:   MAX(ADD("a", 1)),
+			expr2:   MAX(ADD("a", 1)),
+			expect1: datavalues.MakeInt(4),
+			expect2: datavalues.MakeInt(7),
 		},
 		{
-			name:   "count(a)",
-			expr:   COUNT("a"),
-			expect: datavalues.MakeInt(2),
+			name:    "count(b)",
+			expr1:   COUNT("b"),
+			expr2:   COUNT("b"),
+			expect1: datavalues.MakeInt(2),
+			expect2: datavalues.MakeInt(3),
 		},
 		{
-			name:   "count(a+1)",
-			expr:   COUNT(ADD("a", 1)),
-			expect: datavalues.MakeInt(2),
+			name:    "count(a)",
+			expr1:   COUNT("a"),
+			expr2:   COUNT("a"),
+			expect1: datavalues.MakeInt(2),
+			expect2: datavalues.MakeInt(3),
+		},
+		{
+			name:    "count(a+1)",
+			expr1:   COUNT(ADD("a", 1)),
+			expr2:   COUNT(ADD("a", 1)),
+			expect1: datavalues.MakeInt(2),
+			expect2: datavalues.MakeInt(3),
 		},
 	}
 
 	for _, test := range tests {
 		params1 := Map{
-			"a": datavalues.MakeInt(1),
-			"b": datavalues.MakeInt(2),
+			"a": datavalues.ToValue(1),
+			"b": datavalues.ToValue(2),
 		}
 		params2 := Map{
-			"a": datavalues.MakeInt(3),
-			"b": datavalues.MakeInt(5),
+			"a": datavalues.ToValue(3),
+			"b": datavalues.ToValue(5),
 		}
-		_, err := test.expr.Update(params1)
+		expr1 := test.expr1
+		_, err := expr1.Update(params1)
 		assert.Nil(t, err)
-		actual, err := test.expr.Update(params2)
+		_, err = expr1.Update(params2)
 		assert.Nil(t, err)
-		assert.Equal(t, test.expect, actual)
+		actual, err := expr1.Result()
+		assert.Nil(t, err)
+		assert.Equal(t, test.expect1, actual)
 
-		err = test.expr.Walk(func(e IExpression) (bool, error) {
+		err = expr1.Walk(func(e IExpression) (bool, error) {
 			return true, nil
 		})
 		assert.Nil(t, err)
+
+		// Merge.
+
+		params3 := Map{
+			"a": datavalues.ToValue(6),
+			"b": datavalues.ToValue(8),
+		}
+		expr2 := test.expr2
+		_, err = expr2.Update(params3)
+		assert.Nil(t, err)
+		actual, err = expr1.Merge(expr2)
+
+		assert.Nil(t, err)
+		assert.Equal(t, test.expect2, actual)
 	}
 }
