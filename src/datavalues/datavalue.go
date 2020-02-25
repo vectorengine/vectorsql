@@ -35,7 +35,7 @@ const (
 )
 
 type IDataValue interface {
-	Show() []byte
+	Show() string
 	Size() uintptr
 	GetType() Type
 	Compare(value IDataValue) (Comparison, error)

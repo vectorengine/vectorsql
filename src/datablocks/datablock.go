@@ -137,7 +137,7 @@ func (block *DataBlock) Dump() {
 	for it.Next() {
 		row := it.Value()
 		for _, v := range row {
-			body += fmt.Sprintf("%s", v.Show())
+			body += v.Show()
 			body += " "
 		}
 		body += "\n"

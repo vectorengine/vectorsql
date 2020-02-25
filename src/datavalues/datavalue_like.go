@@ -37,5 +37,5 @@ func LikeToRegexp(likeExpr string) *regexp.Regexp {
 
 func Like(likeExpr string, x IDataValue) bool {
 	re := LikeToRegexp(likeExpr)
-	return re.Match(x.Show())
+	return re.Match([]byte(x.Show()))
 }

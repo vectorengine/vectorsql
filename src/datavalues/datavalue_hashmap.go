@@ -6,10 +6,7 @@
 package datavalues
 
 import (
-	"encoding/binary"
-	"hash/fnv"
-
-	"base/errors"
+	"github.com/segmentio/fasthash/fnv1a"
 )
 
 type HashMap struct {
@@ -39,21 +36,14 @@ func AreEqual(left, right IDataValue) bool {
 	return cmp == Equal
 }
 
-func fastHash(key IDataValue) (uint64, error) {
-	hashes := fnv.New64()
-	err := binary.Write(hashes, binary.LittleEndian, key.Show())
-	if err != nil {
-		return 0, errors.Wrap(err)
-	}
-	return hashes.Sum64(), nil
+func fastHash(key IDataValue) uint64 {
+	h2 := fnv1a.Init64
+	h2 = fnv1a.AddString64(h2, (key.Show()))
+	return h2
 }
 
 func (hm *HashMap) Set(key IDataValue, value interface{}) error {
-	hash, err := fastHash(key)
-	if err != nil {
-		return errors.Wrapf(err, "couldn't hash %+v", key)
-	}
-
+	hash := fastHash(key)
 	list := hm.container[hash]
 	for i := range list {
 		if AreEqual(list[i].key, key) {
@@ -80,11 +70,7 @@ func (hm *HashMap) SetByHash(key IDataValue, hash uint64, value interface{}) err
 }
 
 func (hm *HashMap) Get(key IDataValue) (interface{}, uint64, bool, error) {
-	hash, err := fastHash(key)
-	if err != nil {
-		return nil, 0, false, errors.Wrapf(err, "couldn't hash %+v", key)
-	}
-
+	hash := fastHash(key)
 	list := hm.container[hash]
 	for i := range list {
 		if AreEqual(list[i].key, key) {

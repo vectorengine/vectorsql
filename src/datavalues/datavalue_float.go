@@ -5,7 +5,7 @@
 package datavalues
 
 import (
-	"strconv"
+	"fmt"
 	"unsafe"
 
 	"base/docs"
@@ -28,8 +28,8 @@ func (v *ValueFloat) Size() uintptr {
 	return unsafe.Sizeof(*v)
 }
 
-func (v *ValueFloat) Show() []byte {
-	return strconv.AppendFloat(nil, v.dfloat, 'g', -1, 64)
+func (v *ValueFloat) Show() string {
+	return fmt.Sprintf("%v", v.dfloat)
 }
 
 func (v *ValueFloat) GetType() Type {

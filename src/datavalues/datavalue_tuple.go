@@ -5,7 +5,7 @@
 package datavalues
 
 import (
-	"bytes"
+	"strings"
 	"unsafe"
 
 	"base/docs"
@@ -31,12 +31,12 @@ func (v *ValueTuple) Size() uintptr {
 	return size
 }
 
-func (v *ValueTuple) Show() []byte {
-	result := make([][]byte, len(v.fields))
+func (v *ValueTuple) Show() string {
+	result := make([]string, len(v.fields))
 	for i := range v.fields {
 		result[i] = v.fields[i].Show()
 	}
-	return bytes.Join(result, []byte{0x01})
+	return strings.Join(result, "")
 }
 
 func (v *ValueTuple) GetType() Type {

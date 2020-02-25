@@ -26,8 +26,8 @@ func (v *ValueString) Size() uintptr {
 	return unsafe.Sizeof(*v) + uintptr(len(v.dstring))
 }
 
-func (v *ValueString) Show() []byte {
-	return []byte(v.dstring)
+func (v *ValueString) Show() string {
+	return v.dstring
 }
 
 func (v *ValueString) GetType() Type {

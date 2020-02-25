@@ -5,7 +5,6 @@
 package datavalues
 
 import (
-	"strconv"
 	"unsafe"
 
 	"base/docs"
@@ -36,8 +35,12 @@ func (v *ValueBool) AsBool() bool {
 	return v.dbool
 }
 
-func (v *ValueBool) Show() []byte {
-	return strconv.AppendBool(nil, v.dbool)
+func (v *ValueBool) Show() string {
+	if v.dbool {
+		return "true"
+	} else {
+		return "false"
+	}
 }
 
 func (v *ValueBool) Compare(other IDataValue) (Comparison, error) {
