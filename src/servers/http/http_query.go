@@ -54,6 +54,7 @@ func (s *HTTPHandler) processQuery(query string, rw io.Writer) (err error) {
 	if err = s.processOrdinaryQuery(rw, session, sink); err != nil {
 		return
 	}
+	log.Debug("%v", executor.String())
 	return nil
 }
 

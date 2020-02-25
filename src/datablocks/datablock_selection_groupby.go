@@ -5,17 +5,19 @@
 package datablocks
 
 import (
-	"datavalues"
+	"strings"
+
+	"base/hashmap"
 	"expressions"
 	"planners"
 )
 
-func (block *DataBlock) GroupBySelectionByPlan(plan *planners.SelectionPlan) (*datavalues.HashMap, error) {
+func (block *DataBlock) GroupBySelectionByPlan(plan *planners.SelectionPlan) (*hashmap.HashMap, error) {
 	projects := plan.Projects
 	groupbys := plan.GroupBys
 
 	params := make(expressions.Map)
-	hashmap := datavalues.NewHashMap()
+	hashmap := hashmap.NewHashMap()
 
 	groupbyExprs, err := planners.BuildExpressions(groupbys)
 	if err != nil {
@@ -31,21 +33,16 @@ func (block *DataBlock) GroupBySelectionByPlan(plan *planners.SelectionPlan) (*d
 		}
 
 		// GroupBy key.
-		groupbyValues := make([]datavalues.IDataValue, len(groupbyExprs))
+		groupbykeys := make([]string, len(groupbyExprs))
 		for i, expr := range groupbyExprs {
 			val, err := expr.Update(params)
 			if err != nil {
 				return nil, err
 			}
-			groupbyValues[i] = val
+			groupbykeys[i] = val.Show()
 		}
-		var groupKey datavalues.IDataValue
-		if len(groupbyExprs) > 1 {
-			groupKey = datavalues.MakeTuple(groupbyValues...)
-		} else {
-			groupKey = groupbyValues[0]
-		}
-		projectExprs, hash, ok, err := hashmap.Get(groupKey)
+		key := strings.Join(groupbykeys, "")
+		projectExprs, hash, ok, err := hashmap.Get(key)
 		if err != nil {
 			return nil, err
 		}
@@ -53,7 +50,7 @@ func (block *DataBlock) GroupBySelectionByPlan(plan *planners.SelectionPlan) (*d
 			if projectExprs, err = planners.BuildExpressions(projects); err != nil {
 				return nil, err
 			}
-			if err := hashmap.SetByHash(groupKey, hash, projectExprs); err != nil {
+			if err := hashmap.SetByHash(key, hash, projectExprs); err != nil {
 				return nil, err
 			}
 		}

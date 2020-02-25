@@ -3,7 +3,7 @@
 //
 // Code is licensed under Apache License, Version 2.0.
 
-package datavalues
+package hashmap
 
 import (
 	"github.com/segmentio/fasthash/fnv1a"
@@ -21,32 +21,21 @@ func NewHashMap() *HashMap {
 }
 
 type entry struct {
-	key   IDataValue
+	key   string
 	value interface{}
 }
 
-func AreEqual(left, right IDataValue) bool {
-	if left.GetType() != right.GetType() {
-		return false
-	}
-	cmp, err := left.Compare(right)
-	if err != nil {
-		return false
-	}
-	return cmp == Equal
-}
-
-func fastHash(key IDataValue) uint64 {
+func fastHash(key string) uint64 {
 	h2 := fnv1a.Init64
-	h2 = fnv1a.AddString64(h2, (key.Show()))
+	h2 = fnv1a.AddString64(h2, key)
 	return h2
 }
 
-func (hm *HashMap) Set(key IDataValue, value interface{}) error {
+func (hm *HashMap) Set(key string, value interface{}) error {
 	hash := fastHash(key)
 	list := hm.container[hash]
 	for i := range list {
-		if AreEqual(list[i].key, key) {
+		if key == key {
 			list[i].value = value
 			return nil
 		}
@@ -59,7 +48,7 @@ func (hm *HashMap) Set(key IDataValue, value interface{}) error {
 	return nil
 }
 
-func (hm *HashMap) SetByHash(key IDataValue, hash uint64, value interface{}) error {
+func (hm *HashMap) SetByHash(key string, hash uint64, value interface{}) error {
 	list := hm.container[hash]
 	hm.container[hash] = append(list, entry{
 		key:   key,
@@ -69,11 +58,11 @@ func (hm *HashMap) SetByHash(key IDataValue, hash uint64, value interface{}) err
 	return nil
 }
 
-func (hm *HashMap) Get(key IDataValue) (interface{}, uint64, bool, error) {
+func (hm *HashMap) Get(key string) (interface{}, uint64, bool, error) {
 	hash := fastHash(key)
 	list := hm.container[hash]
 	for i := range list {
-		if AreEqual(list[i].key, key) {
+		if list[i].key == key {
 			return list[i].value, hash, true, nil
 		}
 	}
@@ -105,9 +94,9 @@ type HashMapIterator struct {
 	listPosition   int
 }
 
-func (iter *HashMapIterator) Next() (IDataValue, interface{}, bool) {
+func (iter *HashMapIterator) Next() (string, interface{}, bool) {
 	if iter.hashesPosition == len(iter.hashes) {
-		return nil, nil, false
+		return "", nil, false
 	}
 
 	// Save current item location

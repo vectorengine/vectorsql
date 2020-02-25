@@ -7,8 +7,8 @@ package transforms
 import (
 	"sync"
 
+	"base/hashmap"
 	"datablocks"
-	"datavalues"
 	"expressions"
 	"planners"
 	"processors"
@@ -37,7 +37,7 @@ func (t *GroupBySelectionTransform) Execute() {
 	defer out.Close()
 
 	var mu sync.Mutex
-	groupers := make([]*datavalues.HashMap, 0, 32)
+	groupers := make([]*hashmap.HashMap, 0, 32)
 	workerPool := workerpool.New(ctx.conf.Runtime.ParallelWorkerNumber)
 
 	onNext := func(x interface{}) {
@@ -60,7 +60,7 @@ func (t *GroupBySelectionTransform) Execute() {
 
 	onDone := func() {
 		workerPool.StopWait()
-		final := datavalues.NewHashMap()
+		final := hashmap.NewHashMap()
 		for _, grouper := range groupers {
 			iter := grouper.GetIterator()
 			for {
