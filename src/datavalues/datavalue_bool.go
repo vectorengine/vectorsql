@@ -11,16 +11,16 @@ import (
 	"base/errors"
 )
 
-type ValueBool struct {
-	dbool bool
-}
+type ValueBool bool
 
 func MakeBool(v bool) IDataValue {
-	return &ValueBool{dbool: v}
+	r := ValueBool(v)
+	return &r
 }
 
 func ZeroBool() IDataValue {
-	return &ValueBool{dbool: false}
+	r := ValueBool(false)
+	return &r
 }
 
 func (v *ValueBool) Size() uintptr {
@@ -32,11 +32,12 @@ func (v *ValueBool) GetType() Type {
 }
 
 func (v *ValueBool) AsBool() bool {
-	return v.dbool
+	return bool(*v)
 }
 
 func (v *ValueBool) Show() string {
-	if v.dbool {
+	r := bool(*v)
+	if r {
 		return "true"
 	} else {
 		return "false"
@@ -48,8 +49,8 @@ func (v *ValueBool) Compare(other IDataValue) (Comparison, error) {
 		return 0, errors.Errorf("type mismatch between values")
 	}
 
-	a := v.dbool
-	b := other.(*ValueBool).dbool
+	a := bool(*v)
+	b := AsBool(other)
 	switch {
 	case a == b:
 		return 0, nil
@@ -62,4 +63,11 @@ func (v *ValueBool) Compare(other IDataValue) (Comparison, error) {
 
 func (v *ValueBool) Document() docs.Documentation {
 	return docs.Text("Bool")
+}
+
+func AsBool(v IDataValue) bool {
+	if t, ok := v.(*ValueBool); ok {
+		return bool(*t)
+	}
+	return false
 }

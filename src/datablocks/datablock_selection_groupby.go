@@ -7,17 +7,17 @@ package datablocks
 import (
 	"strings"
 
-	"base/hashmap"
+	"base/collections"
 	"expressions"
 	"planners"
 )
 
-func (block *DataBlock) GroupBySelectionByPlan(plan *planners.SelectionPlan) (*hashmap.HashMap, error) {
+func (block *DataBlock) GroupBySelectionByPlan(plan *planners.SelectionPlan) (*collections.HashMap, error) {
 	projects := plan.Projects
 	groupbys := plan.GroupBys
 
 	params := make(expressions.Map)
-	hashmap := hashmap.NewHashMap()
+	hashmap := collections.NewHashMap()
 
 	groupbyExprs, err := planners.BuildExpressions(groupbys)
 	if err != nil {

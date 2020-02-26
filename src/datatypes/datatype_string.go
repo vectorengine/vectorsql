@@ -35,14 +35,14 @@ func (datatype *StringDataType) Name() string {
 }
 
 func (datatype *StringDataType) Serialize(writer *binary.Writer, v datavalues.IDataValue) error {
-	if err := writer.String(v.(*datavalues.ValueString).AsString()); err != nil {
+	if err := writer.String(datavalues.AsString(v)); err != nil {
 		return errors.Wrap(err)
 	}
 	return nil
 }
 
 func (datatype *StringDataType) SerializeText(writer io.Writer, v datavalues.IDataValue) error {
-	if _, err := writer.Write([]byte(v.(*datavalues.ValueString).AsString())); err != nil {
+	if _, err := writer.Write([]byte(datavalues.AsString(v))); err != nil {
 		return errors.Wrap(err)
 	}
 	return nil

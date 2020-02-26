@@ -3,7 +3,7 @@
 //
 // Code is licensed under Apache License, Version 2.0.
 
-package hashmap
+package collections
 
 import (
 	"github.com/segmentio/fasthash/fnv1a"
@@ -29,23 +29,6 @@ func fastHash(key string) uint64 {
 	h2 := fnv1a.Init64
 	h2 = fnv1a.AddString64(h2, key)
 	return h2
-}
-
-func (hm *HashMap) Set(key string, value interface{}) error {
-	hash := fastHash(key)
-	list := hm.container[hash]
-	for i := range list {
-		if key == key {
-			list[i].value = value
-			return nil
-		}
-	}
-	hm.container[hash] = append(list, entry{
-		key:   key,
-		value: value,
-	})
-	hm.count++
-	return nil
 }
 
 func (hm *HashMap) SetByHash(key string, hash uint64, value interface{}) error {

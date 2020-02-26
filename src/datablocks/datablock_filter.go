@@ -40,7 +40,7 @@ func (block *DataBlock) FilterByPlan(fields []string, plan *planners.FilterPlan)
 	n := 0
 	seqs := block.seqs
 	for i, check := range checks {
-		if check.(*datavalues.ValueBool).AsBool() {
+		if datavalues.AsBool(check) {
 			seqs[n] = seqs[i]
 			n++
 		}

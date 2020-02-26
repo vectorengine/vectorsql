@@ -5,29 +5,30 @@
 package datavalues
 
 import (
+	"unsafe"
+
 	"base/docs"
 	"base/errors"
-	"unsafe"
 )
 
-type ValueString struct {
-	dstring string
-}
+type ValueString string
 
 func MakeString(v string) IDataValue {
-	return &ValueString{dstring: v}
+	r := ValueString(v)
+	return &r
 }
 
 func ZeroString() IDataValue {
-	return &ValueString{dstring: ""}
+	r := ValueString("")
+	return &r
 }
 
 func (v *ValueString) Size() uintptr {
-	return unsafe.Sizeof(*v) + uintptr(len(v.dstring))
+	return unsafe.Sizeof(v) + uintptr(len(*v))
 }
 
 func (v *ValueString) Show() string {
-	return v.dstring
+	return string(*v)
 }
 
 func (v *ValueString) GetType() Type {
@@ -35,7 +36,7 @@ func (v *ValueString) GetType() Type {
 }
 
 func (v *ValueString) AsString() string {
-	return v.dstring
+	return string(*v)
 }
 
 func (v *ValueString) Compare(other IDataValue) (Comparison, error) {
@@ -43,8 +44,8 @@ func (v *ValueString) Compare(other IDataValue) (Comparison, error) {
 		return 0, errors.Errorf("type mismatch between values")
 	}
 
-	a := v.dstring
-	b := other.(*ValueString).dstring
+	a := string(*v)
+	b := AsString(other)
 	switch {
 	case a > b:
 		return 1, nil
@@ -57,4 +58,11 @@ func (v *ValueString) Compare(other IDataValue) (Comparison, error) {
 
 func (v *ValueString) Document() docs.Documentation {
 	return docs.Text("String")
+}
+
+func AsString(v IDataValue) string {
+	if t, ok := v.(*ValueString); ok {
+		return string(*t)
+	}
+	return ""
 }

@@ -12,24 +12,24 @@ import (
 	"base/errors"
 )
 
-type ValueFloat struct {
-	dfloat float64
-}
+type ValueFloat float64
 
 func MakeFloat(v float64) IDataValue {
-	return &ValueFloat{dfloat: v}
+	r := ValueFloat(v)
+	return &r
 }
 
 func ZeroFloat() IDataValue {
-	return &ValueFloat{dfloat: 0}
+	r := ValueFloat(0)
+	return &r
 }
 
 func (v *ValueFloat) Size() uintptr {
-	return unsafe.Sizeof(*v)
+	return unsafe.Sizeof(v)
 }
 
 func (v *ValueFloat) Show() string {
-	return fmt.Sprintf("%v", v.dfloat)
+	return fmt.Sprintf("%v", *v)
 }
 
 func (v *ValueFloat) GetType() Type {
@@ -37,7 +37,7 @@ func (v *ValueFloat) GetType() Type {
 }
 
 func (v *ValueFloat) AsFloat() float64 {
-	return v.dfloat
+	return float64(*v)
 }
 
 func (v *ValueFloat) Compare(other IDataValue) (Comparison, error) {
@@ -45,8 +45,8 @@ func (v *ValueFloat) Compare(other IDataValue) (Comparison, error) {
 		return 0, errors.Errorf("type mismatch between values")
 	}
 
-	a := v.dfloat
-	b := other.(*ValueFloat).dfloat
+	a := float64(*v)
+	b := AsFloat(other)
 	switch {
 	case a > b:
 		return 1, nil
@@ -59,4 +59,11 @@ func (v *ValueFloat) Compare(other IDataValue) (Comparison, error) {
 
 func (v *ValueFloat) Document() docs.Documentation {
 	return docs.Text("Float")
+}
+
+func AsFloat(v IDataValue) float64 {
+	if t, ok := v.(*ValueFloat); ok {
+		return float64(*t)
+	}
+	return 0.0
 }

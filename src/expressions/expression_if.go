@@ -22,7 +22,7 @@ func IF(args ...interface{}) IExpression {
 		),
 		exprs: exprs,
 		updateFn: func(args ...datavalues.IDataValue) (datavalues.IDataValue, error) {
-			cond := args[0].(*datavalues.ValueBool).AsBool()
+			cond := datavalues.AsBool(args[0])
 			cond1 := args[1]
 			cond2 := args[2]
 			if cond {

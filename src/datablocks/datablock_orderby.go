@@ -67,10 +67,10 @@ func (block *DataBlock) OrderByPlan(fields []string, plan *planners.OrderByPlan)
 	jparams := make(expressions.Map, len(fields))
 
 	// Sort.
-	matrix := result.(*datavalues.ValueTuple).AsSlice()
+	matrix := datavalues.AsSlice(result)
 	sort.Slice(matrix[:], func(i, j int) bool {
-		irows := matrix[i].(*datavalues.ValueTuple).AsSlice()
-		jrows := matrix[j].(*datavalues.ValueTuple).AsSlice()
+		irows := datavalues.AsSlice(matrix[i])
+		jrows := datavalues.AsSlice(matrix[j])
 		for k := 0; k < len(fields); k++ {
 			iparams[fields[k]] = irows[k]
 			jparams[fields[k]] = jrows[k]
@@ -106,7 +106,7 @@ func (block *DataBlock) OrderByPlan(fields []string, plan *planners.OrderByPlan)
 	// Final.
 	finalSeqs := make([]int, numRows)
 	for i, tuple := range matrix {
-		finalSeqs[i] = int(tuple.(*datavalues.ValueTuple).AsSlice()[len(fields)].(*datavalues.ValueInt).AsInt())
+		finalSeqs[i] = int(datavalues.AsInt(datavalues.AsSlice(tuple)[len(fields)]))
 	}
 	block.seqs = finalSeqs
 	return nil

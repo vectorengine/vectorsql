@@ -12,24 +12,24 @@ import (
 	"base/errors"
 )
 
-type ValueInt struct {
-	dint int64
-}
+type ValueInt int64
 
 func MakeInt(v int64) IDataValue {
-	return &ValueInt{dint: v}
+	r := ValueInt(v)
+	return &r
 }
 
 func ZeroInt() IDataValue {
-	return &ValueInt{dint: int64(0)}
+	r := ValueInt(0)
+	return &r
 }
 
 func (v *ValueInt) Size() uintptr {
-	return unsafe.Sizeof(*v)
+	return unsafe.Sizeof(v)
 }
 
 func (v *ValueInt) Show() string {
-	return fmt.Sprintf("%d", v.dint)
+	return fmt.Sprintf("%d", *v)
 }
 
 func (v *ValueInt) GetType() Type {
@@ -37,7 +37,7 @@ func (v *ValueInt) GetType() Type {
 }
 
 func (v *ValueInt) AsInt() int64 {
-	return v.dint
+	return int64(*v)
 }
 
 func (v *ValueInt) Compare(other IDataValue) (Comparison, error) {
@@ -45,8 +45,8 @@ func (v *ValueInt) Compare(other IDataValue) (Comparison, error) {
 		return 0, errors.Errorf("type mismatch between values")
 	}
 
-	a := v.dint
-	b := other.(*ValueInt).dint
+	a := int64(*v)
+	b := AsInt(other)
 	switch {
 	case a > b:
 		return 1, nil
@@ -59,4 +59,11 @@ func (v *ValueInt) Compare(other IDataValue) (Comparison, error) {
 
 func (v *ValueInt) Document() docs.Documentation {
 	return docs.Text("Int")
+}
+
+func AsInt(v IDataValue) int64 {
+	if t, ok := v.(*ValueInt); ok {
+		return int64(*t)
+	}
+	return 0
 }

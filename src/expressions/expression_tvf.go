@@ -27,12 +27,12 @@ func RANGETABLE(args ...interface{}) IExpression {
 		),
 		exprs: exprs,
 		updateFn: func(args ...datavalues.IDataValue) (datavalues.IDataValue, error) {
-			count := int(args[0].(*datavalues.ValueInt).AsInt())
+			count := int(datavalues.AsInt(args[0]))
 			values := make([]datavalues.IDataValue, count)
 			for i := 0; i < count; i++ {
 				row := make([]datavalues.IDataValue, len(args)-1)
 				for j := 1; j < len(args); j++ {
-					arg := args[j].(*datavalues.ValueString).AsString()
+					arg := datavalues.AsString(args[j])
 					switch arg {
 					case "String":
 						row[j-1] = datavalues.MakeString(fmt.Sprintf("string-%v", i))
@@ -63,17 +63,20 @@ func RANDTABLE(args ...interface{}) IExpression {
 		),
 		exprs: exprs,
 		updateFn: func(args ...datavalues.IDataValue) (datavalues.IDataValue, error) {
-			count := int(args[0].(*datavalues.ValueInt).AsInt())
+			count := int(datavalues.AsInt(args[0]))
 			values := make([]datavalues.IDataValue, count)
+			rand.Seed(86)
+			rng := count / 1000
 			for i := 0; i < count; i++ {
 				row := make([]datavalues.IDataValue, len(args)-1)
 				for j := 1; j < len(args); j++ {
-					arg := args[j].(*datavalues.ValueString).AsString()
+					randnum := rand.Intn(rng)
+					arg := datavalues.AsString(args[j])
 					switch arg {
 					case "String":
-						row[j-1] = datavalues.MakeString(fmt.Sprintf("string-%v", rand.Intn(count)))
+						row[j-1] = datavalues.MakeString(fmt.Sprintf("string-%v", randnum))
 					case "UInt32", "Int32", "UInt64", "Int64":
-						row[j-1] = datavalues.ToValue(rand.Intn(count))
+						row[j-1] = datavalues.ToValue(randnum)
 					default:
 						return nil, errors.Errorf("Unsupported type:%v", arg)
 					}
@@ -100,13 +103,13 @@ func ZIP(args ...interface{}) IExpression {
 		exprs: exprs,
 		updateFn: func(args ...datavalues.IDataValue) (datavalues.IDataValue, error) {
 			argsize := len(args)
-			tuplesize := len(args[0].(*datavalues.ValueTuple).AsSlice())
+			tuplesize := len(datavalues.AsSlice(args[0]))
 			values := make([]datavalues.IDataValue, tuplesize)
 
 			for i := 0; i < tuplesize; i++ {
 				row := make([]datavalues.IDataValue, argsize)
 				for j := 0; j < argsize; j++ {
-					row[j] = args[j].(*datavalues.ValueTuple).AsSlice()[i]
+					row[j] = datavalues.AsSlice(args[j])[i]
 				}
 				values[i] = datavalues.MakeTuple(row...)
 			}

@@ -36,7 +36,7 @@ func (datatype *Float64DataType) Name() string {
 }
 
 func (datatype *Float64DataType) Serialize(writer *binary.Writer, v datavalues.IDataValue) error {
-	round := math.Round(v.(*datavalues.ValueFloat).AsFloat()*10000) / 10000
+	round := math.Round(datavalues.AsFloat(v)*10000) / 10000
 	if err := writer.Float64(round); err != nil {
 		return errors.Wrap(err)
 	}
@@ -44,7 +44,7 @@ func (datatype *Float64DataType) Serialize(writer *binary.Writer, v datavalues.I
 }
 
 func (datatype *Float64DataType) SerializeText(writer io.Writer, v datavalues.IDataValue) error {
-	if _, err := writer.Write([]byte(fmt.Sprintf("%.4f", float64(v.(*datavalues.ValueFloat).AsFloat())))); err != nil {
+	if _, err := writer.Write([]byte(fmt.Sprintf("%.4f", datavalues.AsFloat(v)))); err != nil {
 		return errors.Wrap(err)
 	}
 	return nil

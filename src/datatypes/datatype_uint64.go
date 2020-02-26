@@ -28,7 +28,7 @@ func NewUInt64DataType() IDataType {
 }
 
 func (datatype *UInt64DataType) Type() reflect.Type {
-	return reflect.ValueOf(int64(0)).Type()
+	return reflect.ValueOf(uint64(0)).Type()
 }
 
 func (datatype *UInt64DataType) Name() string {
@@ -36,14 +36,14 @@ func (datatype *UInt64DataType) Name() string {
 }
 
 func (datatype *UInt64DataType) Serialize(writer *binary.Writer, v datavalues.IDataValue) error {
-	if err := writer.UInt64(uint64(v.(*datavalues.ValueInt).AsInt())); err != nil {
+	if err := writer.UInt64(uint64(datavalues.AsInt(v))); err != nil {
 		return errors.Wrap(err)
 	}
 	return nil
 }
 
 func (datatype *UInt64DataType) SerializeText(writer io.Writer, v datavalues.IDataValue) error {
-	if _, err := writer.Write([]byte(fmt.Sprintf("%d", uint64(v.(*datavalues.ValueInt).AsInt())))); err != nil {
+	if _, err := writer.Write([]byte(fmt.Sprintf("%d", uint64(datavalues.AsInt(v))))); err != nil {
 		return errors.Wrap(err)
 	}
 	return nil

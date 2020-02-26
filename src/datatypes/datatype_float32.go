@@ -9,10 +9,9 @@ import (
 	"io"
 	"reflect"
 
-	"datavalues"
-
 	"base/binary"
 	"base/errors"
+	"datavalues"
 )
 
 const (
@@ -36,14 +35,14 @@ func (datatype *Float32DataType) Name() string {
 }
 
 func (datatype *Float32DataType) Serialize(writer *binary.Writer, v datavalues.IDataValue) error {
-	if err := writer.Float32(float32(v.(*datavalues.ValueFloat).AsFloat())); err != nil {
+	if err := writer.Float32(float32(datavalues.AsFloat(v))); err != nil {
 		return errors.Wrap(err)
 	}
 	return nil
 }
 
 func (datatype *Float32DataType) SerializeText(writer io.Writer, v datavalues.IDataValue) error {
-	if _, err := writer.Write([]byte(fmt.Sprintf("%v", float32(v.(*datavalues.ValueFloat).AsFloat())))); err != nil {
+	if _, err := writer.Write([]byte(fmt.Sprintf("%v", datavalues.AsFloat(v)))); err != nil {
 		return errors.Wrap(err)
 	}
 	return nil

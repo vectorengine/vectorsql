@@ -70,11 +70,11 @@ func (executor *TableValuedFunctionExecutor) Execute() (processors.IProcessor, e
 	switch strings.ToUpper(plan.FuncName) {
 	case "RANGETABLE", "RANDTABLE":
 		for i := 1; i < len(variables); i++ {
-			datatype, err := datatypes.DataTypeFactory(constants[i].(*datavalues.ValueString).AsString())
+			datatype, err := datatypes.DataTypeFactory(datavalues.AsString(constants[i].(datavalues.IDataValue)))
 			if err != nil {
 				return nil, err
 			}
-			cols = append(cols, columns.NewColumn(variables[i].(*datavalues.ValueString).AsString(), datatype))
+			cols = append(cols, columns.NewColumn(datavalues.AsString(variables[i]), datatype))
 		}
 	case "LOGMOCK":
 		cols = []*columns.Column{
@@ -88,7 +88,7 @@ func (executor *TableValuedFunctionExecutor) Execute() (processors.IProcessor, e
 
 	// Block.
 	var blocks []*datablocks.DataBlock
-	slice := result.(*datavalues.ValueTuple).AsSlice()
+	slice := datavalues.AsSlice(result)
 	slicesize := len(slice)
 	blocksize := conf.Server.DefaultBlockSize
 	chunks := (slicesize / blocksize)
@@ -101,7 +101,7 @@ func (executor *TableValuedFunctionExecutor) Execute() (processors.IProcessor, e
 			end = slicesize
 		}
 		for j := begin; j < end; j++ {
-			if err := block.WriteRow(slice[j].(*datavalues.ValueTuple).AsSlice()); err != nil {
+			if err := block.WriteRow(datavalues.AsSlice(slice[j])); err != nil {
 				return nil, err
 			}
 		}

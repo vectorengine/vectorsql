@@ -67,3 +67,10 @@ func (v *ValueTuple) Compare(other IDataValue) (Comparison, error) {
 func (v *ValueTuple) Document() docs.Documentation {
 	return docs.Text("Tuple")
 }
+
+func AsSlice(v IDataValue) []IDataValue {
+	if t, ok := v.(*ValueTuple); ok {
+		return t.fields
+	}
+	return nil
+}

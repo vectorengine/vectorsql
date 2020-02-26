@@ -147,8 +147,8 @@ func AND(left interface{}, right interface{}) IExpression {
 		left:        exprs[0],
 		right:       exprs[1],
 		updateFn: func(left datavalues.IDataValue, right datavalues.IDataValue) (datavalues.IDataValue, error) {
-			l := left.(*datavalues.ValueBool).AsBool()
-			r := right.(*datavalues.ValueBool).AsBool()
+			l := datavalues.AsBool(left)
+			r := datavalues.AsBool(right)
 			return datavalues.ToValue(l && r), nil
 		},
 	}
@@ -166,8 +166,8 @@ func OR(left interface{}, right interface{}) IExpression {
 		left:        exprs[0],
 		right:       exprs[1],
 		updateFn: func(left datavalues.IDataValue, right datavalues.IDataValue) (datavalues.IDataValue, error) {
-			l := left.(*datavalues.ValueBool).AsBool()
-			r := right.(*datavalues.ValueBool).AsBool()
+			l := datavalues.AsBool(left)
+			r := datavalues.AsBool(right)
 			return datavalues.ToValue(l || r), nil
 		},
 	}
@@ -185,7 +185,7 @@ func LIKE(left interface{}, right interface{}) IExpression {
 		left:        exprs[0],
 		right:       exprs[1],
 		updateFn: func(left datavalues.IDataValue, right datavalues.IDataValue) (datavalues.IDataValue, error) {
-			r := right.(*datavalues.ValueString).AsString()
+			r := datavalues.AsString(right)
 			return datavalues.ToValue(datavalues.Like(r, left)), nil
 		},
 	}
@@ -203,7 +203,7 @@ func NOT_LIKE(left interface{}, right interface{}) IExpression {
 		left:        exprs[0],
 		right:       exprs[1],
 		updateFn: func(left datavalues.IDataValue, right datavalues.IDataValue) (datavalues.IDataValue, error) {
-			r := right.(*datavalues.ValueString).AsString()
+			r := datavalues.AsString(right)
 			return datavalues.ToValue(!datavalues.Like(r, left)), nil
 		},
 	}
