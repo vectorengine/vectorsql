@@ -21,7 +21,7 @@ func TestTVFExpression(t *testing.T) {
 	}{
 		{
 			name: "RANGETABLE(rows->2, c1->'UInt32', c2->'String')",
-			expr: RANGETABLE(3, CONST("UInt32"), CONST("String")),
+			expr: RANGETABLE(0, 3, CONST("UInt32"), CONST("String")),
 			expect: datavalues.MakeTuple(
 				datavalues.MakeTuple(datavalues.ToValue(0), datavalues.ToValue("string-0")),
 				datavalues.MakeTuple(datavalues.ToValue(1), datavalues.ToValue("string-1")),

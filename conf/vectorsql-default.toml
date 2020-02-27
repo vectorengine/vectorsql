@@ -5,7 +5,7 @@ default_database = "default"
 calculate_text_stack_trace = true
 
 [runtime]
-parallel_worker_number = 4
+parallel_worker_number = 16
 
 [logger]
 level = "debug"

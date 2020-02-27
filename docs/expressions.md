@@ -335,10 +335,9 @@ Logic OR.
 ### Arguments
 
 
-* at least 2 arguments may be provided
+* at least 3 arguments may be provided
 * the 1st argument must be of type Int  
-* the 2nd argument must be of type String  
-* if the 3rd argument is provided, then the 3rd argument must be of type String   
+* the 2nd argument must be of type Int  
 
 ### Description
 Returns a random list of tuples.
@@ -353,10 +352,9 @@ Returns a random list of tuples.
 ### Arguments
 
 
-* at least 2 arguments may be provided
+* at least 3 arguments may be provided
 * the 1st argument must be of type Int  
-* the 2nd argument must be of type String  
-* if the 3rd argument is provided, then the 3rd argument must be of type String   
+* the 2nd argument must be of type Int  
 
 ### Description
 Returns a list of tuples.

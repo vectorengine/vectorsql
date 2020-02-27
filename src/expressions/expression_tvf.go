@@ -20,24 +20,28 @@ func RANGETABLE(args ...interface{}) IExpression {
 		argumentNames: [][]string{},
 		description:   docs.Text("Returns a list of tuples."),
 		validate: All(
-			AtLeastNArgs(2),
+			AtLeastNArgs(3),
 			Arg(0, TypeOf(datavalues.ZeroInt())),
-			Arg(1, TypeOf(datavalues.ZeroString())),
-			IfArgPresent(2, Arg(2, TypeOf(datavalues.ZeroString()))),
+			Arg(1, TypeOf(datavalues.ZeroInt())),
 		),
 		exprs: exprs,
 		updateFn: func(args ...datavalues.IDataValue) (datavalues.IDataValue, error) {
-			count := int(datavalues.AsInt(args[0]))
+			start := 2
+			begin := int(datavalues.AsInt(args[0]))
+			end := int(datavalues.AsInt(args[1]))
+			count := end - begin
+
 			values := make([]datavalues.IDataValue, count)
 			for i := 0; i < count; i++ {
-				row := make([]datavalues.IDataValue, len(args)-1)
-				for j := 1; j < len(args); j++ {
+				row := make([]datavalues.IDataValue, len(args)-start)
+				for j := start; j < len(args); j++ {
+					val := i + begin
 					arg := datavalues.AsString(args[j])
 					switch arg {
 					case "String":
-						row[j-1] = datavalues.MakeString(fmt.Sprintf("string-%v", i))
+						row[j-start] = datavalues.MakeString(fmt.Sprintf("string-%v", val))
 					case "UInt32", "Int32":
-						row[j-1] = datavalues.ToValue(i)
+						row[j-start] = datavalues.ToValue(val)
 					default:
 						return nil, errors.Errorf("Unsupported type:%v", arg)
 					}
@@ -56,27 +60,30 @@ func RANDTABLE(args ...interface{}) IExpression {
 		argumentNames: [][]string{},
 		description:   docs.Text("Returns a random list of tuples."),
 		validate: All(
-			AtLeastNArgs(2),
+			AtLeastNArgs(3),
 			Arg(0, TypeOf(datavalues.ZeroInt())),
-			Arg(1, TypeOf(datavalues.ZeroString())),
-			IfArgPresent(2, Arg(2, TypeOf(datavalues.ZeroString()))),
+			Arg(1, TypeOf(datavalues.ZeroInt())),
 		),
+
 		exprs: exprs,
 		updateFn: func(args ...datavalues.IDataValue) (datavalues.IDataValue, error) {
-			count := int(datavalues.AsInt(args[0]))
+			start := 2
+			begin := int(datavalues.AsInt(args[0]))
+			end := int(datavalues.AsInt(args[1]))
+			count := end - begin
+
 			values := make([]datavalues.IDataValue, count)
-			rand.Seed(86)
-			rng := count / 1000
+			rng := count / 6
 			for i := 0; i < count; i++ {
-				row := make([]datavalues.IDataValue, len(args)-1)
-				for j := 1; j < len(args); j++ {
+				row := make([]datavalues.IDataValue, len(args)-start)
+				for j := start; j < len(args); j++ {
 					randnum := rand.Intn(rng)
 					arg := datavalues.AsString(args[j])
 					switch arg {
 					case "String":
-						row[j-1] = datavalues.MakeString(fmt.Sprintf("string-%v", randnum))
+						row[j-start] = datavalues.MakeString(fmt.Sprintf("string-%v", randnum))
 					case "UInt32", "Int32", "UInt64", "Int64":
-						row[j-1] = datavalues.ToValue(randnum)
+						row[j-start] = datavalues.ToValue(randnum)
 					default:
 						return nil, errors.Errorf("Unsupported type:%v", arg)
 					}

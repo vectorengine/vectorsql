@@ -18,6 +18,8 @@ import (
 	"planners"
 	"processors"
 	"transforms"
+
+	"github.com/gammazero/workerpool"
 )
 
 type TableValuedFunctionExecutor struct {
@@ -41,6 +43,7 @@ func (executor *TableValuedFunctionExecutor) Execute() (processors.IProcessor, e
 	plan := executor.plan
 	log := executor.ctx.log
 	conf := executor.ctx.conf
+	queue := make(chan interface{}, 64)
 
 	log.Debug("Executor->Enter->LogicalPlan:%s", executor.plan)
 	err := plan.Walk(func(plan planners.IPlan) (bool, error) {
@@ -52,16 +55,6 @@ func (executor *TableValuedFunctionExecutor) Execute() (processors.IProcessor, e
 		}
 		return true, nil
 	})
-	if err != nil {
-		return nil, err
-	}
-
-	start := time.Now()
-	function, err := expressions.ExpressionFactory(plan.FuncName, constants)
-	if err != nil {
-		return nil, err
-	}
-	result, err := function.Update(nil)
 	if err != nil {
 		return nil, err
 	}
@@ -86,31 +79,60 @@ func (executor *TableValuedFunctionExecutor) Execute() (processors.IProcessor, e
 		}
 	}
 
-	// Block.
-	var blocks []*datablocks.DataBlock
-	slice := datavalues.AsSlice(result)
-	slicesize := len(slice)
+	rows := int(datavalues.AsInt(constants[0].(datavalues.IDataValue)))
 	blocksize := conf.Server.DefaultBlockSize
-	chunks := (slicesize / blocksize)
-	for i := 0; i < chunks+1; i++ {
-		block := datablocks.NewDataBlock(cols)
+	chunks := (rows / blocksize)
 
-		begin := i * blocksize
-		end := (i + 1) * blocksize
-		if end > slicesize {
-			end = slicesize
-		}
-		for j := begin; j < end; j++ {
-			if err := block.WriteRow(datavalues.AsSlice(slice[j])); err != nil {
-				return nil, err
+	go func() {
+		defer close(queue)
+
+		workerPool := workerpool.New(conf.Runtime.ParallelWorkerNumber)
+
+		start := time.Now()
+		for i := 0; i < chunks+1; i++ {
+			begin := i * blocksize
+			end := (i + 1) * blocksize
+			if end > rows {
+				end = rows
 			}
+
+			workerPool.Submit(func() {
+				block := datablocks.NewDataBlock(cols)
+
+				var consts []interface{}
+				consts = append(consts, datavalues.ToValue(begin))
+				consts = append(consts, datavalues.ToValue(end))
+				consts = append(consts, constants[1:]...)
+				function, err := expressions.ExpressionFactory(plan.FuncName, consts)
+				if err != nil {
+					log.Error("%+v", err)
+					queue <- err
+					return
+				}
+				result, err := function.Result()
+				if err != nil {
+					log.Error("%+v", err)
+					queue <- err
+					return
+				}
+				rows := datavalues.AsSlice(result)
+				for _, row := range rows {
+					if err := block.WriteRow(datavalues.AsSlice(row)); err != nil {
+						queue <- err
+						log.Error("%+v", err)
+						return
+					}
+				}
+				queue <- block
+			})
 		}
-		blocks = append(blocks, block)
-	}
-	executor.duration = time.Since(start)
+
+		workerPool.StopWait()
+		executor.duration = time.Since(start)
+	}()
 
 	// Stream.
-	stream := datastreams.NewOneBlockInputStream(blocks...)
+	stream := datastreams.NewChannelBlockInputStream(queue)
 	transformCtx := transforms.NewTransformContext(executor.ctx.ctx, executor.ctx.log, executor.ctx.conf)
 	transform := transforms.NewDataSourceTransform(transformCtx, stream)
 	executor.transformer = transform

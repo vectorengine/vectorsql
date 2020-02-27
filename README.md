@@ -92,6 +92,7 @@ curl -XPOST http://127.0.0.1:8123 -d "SELECT SUM(IF(status!=200, 1, 0)) AS error
 |Order by Value                 |+              |+              |ORDER BY a desc           |
 |Order by Expression            |+              |+              |ORDER BY (a+b)            |
 |Window Functions               |-              |+              |                          |
+|Common Table Expressions       |-              |+              |                          |
 |Join                           |-              |+              |                          |
 
 ## Performance
@@ -101,17 +102,18 @@ curl -XPOST http://127.0.0.1:8123 -d "SELECT SUM(IF(status!=200, 1, 0)) AS error
 
 |Query |Cost(second)| Parallelism|
 |-------------------------------|---------------|---|
-|SELECT COUNT(c1) FROM randtable(rows->10000000, c1->'Int32')|0.182 s| Yes |
-|SELECT COUNT(c1) FROM randtable(rows->10000000, c1->'Int32') WHERE c1!=0|0.290 s| Yes |
-|SELECT SUM(c1) FROM randtable(rows->10000000, c1->'Int32')| 0.207 s| Yes|
-|SELECT SUM(c1) AS sc1, COUNT(c1) AS cc1, sc1/cc1 AS avgc1 FROM randtable(rows->10000000, c1->'Int32')|1.839 s| Yes |
-|SELECT MIN(c1), MAX(c1) FROM randtable(rows->10000000, c1->'Int32')|0.666 s| Yes |
-|SELECT COUNT(c1) as cc1, c1 FROM randtable(rows->10000000, c1->'Int32') GROUP BY c1 ORDER BY cc1 DESC LIMIT 10|2.094 s| Yes |
-|SELECT c2 FROM randtable(rows->10000000, c2->'String') WHERE c2 LIKE '%xx%'|14.00 s| Yes |
-|SELECT COUNT(c2) FROM randtable(rows->10000000, c2->'String') WHERE c2 LIKE '%xx%'|14.79 s| Yes |
+|SELECT COUNT(c1) FROM randtable(rows->10000000, c1->'Int32')|0.009 s| Yes |
+|SELECT COUNT(c1) FROM randtable(rows->10000000, c1->'Int32') WHERE c1!=0|0.018 s| Yes |
+|SELECT SUM(c1) FROM randtable(rows->10000000, c1->'Int32')| 0.010 s| Yes|
+|SELECT SUM(c1) AS sc1, COUNT(c1) AS cc1, sc1/cc1 AS avgc1 FROM randtable(rows->10000000, c1->'Int32')|0.042 s| Yes |
+|SELECT MIN(c1), MAX(c1) FROM randtable(rows->10000000, c1->'Int32')|0.020 s| Yes |
+|SELECT COUNT(c1) as cc1, c1 FROM randtable(rows->10000000, c1->'Int32') GROUP BY c1 ORDER BY cc1 DESC LIMIT 10|1.356 s| Yes |
+|SELECT c2 FROM randtable(rows->10000000, c2->'String') WHERE c2 LIKE '%xx%'|10.851 s| Yes |
+|SELECT COUNT(c2) FROM randtable(rows->10000000, c2->'String') WHERE c2 LIKE '%xx%'|10.965 s| Yes |
 
 * Note
   - randtable random N numbers to (N/1000) groups
+  - Cost not include the Test Data Generation time
 
 ## Metrics
 

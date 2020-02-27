@@ -22,39 +22,6 @@ func TestGetLog(t *testing.T) {
 	GetLog().Info("INFO")
 }
 
-func TestSysLog(t *testing.T) {
-	log := NewSysLog()
-
-	log.Debug("DEBUG")
-	log.Info("INFO")
-	log.Warning("WARNING")
-	log.Error("ERROR")
-
-	log.SetLevel("DEBUG")
-	log.Debug("DEBUG")
-	log.Info("INFO")
-	log.Warning("WARNING")
-	log.Error("ERROR")
-
-	log.SetLevel("INFO")
-	log.Debug("DEBUG")
-	log.Info("INFO")
-	log.Warning("WARNING")
-	log.Error("ERROR")
-
-	log.SetLevel("WARNING")
-	log.Debug("DEBUG")
-	log.Info("INFO")
-	log.Warning("WARNING")
-	log.Error("ERROR")
-
-	log.SetLevel("ERROR")
-	log.Debug("DEBUG")
-	log.Info("INFO")
-	log.Warning("WARNING")
-	log.Error("ERROR")
-}
-
 func TestStdLog(t *testing.T) {
 	log := NewStdLog()
 
