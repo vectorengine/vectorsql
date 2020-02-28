@@ -29,6 +29,7 @@ test:
 
 testbase:
 	go test -v -race base/xlog
+	go test -v -race base/lru
 	go test -v -race base/metric
 
 testconfig:

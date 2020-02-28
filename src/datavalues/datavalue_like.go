@@ -8,10 +8,13 @@ import (
 	"fmt"
 	"regexp"
 	"strings"
+
+	"base/lru"
 )
 
 var (
-	re = regexp.MustCompile(`([^\\]?|[\\]{2})[%_]`)
+	re      = regexp.MustCompile(`([^\\]?|[\\]{2})[%_]`)
+	reCache = lru.New(65536)
 )
 
 func replacer(s string) string {
@@ -36,6 +39,13 @@ func LikeToRegexp(likeExpr string) *regexp.Regexp {
 }
 
 func Like(likeExpr string, x IDataValue) bool {
-	re := LikeToRegexp(likeExpr)
+	var re *regexp.Regexp
+
+	if rex, ok := reCache.Get(likeExpr); ok {
+		re = rex.(*regexp.Regexp)
+	} else {
+		re = LikeToRegexp(likeExpr)
+		reCache.Add(likeExpr, re)
+	}
 	return re.Match([]byte(x.Show()))
 }

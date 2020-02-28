@@ -108,8 +108,8 @@ curl -XPOST http://127.0.0.1:8123 -d "SELECT SUM(IF(status!=200, 1, 0)) AS error
 |SELECT SUM(c1) AS sc1, COUNT(c1) AS cc1, sc1/cc1 AS avgc1 FROM randtable(rows->10000000, c1->'Int32')|0.042 s| Yes |
 |SELECT MIN(c1), MAX(c1) FROM randtable(rows->10000000, c1->'Int32')|0.020 s| Yes |
 |SELECT COUNT(c1) as cc1, c1 FROM randtable(rows->10000000, c1->'Int32') GROUP BY c1 ORDER BY cc1 DESC LIMIT 10|1.356 s| Yes |
-|SELECT c2 FROM randtable(rows->10000000, c2->'String') WHERE c2 LIKE '%xx%'|10.851 s| Yes |
-|SELECT COUNT(c2) FROM randtable(rows->10000000, c2->'String') WHERE c2 LIKE '%xx%'|10.965 s| Yes |
+|SELECT c2 FROM randtable(rows->10000000, c2->'String') WHERE c2 LIKE '%xx%'|0.075 s| Yes |
+|SELECT COUNT(c2) FROM randtable(rows->10000000, c2->'String') WHERE c2 LIKE '%xx%'|0.100 s| Yes |
 
 * Note
   - randtable random N numbers to (N/1000) groups
