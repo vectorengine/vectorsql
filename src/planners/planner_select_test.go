@@ -612,15 +612,17 @@ LIMIT 10`,
 	}
 
 	for _, test := range tests {
-		statement, err := parsers.Parse(test.query)
-		assert.Nil(t, err)
+		t.Run(test.name, func(t *testing.T) {
+			statement, err := parsers.Parse(test.query)
+			assert.Nil(t, err)
 
-		plan := NewSelectPlan(statement.(*sqlparser.Select))
-		err = plan.Build()
-		assert.Nil(t, err)
+			plan := NewSelectPlan(statement.(*sqlparser.Select))
+			err = plan.Build()
+			assert.Nil(t, err)
 
-		expect := test.expect
-		actual := plan.String()
-		assert.Equal(t, expect, actual)
+			expect := test.expect
+			actual := plan.String()
+			assert.Equal(t, expect, actual)
+		})
 	}
 }

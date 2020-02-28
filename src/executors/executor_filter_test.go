@@ -55,32 +55,34 @@ func TestFilterExecutor(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		mock, cleanup := mocks.NewMock()
-		defer cleanup()
-		ctx := NewExecutorContext(mock.Ctx, mock.Log, mock.Conf, mock.Session)
+		t.Run(test.name, func(t *testing.T) {
+			mock, cleanup := mocks.NewMock()
+			defer cleanup()
+			ctx := NewExecutorContext(mock.Ctx, mock.Log, mock.Conf, mock.Session)
 
-		stream := mocks.NewMockBlockInputStream(test.source)
+			stream := mocks.NewMockBlockInputStream(test.source)
 
-		tctx := transforms.NewTransformContext(mock.Ctx, mock.Log, mock.Conf)
-		datasource := transforms.NewDataSourceTransform(tctx, stream)
+			tctx := transforms.NewTransformContext(mock.Ctx, mock.Log, mock.Conf)
+			datasource := transforms.NewDataSourceTransform(tctx, stream)
 
-		filter := NewFilterExecutor(ctx, test.plan.(*planners.FilterPlan))
-		transform, err := filter.Execute()
-		assert.Nil(t, err)
+			filter := NewFilterExecutor(ctx, test.plan.(*planners.FilterPlan))
+			transform, err := filter.Execute()
+			assert.Nil(t, err)
 
-		sink := processors.NewSink("sink")
-		pipeline := processors.NewPipeline(context.Background())
-		pipeline.Add(datasource)
-		pipeline.Add(transform)
-		pipeline.Add(sink)
-		pipeline.Run()
+			sink := processors.NewSink("sink")
+			pipeline := processors.NewPipeline(context.Background())
+			pipeline.Add(datasource)
+			pipeline.Add(transform)
+			pipeline.Add(sink)
+			pipeline.Run()
 
-		err = pipeline.Wait(func(x interface{}) error {
-			actual := x.(*datablocks.DataBlock)
-			expect := test.expect
-			assert.True(t, mocks.DataBlockEqual(actual, expect))
-			return nil
+			err = pipeline.Wait(func(x interface{}) error {
+				actual := x.(*datablocks.DataBlock)
+				expect := test.expect
+				assert.True(t, mocks.DataBlockEqual(actual, expect))
+				return nil
+			})
+			assert.Nil(t, err)
 		})
-		assert.Nil(t, err)
 	}
 }

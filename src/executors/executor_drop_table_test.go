@@ -43,22 +43,24 @@ func TestDropTableExecutor(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		mock, cleanup := mocks.NewMock()
-		defer cleanup()
+		t.Run(test.name, func(t *testing.T) {
+			mock, cleanup := mocks.NewMock()
+			defer cleanup()
 
-		plan, err := planners.PlanFactory(test.query)
-		assert.Nil(t, err)
-
-		ctx := NewExecutorContext(mock.Ctx, mock.Log, mock.Conf, mock.Session)
-		executor, err := ExecutorFactory(ctx, plan)
-		assert.Nil(t, err)
-
-		transform, err := executor.Execute()
-		if test.err != "" {
-			assert.Equal(t, test.err, err.Error())
-		} else {
+			plan, err := planners.PlanFactory(test.query)
 			assert.Nil(t, err)
-			assert.Nil(t, transform)
-		}
+
+			ctx := NewExecutorContext(mock.Ctx, mock.Log, mock.Conf, mock.Session)
+			executor, err := ExecutorFactory(ctx, plan)
+			assert.Nil(t, err)
+
+			transform, err := executor.Execute()
+			if test.err != "" {
+				assert.Equal(t, test.err, err.Error())
+			} else {
+				assert.Nil(t, err)
+				assert.Nil(t, transform)
+			}
+		})
 	}
 }

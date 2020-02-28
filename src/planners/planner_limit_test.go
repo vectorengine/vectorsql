@@ -37,17 +37,19 @@ func TestLimitPlan(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		plan := test.plan
-		err := plan.Build()
-		assert.Nil(t, err)
+		t.Run(test.name, func(t *testing.T) {
+			plan := test.plan
+			err := plan.Build()
+			assert.Nil(t, err)
 
-		err = plan.Walk(func(plan IPlan) (bool, error) {
-			return true, nil
+			err = plan.Walk(func(plan IPlan) (bool, error) {
+				return true, nil
+			})
+			assert.Nil(t, err)
+			expect := test.expect
+			actual := plan.String()
+
+			assert.Equal(t, expect, actual)
 		})
-		assert.Nil(t, err)
-		expect := test.expect
-		actual := plan.String()
-
-		assert.Equal(t, expect, actual)
 	}
 }

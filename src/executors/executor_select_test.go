@@ -138,26 +138,28 @@ ORDER BY
 	}
 
 	for _, test := range tests {
-		mock, cleanup := mocks.NewMock()
-		defer cleanup()
+		t.Run(test.name, func(t *testing.T) {
+			mock, cleanup := mocks.NewMock()
+			defer cleanup()
 
-		statement, err := parsers.Parse(test.query)
-		assert.Nil(t, err)
+			statement, err := parsers.Parse(test.query)
+			assert.Nil(t, err)
 
-		plan := planners.NewSelectPlan(statement.(*sqlparser.Select))
-		err = plan.Build()
-		assert.Nil(t, err)
+			plan := planners.NewSelectPlan(statement.(*sqlparser.Select))
+			err = plan.Build()
+			assert.Nil(t, err)
 
-		ctx := NewExecutorContext(mock.Ctx, mock.Log, mock.Conf, mock.Session)
-		executor := NewSelectExecutor(ctx, plan)
-		transform, err := executor.Execute()
-		assert.Nil(t, err)
+			ctx := NewExecutorContext(mock.Ctx, mock.Log, mock.Conf, mock.Session)
+			executor := NewSelectExecutor(ctx, plan)
+			transform, err := executor.Execute()
+			assert.Nil(t, err)
 
-		for x := range transform.In().Recv() {
-			expect := test.expect
-			actual := x.(*datablocks.DataBlock)
-			//actual.Dump()
-			assert.True(t, mocks.DataBlockEqual(expect, actual))
-		}
+			for x := range transform.In().Recv() {
+				expect := test.expect
+				actual := x.(*datablocks.DataBlock)
+				//actual.Dump()
+				assert.True(t, mocks.DataBlockEqual(expect, actual))
+			}
+		})
 	}
 }

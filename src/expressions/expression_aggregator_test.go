@@ -114,40 +114,42 @@ func TestAggregatorsExpression(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		params1 := Map{
-			"a": datavalues.ToValue(1),
-			"b": datavalues.ToValue(2),
-		}
-		params2 := Map{
-			"a": datavalues.ToValue(3),
-			"b": datavalues.ToValue(5),
-		}
-		expr1 := test.expr1
-		_, err := expr1.Update(params1)
-		assert.Nil(t, err)
-		_, err = expr1.Update(params2)
-		assert.Nil(t, err)
-		actual, err := expr1.Result()
-		assert.Nil(t, err)
-		assert.Equal(t, test.expect1, actual)
+		t.Run(test.name, func(t *testing.T) {
+			params1 := Map{
+				"a": datavalues.ToValue(1),
+				"b": datavalues.ToValue(2),
+			}
+			params2 := Map{
+				"a": datavalues.ToValue(3),
+				"b": datavalues.ToValue(5),
+			}
+			expr1 := test.expr1
+			_, err := expr1.Update(params1)
+			assert.Nil(t, err)
+			_, err = expr1.Update(params2)
+			assert.Nil(t, err)
+			actual, err := expr1.Result()
+			assert.Nil(t, err)
+			assert.Equal(t, test.expect1, actual)
 
-		err = expr1.Walk(func(e IExpression) (bool, error) {
-			return true, nil
+			err = expr1.Walk(func(e IExpression) (bool, error) {
+				return true, nil
+			})
+			assert.Nil(t, err)
+
+			// Merge.
+
+			params3 := Map{
+				"a": datavalues.ToValue(6),
+				"b": datavalues.ToValue(8),
+			}
+			expr2 := test.expr2
+			_, err = expr2.Update(params3)
+			assert.Nil(t, err)
+			actual, err = expr1.Merge(expr2)
+
+			assert.Nil(t, err)
+			assert.Equal(t, test.expect2, actual)
 		})
-		assert.Nil(t, err)
-
-		// Merge.
-
-		params3 := Map{
-			"a": datavalues.ToValue(6),
-			"b": datavalues.ToValue(8),
-		}
-		expr2 := test.expr2
-		_, err = expr2.Update(params3)
-		assert.Nil(t, err)
-		actual, err = expr1.Merge(expr2)
-
-		assert.Nil(t, err)
-		assert.Equal(t, test.expect2, actual)
 	}
 }

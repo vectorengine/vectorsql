@@ -54,28 +54,30 @@ func TestLimitTransfrom(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		mock, cleanup := mocks.NewMock()
-		defer cleanup()
-		ctx := NewTransformContext(mock.Ctx, mock.Log, mock.Conf)
+		t.Run(test.name, func(t *testing.T) {
+			mock, cleanup := mocks.NewMock()
+			defer cleanup()
+			ctx := NewTransformContext(mock.Ctx, mock.Log, mock.Conf)
 
-		stream := mocks.NewMockBlockInputStream(test.source)
-		datasource := NewDataSourceTransform(ctx, stream)
+			stream := mocks.NewMockBlockInputStream(test.source)
+			datasource := NewDataSourceTransform(ctx, stream)
 
-		limit := NewLimitransform(ctx, test.plan.(*planners.LimitPlan))
+			limit := NewLimitransform(ctx, test.plan.(*planners.LimitPlan))
 
-		sink := processors.NewSink("sink")
-		pipeline := processors.NewPipeline(context.Background())
-		pipeline.Add(datasource)
-		pipeline.Add(limit)
-		pipeline.Add(sink)
-		pipeline.Run()
+			sink := processors.NewSink("sink")
+			pipeline := processors.NewPipeline(context.Background())
+			pipeline.Add(datasource)
+			pipeline.Add(limit)
+			pipeline.Add(sink)
+			pipeline.Run()
 
-		err := pipeline.Wait(func(x interface{}) error {
-			actual := x.(*datablocks.DataBlock)
-			expect := test.expect
-			assert.True(t, mocks.DataBlockEqual(actual, expect))
-			return nil
+			err := pipeline.Wait(func(x interface{}) error {
+				actual := x.(*datablocks.DataBlock)
+				expect := test.expect
+				assert.True(t, mocks.DataBlockEqual(actual, expect))
+				return nil
+			})
+			assert.Nil(t, err)
 		})
-		assert.Nil(t, err)
 	}
 }

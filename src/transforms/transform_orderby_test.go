@@ -100,41 +100,43 @@ func TestOrderByTransfrom(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		mock, cleanup := mocks.NewMock()
-		defer cleanup()
-		ctx := NewTransformContext(mock.Ctx, mock.Log, mock.Conf)
+		t.Run(test.name, func(t *testing.T) {
+			mock, cleanup := mocks.NewMock()
+			defer cleanup()
+			ctx := NewTransformContext(mock.Ctx, mock.Log, mock.Conf)
 
-		stream := mocks.NewMockBlockInputStream(test.source)
-		datasource := NewDataSourceTransform(ctx, stream)
-		orderby := NewOrderByTransform(ctx, test.plan.(*planners.OrderByPlan))
-		sink := processors.NewSink("sink")
+			stream := mocks.NewMockBlockInputStream(test.source)
+			datasource := NewDataSourceTransform(ctx, stream)
+			orderby := NewOrderByTransform(ctx, test.plan.(*planners.OrderByPlan))
+			sink := processors.NewSink("sink")
 
-		pipeline := processors.NewPipeline(context.Background())
-		pipeline.Add(datasource)
-		pipeline.Add(orderby)
-		pipeline.Add(sink)
-		pipeline.Run()
+			pipeline := processors.NewPipeline(context.Background())
+			pipeline.Add(datasource)
+			pipeline.Add(orderby)
+			pipeline.Add(sink)
+			pipeline.Run()
 
-		var actual *datablocks.DataBlock
-		err := pipeline.Wait(func(x interface{}) error {
-			switch x := x.(type) {
-			case *datablocks.DataBlock:
-				if actual == nil {
-					actual = x
-				} else {
-					err := actual.Append(x)
-					assert.Nil(t, err)
+			var actual *datablocks.DataBlock
+			err := pipeline.Wait(func(x interface{}) error {
+				switch x := x.(type) {
+				case *datablocks.DataBlock:
+					if actual == nil {
+						actual = x
+					} else {
+						err := actual.Append(x)
+						assert.Nil(t, err)
+					}
 				}
-			}
-			return nil
-		})
+				return nil
+			})
 
-		expect := test.expect
-		if test.errString != "" {
-			assert.Equal(t, test.errString, fmt.Sprintf("%s", err))
-		} else {
-			assert.Nil(t, err)
-			assert.True(t, mocks.DataBlockEqual(expect, actual))
-		}
+			expect := test.expect
+			if test.errString != "" {
+				assert.Equal(t, test.errString, fmt.Sprintf("%s", err))
+			} else {
+				assert.Nil(t, err)
+				assert.True(t, mocks.DataBlockEqual(expect, actual))
+			}
+		})
 	}
 }

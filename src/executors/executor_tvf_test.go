@@ -62,25 +62,27 @@ func TestTVFExecutor(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		mock, cleanup := mocks.NewMock()
-		defer cleanup()
+		t.Run(test.name, func(t *testing.T) {
+			mock, cleanup := mocks.NewMock()
+			defer cleanup()
 
-		ctx := NewExecutorContext(mock.Ctx, mock.Log, mock.Conf, mock.Session)
-		tree := NewExecutorTree(ctx)
+			ctx := NewExecutorContext(mock.Ctx, mock.Log, mock.Conf, mock.Session)
+			tree := NewExecutorTree(ctx)
 
-		executor1 := NewTableValuedFunctionExecutor(ctx, test.plan)
-		tree.Add(executor1)
-		executor2 := NewSinkExecutor(ctx, nil)
-		tree.Add(executor2)
+			executor1 := NewTableValuedFunctionExecutor(ctx, test.plan)
+			tree.Add(executor1)
+			executor2 := NewSinkExecutor(ctx, nil)
+			tree.Add(executor2)
 
-		pipeline, err := tree.BuildPipeline()
-		assert.Nil(t, err)
-		pipeline.Run()
+			pipeline, err := tree.BuildPipeline()
+			assert.Nil(t, err)
+			pipeline.Run()
 
-		for x := range pipeline.Last().In().Recv() {
-			expect := test.expect
-			actual := x.(*datablocks.DataBlock)
-			assert.Equal(t, expect, actual)
-		}
+			for x := range pipeline.Last().In().Recv() {
+				expect := test.expect
+				actual := x.(*datablocks.DataBlock)
+				assert.Equal(t, expect, actual)
+			}
+		})
 	}
 }

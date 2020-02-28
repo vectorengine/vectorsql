@@ -83,21 +83,21 @@ func TestFilterPlan(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		plan := NewFilterPlan(test.plan)
-		err := plan.Build()
-		if test.errString == "" {
-			assert.Nil(t, err)
-		} else {
-			assert.Equal(t, test.errString, err.Error())
-			continue
-		}
-
-		err = plan.Walk(func(plan IPlan) (bool, error) {
-			return true, nil
+		t.Run(test.name, func(t *testing.T) {
+			plan := NewFilterPlan(test.plan)
+			err := plan.Build()
+			if test.errString != "" {
+				assert.Equal(t, test.errString, err.Error())
+			} else {
+				assert.Nil(t, err)
+				err = plan.Walk(func(plan IPlan) (bool, error) {
+					return true, nil
+				})
+				assert.Nil(t, err)
+				expect := test.expect
+				actual := plan.String()
+				assert.Equal(t, expect, actual)
+			}
 		})
-		assert.Nil(t, err)
-		expect := test.expect
-		actual := plan.String()
-		assert.Equal(t, expect, actual)
 	}
 }

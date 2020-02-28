@@ -152,32 +152,34 @@ func TestFilterTransform(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		mock, cleanup := mocks.NewMock()
-		defer cleanup()
-		ctx := NewTransformContext(mock.Ctx, mock.Log, mock.Conf)
+		t.Run(test.name, func(t *testing.T) {
+			mock, cleanup := mocks.NewMock()
+			defer cleanup()
+			ctx := NewTransformContext(mock.Ctx, mock.Log, mock.Conf)
 
-		stream := mocks.NewMockBlockInputStream(test.source)
-		datasource := NewDataSourceTransform(ctx, stream)
+			stream := mocks.NewMockBlockInputStream(test.source)
+			datasource := NewDataSourceTransform(ctx, stream)
 
-		plan := planners.NewFilterPlan(test.plan)
-		err := plan.Build()
-		assert.Nil(t, err)
+			plan := planners.NewFilterPlan(test.plan)
+			err := plan.Build()
+			assert.Nil(t, err)
 
-		filter := NewFilterTransform(ctx, plan)
+			filter := NewFilterTransform(ctx, plan)
 
-		sink := processors.NewSink("sink")
-		pipeline := processors.NewPipeline(context.Background())
-		pipeline.Add(datasource)
-		pipeline.Add(filter)
-		pipeline.Add(sink)
-		pipeline.Run()
+			sink := processors.NewSink("sink")
+			pipeline := processors.NewPipeline(context.Background())
+			pipeline.Add(datasource)
+			pipeline.Add(filter)
+			pipeline.Add(sink)
+			pipeline.Run()
 
-		err = pipeline.Wait(func(x interface{}) error {
-			expect := test.expect
-			actual := x.(*datablocks.DataBlock)
-			assert.True(t, mocks.DataBlockEqual(expect, actual))
-			return nil
+			err = pipeline.Wait(func(x interface{}) error {
+				expect := test.expect
+				actual := x.(*datablocks.DataBlock)
+				assert.True(t, mocks.DataBlockEqual(expect, actual))
+				return nil
+			})
+			assert.Nil(t, err)
 		})
-		assert.Nil(t, err)
 	}
 }

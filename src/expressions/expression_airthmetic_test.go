@@ -72,23 +72,26 @@ func TestAirthmeticsExpression(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		params := Map{
-			"a": datavalues.ToValue(1),
-			"b": datavalues.ToValue(2),
-			"c": datavalues.MakeString("c"),
-		}
-		actual, err := test.expr.Update(params)
-		if test.errstring != "" {
-			assert.NotNil(t, err)
-		} else {
-			assert.Nil(t, err)
-			assert.Equal(t, test.expect, actual)
 
-			err = test.expr.Walk(func(e IExpression) (bool, error) {
-				return true, nil
-			})
-			assert.Nil(t, err)
-		}
+		t.Run(test.name, func(t *testing.T) {
+			params := Map{
+				"a": datavalues.ToValue(1),
+				"b": datavalues.ToValue(2),
+				"c": datavalues.MakeString("c"),
+			}
+			actual, err := test.expr.Update(params)
+			if test.errstring != "" {
+				assert.NotNil(t, err)
+			} else {
+				assert.Nil(t, err)
+				assert.Equal(t, test.expect, actual)
+
+				err = test.expr.Walk(func(e IExpression) (bool, error) {
+					return true, nil
+				})
+				assert.Nil(t, err)
+			}
+		})
 	}
 }
 
@@ -107,12 +110,14 @@ func TestAirthmeticsParamsExpression(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		actual, err := test.expr.Result()
-		if test.errstring != "" {
-			assert.NotNil(t, err)
-		} else {
-			assert.Nil(t, err)
-			assert.Equal(t, test.expect, actual)
-		}
+		t.Run(test.name, func(t *testing.T) {
+			actual, err := test.expr.Result()
+			if test.errstring != "" {
+				assert.NotNil(t, err)
+			} else {
+				assert.Nil(t, err)
+				assert.Equal(t, test.expect, actual)
+			}
+		})
 	}
 }

@@ -75,17 +75,19 @@ func TestTVFExpression(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		actual, err := test.expr.Update(nil)
-		if test.errstring != "" {
-			assert.NotNil(t, err)
-		} else {
-			assert.Nil(t, err)
-			assert.Equal(t, test.expect, actual)
+		t.Run(test.name, func(t *testing.T) {
+			actual, err := test.expr.Update(nil)
+			if test.errstring != "" {
+				assert.NotNil(t, err)
+			} else {
+				assert.Nil(t, err)
+				assert.Equal(t, test.expect, actual)
 
-			err = test.expr.Walk(func(e IExpression) (bool, error) {
-				return true, nil
-			})
-			assert.Nil(t, err)
-		}
+				err = test.expr.Walk(func(e IExpression) (bool, error) {
+					return true, nil
+				})
+				assert.Nil(t, err)
+			}
+		})
 	}
 }

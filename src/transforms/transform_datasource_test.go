@@ -45,25 +45,27 @@ func TestDataSourceTransfrom(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		mock, cleanup := mocks.NewMock()
-		defer cleanup()
-		ctx := NewTransformContext(mock.Ctx, mock.Log, mock.Conf)
+		t.Run(test.name, func(t *testing.T) {
+			mock, cleanup := mocks.NewMock()
+			defer cleanup()
+			ctx := NewTransformContext(mock.Ctx, mock.Log, mock.Conf)
 
-		stream := mocks.NewMockBlockInputStream(test.source)
-		datasource := NewDataSourceTransform(ctx, stream)
+			stream := mocks.NewMockBlockInputStream(test.source)
+			datasource := NewDataSourceTransform(ctx, stream)
 
-		sink := processors.NewSink("sink")
-		pipeline := processors.NewPipeline(context.Background())
-		pipeline.Add(datasource)
-		pipeline.Add(sink)
-		pipeline.Run()
+			sink := processors.NewSink("sink")
+			pipeline := processors.NewPipeline(context.Background())
+			pipeline.Add(datasource)
+			pipeline.Add(sink)
+			pipeline.Run()
 
-		err := pipeline.Wait(func(x interface{}) error {
-			expect := test.expect
-			actual := x.(*datablocks.DataBlock)
-			assert.Equal(t, expect, actual)
-			return nil
+			err := pipeline.Wait(func(x interface{}) error {
+				expect := test.expect
+				actual := x.(*datablocks.DataBlock)
+				assert.Equal(t, expect, actual)
+				return nil
+			})
+			assert.Nil(t, err)
 		})
-		assert.Nil(t, err)
 	}
 }
