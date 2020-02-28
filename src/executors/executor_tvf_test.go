@@ -83,6 +83,7 @@ func TestTVFExecutor(t *testing.T) {
 				actual := x.(*datablocks.DataBlock)
 				assert.Equal(t, expect, actual)
 			}
+			executor1.String()
 		})
 	}
 }

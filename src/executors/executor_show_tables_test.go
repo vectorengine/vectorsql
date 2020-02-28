@@ -62,6 +62,7 @@ func TestShowTablessExecutor(t *testing.T) {
 					}
 				}
 			}
+			executor.String()
 		})
 	}
 }

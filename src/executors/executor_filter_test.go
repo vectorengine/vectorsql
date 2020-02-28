@@ -82,6 +82,7 @@ func TestFilterExecutor(t *testing.T) {
 				assert.True(t, mocks.DataBlockEqual(actual, expect))
 				return nil
 			})
+			filter.String()
 			assert.Nil(t, err)
 		})
 	}

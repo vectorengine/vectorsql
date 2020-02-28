@@ -54,6 +54,7 @@ func TestCreateTableExecutor(t *testing.T) {
 			if test.err != "" {
 				assert.Equal(t, test.err, err.Error())
 			} else {
+				executor.String()
 				assert.Nil(t, err)
 				assert.Nil(t, transform)
 			}

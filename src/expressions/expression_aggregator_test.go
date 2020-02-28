@@ -138,7 +138,6 @@ func TestAggregatorsExpression(t *testing.T) {
 			assert.Nil(t, err)
 
 			// Merge.
-
 			params3 := Map{
 				"a": datavalues.ToValue(6),
 				"b": datavalues.ToValue(8),
@@ -150,6 +149,7 @@ func TestAggregatorsExpression(t *testing.T) {
 
 			assert.Nil(t, err)
 			assert.Equal(t, test.expect2, actual)
+			expr2.String()
 		})
 	}
 }

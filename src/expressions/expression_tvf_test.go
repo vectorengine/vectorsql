@@ -83,11 +83,16 @@ func TestTVFExpression(t *testing.T) {
 				assert.Nil(t, err)
 				assert.Equal(t, test.expect, actual)
 
+				result, err := test.expr.Result()
+				assert.Nil(t, err)
+				assert.Equal(t, result, actual)
+
 				err = test.expr.Walk(func(e IExpression) (bool, error) {
 					return true, nil
 				})
 				assert.Nil(t, err)
 			}
+			test.expr.String()
 		})
 	}
 }

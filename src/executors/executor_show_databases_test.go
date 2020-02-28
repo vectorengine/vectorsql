@@ -72,6 +72,7 @@ func TestShowDatabasesExecutor(t *testing.T) {
 					}
 				}
 			}
+			executor.String()
 		})
 	}
 }

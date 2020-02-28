@@ -118,6 +118,7 @@ func TestAirthmeticsParamsExpression(t *testing.T) {
 				assert.Nil(t, err)
 				assert.Equal(t, test.expect, actual)
 			}
+			test.expr.String()
 		})
 	}
 }
