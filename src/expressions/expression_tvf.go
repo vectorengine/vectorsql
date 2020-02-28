@@ -6,11 +6,12 @@ package expressions
 
 import (
 	"fmt"
-	"math/rand"
 
 	"base/docs"
 	"base/errors"
 	"datavalues"
+
+	"github.com/valyala/fastrand"
 )
 
 func RANGETABLE(args ...interface{}) IExpression {
@@ -77,7 +78,7 @@ func RANDTABLE(args ...interface{}) IExpression {
 			for i := 0; i < count; i++ {
 				row := make([]datavalues.IDataValue, len(args)-start)
 				for j := start; j < len(args); j++ {
-					randnum := rand.Intn(rng)
+					randnum := fastrand.Uint32n(uint32(rng))
 					arg := datavalues.AsString(args[j])
 					switch arg {
 					case "String":

@@ -13,10 +13,10 @@ import (
 	"github.com/gammazero/workerpool"
 )
 
-func (block *DataBlock) AggregateSelectionByPlan(fields []string, plan *planners.MapPlan) ([]expressions.IExpression, error) {
+func (block *DataBlock) AggregateSelectionByPlan(fields []string, plan *planners.SelectionPlan) ([]expressions.IExpression, error) {
 	var errs []error
 	var mu sync.Mutex
-	projects := plan
+	projects := plan.Projects
 
 	projectExprs, err := planners.BuildExpressions(projects)
 	if err != nil {

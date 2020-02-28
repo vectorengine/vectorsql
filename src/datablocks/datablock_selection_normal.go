@@ -11,8 +11,8 @@ import (
 	"planners"
 )
 
-func (block *DataBlock) NormalSelectionByPlan(fields []string, plan *planners.MapPlan) (*DataBlock, error) {
-	projects := plan
+func (block *DataBlock) NormalSelectionByPlan(fields []string, plan *planners.SelectionPlan) (*DataBlock, error) {
+	projects := plan.Projects
 
 	projectExprs, err := planners.BuildExpressions(projects)
 	if err != nil {

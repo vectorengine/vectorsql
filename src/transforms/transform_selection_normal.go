@@ -30,10 +30,10 @@ func (t *NormalSelectionTransform) Execute() {
 	ctx := t.ctx
 	out := t.Out()
 	defer out.Close()
-	plan := t.plan.Projects
+	plan := t.plan
 
 	// Get all base fields by the expression.
-	fields, err := planners.BuildVariableValues(plan)
+	fields, err := planners.BuildVariableValues(plan.Projects)
 	if err != nil {
 		out.Send(err)
 		return
@@ -44,7 +44,7 @@ func (t *NormalSelectionTransform) Execute() {
 		switch y := x.(type) {
 		case *datablocks.DataBlock:
 			workerPool.Submit(func() {
-				if block, err := y.NormalSelectionByPlan(fields, t.plan.Projects); err != nil {
+				if block, err := y.NormalSelectionByPlan(fields, plan); err != nil {
 					out.Send(err)
 				} else {
 					out.Send(block)

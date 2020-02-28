@@ -5,7 +5,7 @@
 package datavalues
 
 import (
-	"fmt"
+	"strconv"
 	"unsafe"
 
 	"base/docs"
@@ -29,7 +29,7 @@ func (v *ValueFloat) Size() uintptr {
 }
 
 func (v *ValueFloat) Show() string {
-	return fmt.Sprintf("%v", *v)
+	return strconv.FormatFloat(float64(*v), 'E', -1, 64)
 }
 
 func (v *ValueFloat) GetType() Type {

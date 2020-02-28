@@ -33,10 +33,10 @@ func (t *AggregateSelectionTransform) Execute() {
 	ctx := t.ctx
 	out := t.Out()
 	defer out.Close()
-	plan := t.plan.Projects
+	plan := t.plan
 
 	// Get all base fields by the expression.
-	fields, err := planners.BuildVariableValues(plan)
+	fields, err := planners.BuildVariableValues(plan.Projects)
 	if err != nil {
 		out.Send(err)
 		return
