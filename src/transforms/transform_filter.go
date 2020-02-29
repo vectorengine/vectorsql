@@ -6,15 +6,16 @@ package transforms
 
 import (
 	"datablocks"
+	"github.com/gammazero/workerpool"
 	"planners"
 	"processors"
-
-	"github.com/gammazero/workerpool"
+	"sync/atomic"
 )
 
 type FilterTransform struct {
-	ctx    *TransformContext
-	filter *planners.FilterPlan
+	ctx         *TransformContext
+	filter      *planners.FilterPlan
+	processRows int64
 	processors.BaseProcessor
 }
 
@@ -43,6 +44,7 @@ func (t *FilterTransform) Execute() {
 	onNext := func(x interface{}) {
 		switch y := x.(type) {
 		case *datablocks.DataBlock:
+			atomic.AddInt64(&t.processRows, int64(y.NumRows()))
 			workerPool.Submit(func() {
 				if err := y.FilterByPlan(fields, plan); err != nil {
 					out.Send(err)
@@ -60,4 +62,8 @@ func (t *FilterTransform) Execute() {
 		workerPool.StopWait()
 	}
 	t.Subscribe(onNext, onDone)
+}
+
+func (t *FilterTransform) Rows() int64 {
+	return atomic.LoadInt64(&t.processRows)
 }

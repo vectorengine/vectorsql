@@ -6,6 +6,7 @@ package datablocks
 
 import (
 	"fmt"
+	"sync"
 
 	"base/errors"
 	"columns"
@@ -13,6 +14,7 @@ import (
 )
 
 type DataBlock struct {
+	mu     sync.RWMutex
 	seqs   []int
 	info   *DataBlockInfo
 	values []*DataBlockValue
@@ -50,6 +52,8 @@ func (block *DataBlock) Info() *DataBlockInfo {
 }
 
 func (block *DataBlock) NumRows() int {
+	block.mu.RLock()
+	defer block.mu.RUnlock()
 	return len(block.seqs)
 }
 

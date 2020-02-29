@@ -5,14 +5,17 @@
 package transforms
 
 import (
+	"sync/atomic"
+
 	"datablocks"
 	"planners"
 	"processors"
 )
 
 type OrderByTransform struct {
-	ctx  *TransformContext
-	plan *planners.OrderByPlan
+	ctx         *TransformContext
+	plan        *planners.OrderByPlan
+	processRows int64
 	processors.BaseProcessor
 }
 
@@ -58,8 +61,13 @@ func (t *OrderByTransform) Execute() {
 				out.Send(err)
 			} else {
 				out.Send(block)
+				atomic.AddInt64(&t.processRows, int64(block.NumRows()))
 			}
 		}
 	}
 	t.Subscribe(onNext, onDone)
+}
+
+func (t *OrderByTransform) Rows() int64 {
+	return atomic.LoadInt64(&t.processRows)
 }

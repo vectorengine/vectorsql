@@ -7,11 +7,13 @@ package transforms
 import (
 	"datastreams"
 	"processors"
+	"sync/atomic"
 )
 
 type DataSourceTransform struct {
-	ctx   *TransformContext
-	input datastreams.IDataBlockInputStream
+	ctx         *TransformContext
+	input       datastreams.IDataBlockInputStream
+	processRows int64
 	processors.BaseProcessor
 }
 
@@ -47,7 +49,12 @@ func (t *DataSourceTransform) Execute() {
 				return
 			}
 			out.Send(data)
+			atomic.AddInt64(&t.processRows, int64(data.NumRows()))
 		}
 
 	}
+}
+
+func (t *DataSourceTransform) Rows() int64 {
+	return atomic.LoadInt64(&t.processRows)
 }

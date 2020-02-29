@@ -51,5 +51,14 @@ func (executor *SelectionExecutor) Execute() (processors.IProcessor, error) {
 }
 
 func (executor *SelectionExecutor) String() string {
-	return fmt.Sprintf("(%v, cost:%v)", executor.transformer.Name(), executor.transformer.Duration())
+	transformer := executor.transformer
+	switch transformer := transformer.(type) {
+	case *transforms.NormalSelectionTransform:
+		return fmt.Sprintf("(%v, rows:%v, cost:%v)", transformer.Name(), transformer.Rows(), transformer.Duration())
+	case *transforms.AggregateSelectionTransform:
+		return fmt.Sprintf("(%v, rows:%v, cost:%v)", transformer.Name(), transformer.Rows(), transformer.Duration())
+	case *transforms.GroupBySelectionTransform:
+		return fmt.Sprintf("(%v, rows:%v, cost:%v)", transformer.Name(), transformer.Rows(), transformer.Duration())
+	}
+	return ""
 }

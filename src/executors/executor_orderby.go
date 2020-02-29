@@ -38,5 +38,6 @@ func (executor *OrderByExecutor) Execute() (processors.IProcessor, error) {
 }
 
 func (executor *OrderByExecutor) String() string {
-	return fmt.Sprintf("(%v, cost:%v)", executor.transformer.Name(), executor.transformer.Duration())
+	transformer := executor.transformer.(*transforms.OrderByTransform)
+	return fmt.Sprintf("(%v, rows:%v, cost:%v)", transformer.Name(), transformer.Rows(), transformer.Duration())
 }

@@ -5,19 +5,20 @@
 package transforms
 
 import (
-	"sync"
-
 	"datablocks"
 	"expressions"
 	"planners"
 	"processors"
+	"sync"
+	"sync/atomic"
 
 	"github.com/gammazero/workerpool"
 )
 
 type AggregateSelectionTransform struct {
-	ctx  *TransformContext
-	plan *planners.SelectionPlan
+	ctx         *TransformContext
+	plan        *planners.SelectionPlan
+	processRows int64
 	processors.BaseProcessor
 }
 
@@ -58,6 +59,7 @@ func (t *AggregateSelectionTransform) Execute() {
 				mu.Lock()
 				exprs = append(exprs, expr)
 				mu.Unlock()
+				atomic.AddInt64(&t.processRows, int64(y.NumRows()))
 			})
 		case error:
 			out.Send(y)
@@ -88,4 +90,8 @@ func (t *AggregateSelectionTransform) Execute() {
 		}
 	}
 	t.Subscribe(onNext, onDone)
+}
+
+func (t *AggregateSelectionTransform) Rows() int64 {
+	return atomic.LoadInt64(&t.processRows)
 }

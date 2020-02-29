@@ -16,7 +16,9 @@ func (block *DataBlock) Limit(offset, limit int) (cutOffset, cutLimit int) {
 	if st > preRows {
 		st = preRows
 	}
+	block.mu.Lock()
 	block.seqs = block.seqs[st:ed]
+	block.mu.Unlock()
 
 	cutOffset += st
 	cutLimit += ed - st

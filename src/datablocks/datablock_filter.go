@@ -45,6 +45,8 @@ func (block *DataBlock) FilterByPlan(fields []string, plan *planners.FilterPlan)
 			n++
 		}
 	}
+	block.mu.Lock()
 	block.seqs = seqs[:n]
+	block.mu.Unlock()
 	return nil
 }

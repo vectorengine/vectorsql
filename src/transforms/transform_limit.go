@@ -8,11 +8,13 @@ import (
 	"datablocks"
 	"planners"
 	"processors"
+	"sync/atomic"
 )
 
 type Limitransform struct {
-	ctx  *TransformContext
-	plan *planners.LimitPlan
+	ctx         *TransformContext
+	plan        *planners.LimitPlan
+	processRows int64
 	processors.BaseProcessor
 }
 
@@ -45,6 +47,7 @@ func (t *Limitransform) Execute() {
 				offset -= cutOffset
 				limit -= cutLimit
 				x = y
+				atomic.AddInt64(&t.processRows, int64(y.NumRows()))
 			}
 		}
 		out.Send(x)
@@ -55,4 +58,8 @@ func (t *Limitransform) Execute() {
 		}
 	}
 	t.Subscribe(onNext)
+}
+
+func (t *Limitransform) Rows() int64 {
+	return atomic.LoadInt64(&t.processRows)
 }

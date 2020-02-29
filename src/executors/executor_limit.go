@@ -38,5 +38,6 @@ func (executor *LimitExecutor) Execute() (processors.IProcessor, error) {
 }
 
 func (executor *LimitExecutor) String() string {
-	return fmt.Sprintf("(%v, cost:%v)", executor.transformer.Name(), executor.transformer.Duration())
+	transformer := executor.transformer.(*transforms.Limitransform)
+	return fmt.Sprintf("(%v, rows:%v, cost:%v)", transformer.Name(), transformer.Rows(), transformer.Duration())
 }

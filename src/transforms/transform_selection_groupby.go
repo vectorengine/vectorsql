@@ -6,6 +6,7 @@ package transforms
 
 import (
 	"sync"
+	"sync/atomic"
 
 	"base/collections"
 	"datablocks"
@@ -17,8 +18,9 @@ import (
 )
 
 type GroupBySelectionTransform struct {
-	ctx  *TransformContext
-	plan *planners.SelectionPlan
+	ctx         *TransformContext
+	plan        *planners.SelectionPlan
+	processRows int64
 	processors.BaseProcessor
 }
 
@@ -52,6 +54,7 @@ func (t *GroupBySelectionTransform) Execute() {
 				mu.Lock()
 				groupers = append(groupers, grouper)
 				mu.Unlock()
+				atomic.AddInt64(&t.processRows, int64(y.NumRows()))
 			})
 		case error:
 			out.Send(y)
@@ -111,4 +114,8 @@ func (t *GroupBySelectionTransform) Execute() {
 		}
 	}
 	t.Subscribe(onNext, onDone)
+}
+
+func (t *GroupBySelectionTransform) Rows() int64 {
+	return atomic.LoadInt64(&t.processRows)
 }

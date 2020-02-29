@@ -38,5 +38,6 @@ func (executor *FilterExecutor) Execute() (processors.IProcessor, error) {
 }
 
 func (executor *FilterExecutor) String() string {
-	return fmt.Sprintf("(%v, cost:%v)", executor.transformer.Name(), executor.transformer.Duration())
+	transformer := executor.transformer.(*transforms.FilterTransform)
+	return fmt.Sprintf("(%v, rows:%v, cost:%v)", transformer.Name(), transformer.Rows(), transformer.Duration())
 }

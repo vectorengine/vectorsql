@@ -8,13 +8,15 @@ import (
 	"datablocks"
 	"planners"
 	"processors"
+	"sync/atomic"
 
 	"github.com/gammazero/workerpool"
 )
 
 type NormalSelectionTransform struct {
-	ctx  *TransformContext
-	plan *planners.SelectionPlan
+	ctx         *TransformContext
+	plan        *planners.SelectionPlan
+	processRows int64
 	processors.BaseProcessor
 }
 
@@ -48,6 +50,7 @@ func (t *NormalSelectionTransform) Execute() {
 					out.Send(err)
 				} else {
 					out.Send(block)
+					atomic.AddInt64(&t.processRows, int64(y.NumRows()))
 				}
 			})
 		case error:
@@ -58,4 +61,8 @@ func (t *NormalSelectionTransform) Execute() {
 		workerPool.StopWait()
 	}
 	t.Subscribe(onNext, onDone)
+}
+
+func (t *NormalSelectionTransform) Rows() int64 {
+	return atomic.LoadInt64(&t.processRows)
 }
