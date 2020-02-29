@@ -92,7 +92,6 @@ func TestTVFExpression(t *testing.T) {
 				})
 				assert.Nil(t, err)
 			}
-			test.expr.String()
 		})
 	}
 }

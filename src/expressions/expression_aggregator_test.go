@@ -149,7 +149,6 @@ func TestAggregatorsExpression(t *testing.T) {
 
 			assert.Nil(t, err)
 			assert.Equal(t, test.expect2, actual)
-			expr2.String()
 		})
 	}
 }

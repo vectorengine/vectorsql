@@ -53,7 +53,7 @@ func (t *Limitransform) Execute() {
 		out.Send(x)
 
 		if offset < 0 || limit <= 0 {
-			t.Finish()
+			out.Close()
 			return
 		}
 	}

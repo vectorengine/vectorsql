@@ -6,6 +6,7 @@ package processors
 
 import (
 	"context"
+	"sync/atomic"
 	"time"
 )
 
@@ -21,7 +22,6 @@ type (
 		ctx         context.Context
 		duration    time.Duration
 		pauseChan   chan struct{}
-		finishChan  chan struct{}
 		resumeChan  chan struct{}
 		nextHandler NextFunc
 		doneHandler DoneFunc
@@ -35,7 +35,6 @@ func NewBaseProcessor(name string) BaseProcessor {
 		ctx:        context.Background(),
 		name:       name,
 		pauseChan:  make(chan struct{}),
-		finishChan: make(chan struct{}),
 		resumeChan: make(chan struct{}),
 	}
 }
@@ -45,7 +44,7 @@ func (p *BaseProcessor) Name() string {
 }
 
 func (p *BaseProcessor) Duration() time.Duration {
-	return p.duration
+	return time.Duration(atomic.LoadInt64((*int64)(&p.duration)))
 }
 
 func (p *BaseProcessor) In() *InPort {
@@ -75,10 +74,6 @@ func (p *BaseProcessor) Execute() {
 
 func (p *BaseProcessor) Pause() {
 	p.pauseChan <- struct{}{}
-}
-
-func (p *BaseProcessor) Finish() {
-	close(p.finishChan)
 }
 
 func (p *BaseProcessor) Resume() {
@@ -116,9 +111,6 @@ func (p *BaseProcessor) Subscribe(eventHandlers ...EventHandler) {
 			for range p.resumeChan {
 				goto Loop
 			}
-		case <-p.finishChan:
-			in.Close()
-			out.Close()
 			return
 
 		case <-ctx.Done():
@@ -131,14 +123,14 @@ func (p *BaseProcessor) Subscribe(eventHandlers ...EventHandler) {
 				if p.doneHandler != nil {
 					start := time.Now()
 					p.doneHandler()
-					p.duration += time.Since(start)
+					atomic.AddInt64((*int64)(&p.duration), int64(time.Since(start)))
 				}
 				return
 			}
 			if p.nextHandler != nil {
 				start := time.Now()
 				p.nextHandler(x)
-				p.duration += time.Since(start)
+				atomic.AddInt64((*int64)(&p.duration), int64(time.Since(start)))
 			}
 		}
 	}

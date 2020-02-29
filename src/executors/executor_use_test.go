@@ -57,7 +57,6 @@ func TestUseExecutor(t *testing.T) {
 				assert.Nil(t, err)
 				assert.Nil(t, transform)
 			}
-			executor.String()
 		})
 	}
 }

@@ -17,11 +17,8 @@ func TestAliasedExpression(t *testing.T) {
 	aliased := ALIASED("xx", expr)
 	assert.NotNil(t, aliased)
 
-	aliased.Result()
-	aliased.String()
-	aliased.Update(nil)
-	aliased.Document()
-	aliased.Walk(func(e IExpression) (bool, error) {
+	err = aliased.Walk(func(e IExpression) (bool, error) {
 		return true, nil
 	})
+	assert.Nil(t, err)
 }

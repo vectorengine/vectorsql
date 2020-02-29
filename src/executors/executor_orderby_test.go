@@ -91,7 +91,6 @@ func TestOrderByExecutor(t *testing.T) {
 				return nil
 			})
 			assert.Nil(t, err)
-			orderby.String()
 		})
 	}
 }

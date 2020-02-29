@@ -160,7 +160,6 @@ ORDER BY
 				//actual.Dump()
 				assert.True(t, mocks.DataBlockEqual(expect, actual))
 			}
-			executor.String()
 		})
 	}
 }
