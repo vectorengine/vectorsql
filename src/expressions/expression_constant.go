@@ -23,8 +23,8 @@ func NewConstantExpression(v datavalues.IDataValue) *ConstantExpression {
 	}
 }
 
-func (e *ConstantExpression) Result() (datavalues.IDataValue, error) {
-	return e.value, nil
+func (e *ConstantExpression) Eval() error {
+	return nil
 }
 
 func (e *ConstantExpression) Update(params IParams) (datavalues.IDataValue, error) {
@@ -36,12 +36,16 @@ func (e *ConstantExpression) Merge(arg IExpression) (datavalues.IDataValue, erro
 	return other.value, nil
 }
 
+func (e *ConstantExpression) Result() datavalues.IDataValue {
+	return e.value
+}
+
 func (e *ConstantExpression) Walk(visit Visit) error {
 	return nil
 }
 
 func (e *ConstantExpression) String() string {
-	return string(e.value.Show())
+	return string(e.value.String())
 }
 
 func (e *ConstantExpression) Document() docs.Documentation {

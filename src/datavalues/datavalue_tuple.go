@@ -31,16 +31,20 @@ func (v *ValueTuple) Size() uintptr {
 	return size
 }
 
-func (v *ValueTuple) Show() string {
+func (v *ValueTuple) String() string {
 	result := make([]string, len(v.fields))
 	for i := range v.fields {
-		result[i] = v.fields[i].Show()
+		result[i] = v.fields[i].String()
 	}
 	return strings.Join(result, "")
 }
 
-func (v *ValueTuple) GetType() Type {
+func (v *ValueTuple) Type() Type {
 	return TypeTuple
+}
+
+func (v *ValueTuple) Family() Family {
+	return FamilyTuple
 }
 
 func (v *ValueTuple) AsSlice() []IDataValue {

@@ -26,10 +26,10 @@ func NewDataBlockValue(col *columns.Column) *DataBlockValue {
 	}
 }
 
-func NewDataBlockValueWithCapacity(col *columns.Column, capacity int) *DataBlockValue {
+func newDataBlockValueWithValues(col *columns.Column, values []datavalues.IDataValue) *DataBlockValue {
 	return &DataBlockValue{
 		column: col,
-		values: make([]datavalues.IDataValue, capacity),
+		values: values,
 	}
 }
 

@@ -39,7 +39,7 @@ func (block *DataBlock) GroupBySelectionByPlan(plan *planners.SelectionPlan) (*c
 			if err != nil {
 				return nil, err
 			}
-			groupbykeys[i] = val.Show()
+			groupbykeys[i] = val.String()
 		}
 		key := strings.Join(groupbykeys, "")
 		projectExprs, hash, ok, err := hashmap.Get(key)

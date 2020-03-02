@@ -17,6 +17,7 @@ const (
 	TypeNull
 	TypePhantom
 	TypeInt
+	TypeInt32
 	TypeFloat
 	TypeBool
 	TypeString
@@ -34,10 +35,21 @@ const (
 	GreaterThan Comparison = 1
 )
 
+type Family int32
+
+const (
+	FamilyBool Family = iota
+	FamilyInt
+	FamilyFloat
+	FamilyString
+	FamilyTuple
+)
+
 type IDataValue interface {
-	Show() string
 	Size() uintptr
-	GetType() Type
+	Type() Type
+	Family() Family
+	String() string
 	Compare(value IDataValue) (Comparison, error)
 	Document() docs.Documentation
 }
@@ -49,13 +61,13 @@ func ToValue(value interface{}) IDataValue {
 	case bool:
 		return MakeBool(value)
 	case int:
-		return MakeInt(int64(value))
+		return MakeInt32(int32(value))
 	case int8:
-		return MakeInt(int64(value))
+		return MakeInt32(int32(value))
 	case int16:
-		return MakeInt(int64(value))
+		return MakeInt32(int32(value))
 	case int32:
-		return MakeInt(int64(value))
+		return MakeInt32(value)
 	case int64:
 		return MakeInt(int64(value))
 	case uint8:

@@ -25,8 +25,8 @@ func NewVariableExpression(v string) *VariableExpression {
 	}
 }
 
-func (e *VariableExpression) Result() (datavalues.IDataValue, error) {
-	return e.saved, nil
+func (e *VariableExpression) Eval() error {
+	return nil
 }
 
 func (e *VariableExpression) Update(params IParams) (datavalues.IDataValue, error) {
@@ -44,6 +44,10 @@ func (e *VariableExpression) Update(params IParams) (datavalues.IDataValue, erro
 func (e *VariableExpression) Merge(arg IExpression) (datavalues.IDataValue, error) {
 	other := arg.(*VariableExpression)
 	return other.saved, nil
+}
+
+func (e *VariableExpression) Result() datavalues.IDataValue {
+	return e.saved
 }
 
 func (e *VariableExpression) Walk(visit Visit) error {

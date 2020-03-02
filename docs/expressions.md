@@ -25,8 +25,8 @@ Not equal.
 
 * must satisfy one of 
 
-	* all arguments must be of type Int  
-	* all arguments must be of type Float  
+	* index 1 family must be same
+	* index 2 family must be same
  
 
 ### Description
@@ -45,8 +45,8 @@ Returns the dot product of the two arguments.
 
 * must satisfy one of 
 
-	* all arguments must be of type Int  
-	* all arguments must be of type Float  
+	* index 1 family must be same
+	* index 2 family must be same
  
 
 ### Description
@@ -65,8 +65,8 @@ Returns the sum of the two arguments.
 
 * must satisfy one of 
 
-	* all arguments must be of type Int  
-	* all arguments must be of type Float  
+	* index 1 family must be same
+	* index 2 family must be same
  
 
 ### Description
@@ -85,8 +85,8 @@ Returns the difference between the two arguments.
 
 * must satisfy one of 
 
-	* all arguments must be of type Int  
-	* all arguments must be of type Float  
+	* index 1 family must be same
+	* index 2 family must be same
  
 
 ### Description
@@ -269,8 +269,8 @@ Returns a mock log table.
 
 * must satisfy one of 
 
-	* all arguments must be of type Int  
-	* all arguments must be of type Float  
+	* index 1 family must be same
+	* index 2 family must be same
  
 
 ### Description
@@ -288,8 +288,8 @@ Takes the maximum element in the group. Works with Ints, Floats, Strings, Boolea
 
 * must satisfy one of 
 
-	* all arguments must be of type Int  
-	* all arguments must be of type Float  
+	* index 1 family must be same
+	* index 2 family must be same
  
 
 ### Description
@@ -336,8 +336,8 @@ Logic OR.
 
 
 * at least 3 arguments may be provided
-* the 1st argument must be of type Int  
-* the 2nd argument must be of type Int  
+* the 1st argument must be of type Int32  
+* the 2nd argument must be of type Int32  
 
 ### Description
 Returns a random list of tuples.
@@ -353,8 +353,8 @@ Returns a random list of tuples.
 
 
 * at least 3 arguments may be provided
-* the 1st argument must be of type Int  
-* the 2nd argument must be of type Int  
+* the 1st argument must be of type Int32  
+* the 2nd argument must be of type Int32  
 
 ### Description
 Returns a list of tuples.
@@ -371,8 +371,8 @@ Returns a list of tuples.
 
 * must satisfy one of 
 
-	* all arguments must be of type Int  
-	* all arguments must be of type Float  
+	* index 1 family must be same
+	* index 2 family must be same
  
 
 ### Description

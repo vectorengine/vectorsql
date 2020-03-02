@@ -28,12 +28,16 @@ func (v *ValueFloat) Size() uintptr {
 	return unsafe.Sizeof(v)
 }
 
-func (v *ValueFloat) Show() string {
+func (v *ValueFloat) String() string {
 	return strconv.FormatFloat(float64(*v), 'E', -1, 64)
 }
 
-func (v *ValueFloat) GetType() Type {
+func (v *ValueFloat) Type() Type {
 	return TypeFloat
+}
+
+func (v *ValueFloat) Family() Family {
+	return FamilyFloat
 }
 
 func (v *ValueFloat) AsFloat() float64 {
@@ -41,7 +45,7 @@ func (v *ValueFloat) AsFloat() float64 {
 }
 
 func (v *ValueFloat) Compare(other IDataValue) (Comparison, error) {
-	if other.GetType() != TypeFloat {
+	if other.Type() != TypeFloat {
 		return 0, errors.Errorf("type mismatch between values")
 	}
 

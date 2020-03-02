@@ -25,27 +25,26 @@ type BinaryExpression struct {
 	description   docs.Documentation
 }
 
-func (e *BinaryExpression) Result() (datavalues.IDataValue, error) {
+func (e *BinaryExpression) Eval() error {
 	var err error
-	var left, right datavalues.IDataValue
 
 	if e.saved == nil {
-		if left, err = e.left.Result(); err != nil {
-			return nil, err
+		if err = e.left.Eval(); err != nil {
+			return err
 		}
-		if right, err = e.right.Result(); err != nil {
-			return nil, err
+		if err = e.right.Eval(); err != nil {
+			return err
 		}
 		if e.validate != nil {
-			if err := e.validate.Validate(left, right); err != nil {
-				return nil, err
+			if err := e.validate.Validate(e.left.Result(), e.right.Result()); err != nil {
+				return err
 			}
 		}
-		if e.saved, err = e.updateFn(left, right); err != nil {
-			return nil, err
+		if e.saved, err = e.updateFn(e.left.Result(), e.right.Result()); err != nil {
+			return err
 		}
 	}
-	return e.saved, nil
+	return nil
 }
 
 func (e *BinaryExpression) Update(params IParams) (datavalues.IDataValue, error) {
@@ -87,6 +86,10 @@ func (e *BinaryExpression) Merge(arg IExpression) (datavalues.IDataValue, error)
 		return nil, err
 	}
 	return e.saved, nil
+}
+
+func (e *BinaryExpression) Result() datavalues.IDataValue {
+	return e.saved
 }
 
 func (e *BinaryExpression) Walk(visit Visit) error {

@@ -7,6 +7,7 @@ package datablocks
 import (
 	"columns"
 	"datatypes"
+	"datavalues"
 	"expressions"
 	"planners"
 )
@@ -39,7 +40,6 @@ func (block *DataBlock) NormalSelectionByPlan(fields []string, plan *planners.Se
 		// Copy the colums from old.
 		columnValues = append(columnValues, block.values...)
 		for _, expr := range projectExprs {
-			var columnValue *DataBlockValue
 			name := expr.String()
 
 			// Check exists.
@@ -54,6 +54,8 @@ func (block *DataBlock) NormalSelectionByPlan(fields []string, plan *planners.Se
 			if err != nil {
 				return nil, err
 			}
+
+			values := make([]datavalues.IDataValue, rows)
 			for it.Next() {
 				row := it.Value()
 				for j := range row {
@@ -63,21 +65,20 @@ func (block *DataBlock) NormalSelectionByPlan(fields []string, plan *planners.Se
 				if err != nil {
 					return nil, err
 				}
-				if k == 0 {
-					// Get the column type via the expression value.
-					dtype, err := datatypes.GetDataTypeByValue(val)
-					if err != nil {
-						return nil, err
-					}
-					columnValue = NewDataBlockValueWithCapacity(columns.NewColumn(name, dtype), rows)
-				}
 				if seqs != nil {
-					columnValue.values[seqs[k]] = val
+					values[seqs[k]] = val
 				} else {
-					columnValue.values[k] = val
+					values[k] = val
 				}
 				k++
 			}
+
+			// Get the column type via the expression value.
+			dtype, err := datatypes.GetDataTypeByValue(expr.Result())
+			if err != nil {
+				return nil, err
+			}
+			columnValue := newDataBlockValueWithValues(columns.NewColumn(name, dtype), values)
 			columnValues = append(columnValues, columnValue)
 		}
 		return &DataBlock{

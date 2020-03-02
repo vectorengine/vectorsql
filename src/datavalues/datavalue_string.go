@@ -27,12 +27,16 @@ func (v *ValueString) Size() uintptr {
 	return unsafe.Sizeof(v) + uintptr(len(*v))
 }
 
-func (v *ValueString) Show() string {
+func (v *ValueString) String() string {
 	return string(*v)
 }
 
-func (v *ValueString) GetType() Type {
+func (v *ValueString) Type() Type {
 	return TypeString
+}
+
+func (v *ValueString) Family() Family {
+	return FamilyString
 }
 
 func (v *ValueString) AsString() string {
@@ -40,7 +44,7 @@ func (v *ValueString) AsString() string {
 }
 
 func (v *ValueString) Compare(other IDataValue) (Comparison, error) {
-	if other.GetType() != TypeString {
+	if other.Type() != TypeString {
 		return 0, errors.Errorf("type mismatch between values")
 	}
 

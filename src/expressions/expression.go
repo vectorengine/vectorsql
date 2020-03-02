@@ -11,11 +11,12 @@ import (
 )
 
 type IExpression interface {
-	String() string
-	Walk(visit Visit) error
-	Result() (datavalues.IDataValue, error)
+	Eval() error
+	Result() datavalues.IDataValue
 	Update(params IParams) (datavalues.IDataValue, error)
 	Merge(arg IExpression) (datavalues.IDataValue, error)
+	Walk(visit Visit) error
+	String() string
 	Document() docs.Documentation
 }
 

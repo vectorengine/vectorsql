@@ -141,7 +141,7 @@ func (block *DataBlock) Dump() {
 	for it.Next() {
 		row := it.Value()
 		for _, v := range row {
-			body += v.Show()
+			body += v.String()
 			body += " "
 		}
 		body += "\n"

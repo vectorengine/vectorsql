@@ -23,28 +23,28 @@ type ScalarExpression struct {
 	description   docs.Documentation
 }
 
-func (e *ScalarExpression) Result() (datavalues.IDataValue, error) {
+func (e *ScalarExpression) Eval() error {
+	var err error
+
 	if e.saved == nil {
-		var err error
 		values := make([]datavalues.IDataValue, len(e.exprs))
 
 		for i, expr := range e.exprs {
-			val, err := expr.Result()
-			if err != nil {
-				return nil, err
+			if err := expr.Eval(); err != nil {
+				return err
 			}
-			values[i] = val
+			values[i] = expr.Result()
 		}
 		if e.validate != nil {
 			if err := e.validate.Validate(values...); err != nil {
-				return nil, err
+				return err
 			}
 		}
 		if e.saved, err = e.updateFn(values...); err != nil {
-			return nil, err
+			return err
 		}
 	}
-	return e.saved, nil
+	return nil
 }
 
 func (e *ScalarExpression) Update(params IParams) (datavalues.IDataValue, error) {
@@ -71,6 +71,10 @@ func (e *ScalarExpression) Update(params IParams) (datavalues.IDataValue, error)
 
 func (e *ScalarExpression) Merge(arg IExpression) (datavalues.IDataValue, error) {
 	return e.saved, nil
+}
+
+func (e *ScalarExpression) Result() datavalues.IDataValue {
+	return e.saved
 }
 
 func (e *ScalarExpression) Walk(visit Visit) error {

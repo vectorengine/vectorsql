@@ -133,7 +133,7 @@ func TypeOf(wantedType datavalues.IDataValue) *typeOf {
 }
 
 func (v *typeOf) Validate(arg datavalues.IDataValue) error {
-	if v.wantedType.GetType() != arg.GetType() {
+	if v.wantedType.Type() != arg.Type() {
 		return errors.Errorf("expected type %v but got %v", v.wantedType.Document(), arg.Document())
 	}
 	return nil
@@ -242,7 +242,7 @@ func (v *sameType) Validate(args ...datavalues.IDataValue) error {
 		if current == nil {
 			current = arg
 		}
-		if current.GetType() != arg.GetType() {
+		if current.Type() != arg.Type() {
 			return fmt.Errorf("bad argument type at index %v, wanted:%v, got:%v", i, current.Document(), arg.Document())
 		}
 	}
@@ -251,6 +251,27 @@ func (v *sameType) Validate(args ...datavalues.IDataValue) error {
 
 func (v *sameType) Document() docs.Documentation {
 	return docs.Text(fmt.Sprintf("index %+v type must be same", v.idxs))
+}
+
+type sameFamily struct {
+	family datavalues.Family
+}
+
+func SameFamily(f datavalues.Family) *sameFamily {
+	return &sameFamily{family: f}
+}
+
+func (v *sameFamily) Validate(args ...datavalues.IDataValue) error {
+	for i, arg := range args {
+		if arg.Family() != v.family {
+			return fmt.Errorf("bad argument family at index %v, wanted:%v, got:%v", i, v.family, arg.Family())
+		}
+	}
+	return nil
+}
+
+func (v *sameFamily) Document() docs.Documentation {
+	return docs.Text(fmt.Sprintf("index %+v family must be same", v.family))
 }
 
 type allArgs struct {

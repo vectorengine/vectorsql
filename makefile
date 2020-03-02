@@ -1,3 +1,4 @@
+export GO111MODULE = off
 export GOPATH := $(shell pwd)
 
 build:

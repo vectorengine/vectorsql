@@ -28,12 +28,16 @@ func (v *ValueInt) Size() uintptr {
 	return unsafe.Sizeof(v)
 }
 
-func (v *ValueInt) Show() string {
+func (v *ValueInt) String() string {
 	return strconv.FormatInt(int64(*v), 10)
 }
 
-func (v *ValueInt) GetType() Type {
+func (v *ValueInt) Type() Type {
 	return TypeInt
+}
+
+func (v *ValueInt) Family() Family {
+	return FamilyInt
 }
 
 func (v *ValueInt) AsInt() int64 {
@@ -41,8 +45,8 @@ func (v *ValueInt) AsInt() int64 {
 }
 
 func (v *ValueInt) Compare(other IDataValue) (Comparison, error) {
-	if other.GetType() != TypeInt {
-		return 0, errors.Errorf("type mismatch between values")
+	if !IsIntegral(other) {
+		return 0, errors.Errorf("type mismatch between values, got:%v", other.Type())
 	}
 
 	a := int64(*v)
@@ -62,7 +66,10 @@ func (v *ValueInt) Document() docs.Documentation {
 }
 
 func AsInt(v IDataValue) int64 {
-	if t, ok := v.(*ValueInt); ok {
+	switch t := v.(type) {
+	case *ValueInt:
+		return int64(*t)
+	case *ValueInt32:
 		return int64(*t)
 	}
 	return 0

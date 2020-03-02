@@ -47,5 +47,5 @@ func Like(likeExpr string, x IDataValue) bool {
 		re = LikeToRegexp(likeExpr)
 		reCache.Add(likeExpr, re)
 	}
-	return re.Match([]byte(x.Show()))
+	return re.Match([]byte(x.String()))
 }

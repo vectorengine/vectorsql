@@ -19,8 +19,8 @@ func ADD(left interface{}, right interface{}) IExpression {
 		description: docs.Text("Returns the sum of the two arguments."),
 		validate: All(
 			OneOf(
-				AllArgs(TypeOf(datavalues.ZeroInt())),
-				AllArgs(TypeOf(datavalues.ZeroFloat())),
+				SameFamily(datavalues.FamilyInt),
+				SameFamily(datavalues.FamilyFloat),
 			),
 		),
 		left:  exprs[0],
@@ -41,8 +41,8 @@ func SUB(left interface{}, right interface{}) IExpression {
 		description: docs.Text("Returns the difference between the two arguments."),
 		validate: All(
 			OneOf(
-				AllArgs(TypeOf(datavalues.ZeroInt())),
-				AllArgs(TypeOf(datavalues.ZeroFloat())),
+				SameFamily(datavalues.FamilyInt),
+				SameFamily(datavalues.FamilyFloat),
 			),
 		),
 		left:  exprs[0],
@@ -63,8 +63,8 @@ func MUL(left interface{}, right interface{}) IExpression {
 		description: docs.Text("Returns the dot product of the two arguments."),
 		validate: All(
 			OneOf(
-				AllArgs(TypeOf(datavalues.ZeroInt())),
-				AllArgs(TypeOf(datavalues.ZeroFloat())),
+				SameFamily(datavalues.FamilyInt),
+				SameFamily(datavalues.FamilyFloat),
 			),
 		),
 		left:  exprs[0],
@@ -85,8 +85,8 @@ func DIV(left interface{}, right interface{}) IExpression {
 		description: docs.Text("Returns the division of the two arguments."),
 		validate: All(
 			OneOf(
-				AllArgs(TypeOf(datavalues.ZeroInt())),
-				AllArgs(TypeOf(datavalues.ZeroFloat())),
+				SameFamily(datavalues.FamilyInt),
+				SameFamily(datavalues.FamilyFloat),
 			),
 		),
 		left:  exprs[0],

@@ -82,14 +82,13 @@ func TestSelectExecutor(t *testing.T) {
 			expect: mocks.NewBlockFromSlice(
 				[]*columns.Column{
 					{Name: "number", DataType: datatypes.NewUInt64DataType()},
-					{Name: "(number+1)", DataType: datatypes.NewInt64DataType()},
+					{Name: "(number+1)", DataType: datatypes.NewInt32DataType()},
 				},
 				[]interface{}{0, 1},
 				[]interface{}{1, 2},
 				[]interface{}{2, 3},
 			),
 		},
-
 		{
 			name:  "simple-pass",
 			query: "SELECT server,sum(response_time) as time FROM logmock(rows->15) order by time desc",
@@ -122,8 +121,8 @@ ORDER BY
 			expect: mocks.NewBlockFromSlice(
 				[]*columns.Column{
 					{Name: "count", DataType: datatypes.NewInt64DataType()},
-					{Name: "errors", DataType: datatypes.NewInt64DataType()},
-					{Name: "success", DataType: datatypes.NewInt64DataType()},
+					{Name: "errors", DataType: datatypes.NewInt32DataType()},
+					{Name: "success", DataType: datatypes.NewInt32DataType()},
 					{Name: "error_rate", DataType: datatypes.NewFloat64DataType()},
 					{Name: "success_rate", DataType: datatypes.NewFloat64DataType()},
 					{Name: "load_avg", DataType: datatypes.NewFloat64DataType()},
@@ -157,7 +156,6 @@ ORDER BY
 			for x := range transform.In().Recv() {
 				expect := test.expect
 				actual := x.(*datablocks.DataBlock)
-				//actual.Dump()
 				assert.True(t, mocks.DataBlockEqual(expect, actual))
 			}
 		})

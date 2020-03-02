@@ -103,19 +103,18 @@ func (executor *TableValuedFunctionExecutor) Execute() (processors.IProcessor, e
 				consts = append(consts, datavalues.ToValue(begin))
 				consts = append(consts, datavalues.ToValue(end))
 				consts = append(consts, constants[1:]...)
-				function, err := expressions.ExpressionFactory(plan.FuncName, consts)
+				expr, err := expressions.ExpressionFactory(plan.FuncName, consts)
 				if err != nil {
 					log.Error("%+v", err)
 					queue <- err
 					return
 				}
-				result, err := function.Result()
-				if err != nil {
+				if err := expr.Eval(); err != nil {
 					log.Error("%+v", err)
 					queue <- err
 					return
 				}
-				rows := datavalues.AsSlice(result)
+				rows := datavalues.AsSlice(expr.Result())
 				for _, row := range rows {
 					if err := block.WriteRow(datavalues.AsSlice(row)); err != nil {
 						queue <- err

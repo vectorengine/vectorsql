@@ -16,8 +16,8 @@ func SUM(arg interface{}) IExpression {
 		description:   docs.Text("Sums Floats, Ints or Durations in the group. You may not mix types."),
 		validate: All(
 			OneOf(
-				AllArgs(TypeOf(datavalues.ZeroInt())),
-				AllArgs(TypeOf(datavalues.ZeroFloat())),
+				SameFamily(datavalues.FamilyInt),
+				SameFamily(datavalues.FamilyFloat),
 			),
 		),
 		expr: expressionsFor(arg)[0],
@@ -28,16 +28,8 @@ func SUM(arg interface{}) IExpression {
 				return datavalues.Add(current, next)
 			}
 		},
-		mergeFn: func(arg0 datavalues.IDataValue, args ...datavalues.IDataValue) (datavalues.IDataValue, error) {
-			var err error
-			res := arg0
-
-			for _, arg := range args {
-				if res, err = datavalues.Add(res, arg); err != nil {
-					return nil, err
-				}
-			}
-			return res, nil
+		mergeFn: func(current datavalues.IDataValue, next datavalues.IDataValue) (datavalues.IDataValue, error) {
+			return datavalues.Add(current, next)
 		},
 	}
 }
@@ -49,8 +41,8 @@ func MIN(arg interface{}) IExpression {
 		description:   docs.Text("Takes the minimum element in the group. Works with Ints, Floats, Strings, Booleans, Times, Durations."),
 		validate: All(
 			OneOf(
-				AllArgs(TypeOf(datavalues.ZeroInt())),
-				AllArgs(TypeOf(datavalues.ZeroFloat())),
+				SameFamily(datavalues.FamilyInt),
+				SameFamily(datavalues.FamilyFloat),
 			),
 		),
 		expr: expressionsFor(arg)[0],
@@ -60,19 +52,19 @@ func MIN(arg interface{}) IExpression {
 			}
 			return datavalues.Min(current, next)
 		},
-		mergeFn: func(arg0 datavalues.IDataValue, args ...datavalues.IDataValue) (datavalues.IDataValue, error) {
-			res := arg0
-
-			for _, arg := range args {
-				cmp, err := res.Compare(arg)
-				if err != nil {
-					return nil, err
-				}
-				if cmp == datavalues.GreaterThan {
-					res = arg
-				}
+		mergeFn: func(current datavalues.IDataValue, next datavalues.IDataValue) (datavalues.IDataValue, error) {
+			if current == nil {
+				return next, nil
 			}
-			return res, nil
+
+			cmp, err := current.Compare(next)
+			if err != nil {
+				return nil, err
+			}
+			if cmp == datavalues.GreaterThan {
+				return next, nil
+			}
+			return current, nil
 		},
 	}
 }
@@ -84,8 +76,8 @@ func MAX(arg interface{}) IExpression {
 		description:   docs.Text("Takes the maximum element in the group. Works with Ints, Floats, Strings, Booleans, Times, Durations."),
 		validate: All(
 			OneOf(
-				AllArgs(TypeOf(datavalues.ZeroInt())),
-				AllArgs(TypeOf(datavalues.ZeroFloat())),
+				SameFamily(datavalues.FamilyInt),
+				SameFamily(datavalues.FamilyFloat),
 			),
 		),
 		expr: expressionsFor(arg)[0],
@@ -95,19 +87,19 @@ func MAX(arg interface{}) IExpression {
 			}
 			return datavalues.Max(current, next)
 		},
-		mergeFn: func(arg0 datavalues.IDataValue, args ...datavalues.IDataValue) (datavalues.IDataValue, error) {
-			res := arg0
-
-			for _, arg := range args {
-				cmp, err := res.Compare(arg)
-				if err != nil {
-					return nil, err
-				}
-				if cmp == datavalues.LessThan {
-					res = arg
-				}
+		mergeFn: func(current datavalues.IDataValue, next datavalues.IDataValue) (datavalues.IDataValue, error) {
+			if current == nil {
+				return next, nil
 			}
-			return res, nil
+
+			cmp, err := current.Compare(next)
+			if err != nil {
+				return nil, err
+			}
+			if cmp == datavalues.LessThan {
+				return next, nil
+			}
+			return current, nil
 		},
 	}
 }
@@ -126,16 +118,8 @@ func COUNT(arg interface{}) IExpression {
 				return datavalues.Add(current, datavalues.MakeInt(1))
 			}
 		},
-		mergeFn: func(arg0 datavalues.IDataValue, args ...datavalues.IDataValue) (datavalues.IDataValue, error) {
-			var err error
-			res := arg0
-
-			for _, arg := range args {
-				if res, err = datavalues.Add(res, arg); err != nil {
-					return nil, err
-				}
-			}
-			return res, nil
+		mergeFn: func(current datavalues.IDataValue, next datavalues.IDataValue) (datavalues.IDataValue, error) {
+			return datavalues.Add(current, next)
 		},
 	}
 }

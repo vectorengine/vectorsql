@@ -27,15 +27,19 @@ func (v *ValueBool) Size() uintptr {
 	return unsafe.Sizeof(*v)
 }
 
-func (v *ValueBool) GetType() Type {
+func (v *ValueBool) Type() Type {
 	return TypeBool
+}
+
+func (v *ValueBool) Family() Family {
+	return FamilyBool
 }
 
 func (v *ValueBool) AsBool() bool {
 	return bool(*v)
 }
 
-func (v *ValueBool) Show() string {
+func (v *ValueBool) String() string {
 	r := bool(*v)
 	if r {
 		return "true"
@@ -45,7 +49,7 @@ func (v *ValueBool) Show() string {
 }
 
 func (v *ValueBool) Compare(other IDataValue) (Comparison, error) {
-	if other.GetType() != TypeBool {
+	if other.Type() != TypeBool {
 		return 0, errors.Errorf("type mismatch between values")
 	}
 

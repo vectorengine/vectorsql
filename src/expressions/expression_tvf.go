@@ -22,8 +22,8 @@ func RANGETABLE(args ...interface{}) IExpression {
 		description:   docs.Text("Returns a list of tuples."),
 		validate: All(
 			AtLeastNArgs(3),
-			Arg(0, TypeOf(datavalues.ZeroInt())),
-			Arg(1, TypeOf(datavalues.ZeroInt())),
+			Arg(0, TypeOf(datavalues.ZeroInt32())),
+			Arg(1, TypeOf(datavalues.ZeroInt32())),
 		),
 		exprs: exprs,
 		updateFn: func(args ...datavalues.IDataValue) (datavalues.IDataValue, error) {
@@ -41,7 +41,9 @@ func RANGETABLE(args ...interface{}) IExpression {
 					switch arg {
 					case "String":
 						row[j-start] = datavalues.MakeString(fmt.Sprintf("string-%v", val))
-					case "UInt32", "Int32":
+					case "Int32":
+						row[j-start] = datavalues.MakeInt32(int32(val))
+					case "UInt32", "UInt64":
 						row[j-start] = datavalues.ToValue(val)
 					default:
 						return nil, errors.Errorf("Unsupported type:%v", arg)
@@ -62,8 +64,8 @@ func RANDTABLE(args ...interface{}) IExpression {
 		description:   docs.Text("Returns a random list of tuples."),
 		validate: All(
 			AtLeastNArgs(3),
-			Arg(0, TypeOf(datavalues.ZeroInt())),
-			Arg(1, TypeOf(datavalues.ZeroInt())),
+			Arg(0, TypeOf(datavalues.ZeroInt32())),
+			Arg(1, TypeOf(datavalues.ZeroInt32())),
 		),
 
 		exprs: exprs,
@@ -83,7 +85,9 @@ func RANDTABLE(args ...interface{}) IExpression {
 					switch arg {
 					case "String":
 						row[j-start] = datavalues.MakeString(fmt.Sprintf("string-%v", randnum))
-					case "UInt32", "Int32", "UInt64", "Int64":
+					case "Int32":
+						row[j-start] = datavalues.MakeInt32(int32(randnum))
+					case "UInt32", "UInt64", "Int64":
 						row[j-start] = datavalues.ToValue(randnum)
 					default:
 						return nil, errors.Errorf("Unsupported type:%v", arg)

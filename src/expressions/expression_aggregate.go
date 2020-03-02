@@ -5,6 +5,7 @@
 package expressions
 
 import (
+	"base/errors"
 	"fmt"
 	"strings"
 
@@ -12,7 +13,7 @@ import (
 	"datavalues"
 )
 
-type aggregateMergeFunc func(arg0 datavalues.IDataValue, args ...datavalues.IDataValue) (datavalues.IDataValue, error)
+type aggregateMergeFunc func(current datavalues.IDataValue, next datavalues.IDataValue) (datavalues.IDataValue, error)
 type aggregateUpdateFunc func(current, next datavalues.IDataValue) (datavalues.IDataValue, error)
 
 type AggregateExpression struct {
@@ -26,8 +27,8 @@ type AggregateExpression struct {
 	description   docs.Documentation
 }
 
-func (e *AggregateExpression) Result() (datavalues.IDataValue, error) {
-	return e.saved, nil
+func (e *AggregateExpression) Eval() error {
+	return errors.Errorf("Aggregate expression not supported Eval")
 }
 
 func (e *AggregateExpression) Update(params IParams) (datavalues.IDataValue, error) {
@@ -56,6 +57,10 @@ func (e *AggregateExpression) Merge(arg IExpression) (datavalues.IDataValue, err
 		return nil, err
 	}
 	return e.saved, nil
+}
+
+func (e *AggregateExpression) Result() datavalues.IDataValue {
+	return e.saved
 }
 
 func (e *AggregateExpression) Walk(visit Visit) error {

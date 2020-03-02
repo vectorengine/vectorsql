@@ -25,8 +25,8 @@ func NewAliasedExpression(name string, expr IExpression) *AliasedExpression {
 	}
 }
 
-func (e *AliasedExpression) Result() (datavalues.IDataValue, error) {
-	return e.expr.Result()
+func (e *AliasedExpression) Eval() error {
+	return e.expr.Eval()
 }
 
 func (e *AliasedExpression) Update(params IParams) (datavalues.IDataValue, error) {
@@ -36,6 +36,10 @@ func (e *AliasedExpression) Update(params IParams) (datavalues.IDataValue, error
 func (e *AliasedExpression) Merge(arg IExpression) (datavalues.IDataValue, error) {
 	other := arg.(*AliasedExpression)
 	return e.expr.Merge(other.expr)
+}
+
+func (e *AliasedExpression) Result() datavalues.IDataValue {
+	return e.expr.Result()
 }
 
 func (e *AliasedExpression) Walk(visit Visit) error {
