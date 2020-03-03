@@ -20,37 +20,34 @@ func TestAggregatorsExpression(t *testing.T) {
 		expect1 datavalues.IDataValue
 		expect2 datavalues.IDataValue
 	}{
-		/*
-			{
-				name:    "sum(1)",
-				expr1:   SUM(1),
-				expr2:   SUM(1),
-				expect1: datavalues.ToValue(2),
-				expect2: datavalues.ToValue(3),
-			},
-			{
-				name:    "sum(a)",
-				expr1:   SUM("a"),
-				expr2:   SUM("a"),
-				expect1: datavalues.ToValue(4),
-				expect2: datavalues.ToValue(10),
-			},
-			{
-				name:    "sum(a+1)",
-				expr1:   SUM(ADD("a", 1)),
-				expr2:   SUM(ADD("a", 1)),
-				expect1: datavalues.ToValue(6),
-				expect2: datavalues.ToValue(13),
-			},
-			{
-				name:    "sum(b)+3+2",
-				expr1:   ADD(ADD(SUM("b"), 3), 2),
-				expr2:   ADD(ADD(SUM("b"), 3), 2),
-				expect1: datavalues.ToValue(12),
-				expect2: datavalues.ToValue(20),
-			},
-
-		*/
+		{
+			name:    "sum(1)",
+			expr1:   SUM(1),
+			expr2:   SUM(1),
+			expect1: datavalues.ToValue(2),
+			expect2: datavalues.ToValue(3),
+		},
+		{
+			name:    "sum(a)",
+			expr1:   SUM("a"),
+			expr2:   SUM("a"),
+			expect1: datavalues.ToValue(4),
+			expect2: datavalues.ToValue(10),
+		},
+		{
+			name:    "sum(a+1)",
+			expr1:   SUM(ADD("a", 1)),
+			expr2:   SUM(ADD("a", 1)),
+			expect1: datavalues.ToValue(6),
+			expect2: datavalues.ToValue(13),
+		},
+		{
+			name:    "sum(b)+3+2",
+			expr1:   ADD(ADD(SUM("b"), 3), 2),
+			expr2:   ADD(ADD(SUM("b"), 3), 2),
+			expect1: datavalues.ToValue(12),
+			expect2: datavalues.ToValue(20),
+		},
 		{
 			name:    "SUM(b)/COUNT(b)+2",
 			expr1:   ADD(DIV(SUM("b"), COUNT("b")), 2.0),

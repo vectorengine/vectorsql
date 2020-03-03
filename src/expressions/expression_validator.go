@@ -58,14 +58,14 @@ func OneOf(validators ...IValidator) *oneOf {
 }
 
 func (v *oneOf) Validate(args ...datavalues.IDataValue) error {
-	errs := make([]error, len(v.validators))
-	for i, validator := range v.validators {
-		errs[i] = validator.Validate(args...)
-		if errs[i] == nil {
+	var err error
+
+	for _, validator := range v.validators {
+		if err = validator.Validate(args...); err == nil {
 			return nil
 		}
 	}
-	return errors.Errorf("none of the conditions have been met: %+v", errs)
+	return errors.Errorf("none of the conditions have been met: %+v", err)
 }
 
 func (v *oneOf) Document() docs.Documentation {

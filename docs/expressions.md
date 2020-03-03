@@ -21,14 +21,11 @@ Not equal.
 * *(left, right)
 
 ### Arguments
+must satisfy one of 
 
-
-* must satisfy one of 
-
-	* index 1 family must be same
-	* index 2 family must be same
+* index 1 family must be same
+* index 2 family must be same
  
-
 ### Description
 Returns the dot product of the two arguments.
 
@@ -41,14 +38,11 @@ Returns the dot product of the two arguments.
 * +(left, right)
 
 ### Arguments
+must satisfy one of 
 
-
-* must satisfy one of 
-
-	* index 1 family must be same
-	* index 2 family must be same
+* index 1 family must be same
+* index 2 family must be same
  
-
 ### Description
 Returns the sum of the two arguments.
 
@@ -61,14 +55,11 @@ Returns the sum of the two arguments.
 * -(left, right)
 
 ### Arguments
+must satisfy one of 
 
-
-* must satisfy one of 
-
-	* index 1 family must be same
-	* index 2 family must be same
+* index 1 family must be same
+* index 2 family must be same
  
-
 ### Description
 Returns the difference between the two arguments.
 
@@ -81,14 +72,11 @@ Returns the difference between the two arguments.
 * /(left, right)
 
 ### Arguments
+must satisfy one of 
 
-
-* must satisfy one of 
-
-	* index 1 family must be same
-	* index 2 family must be same
+* index 1 family must be same
+* index 2 family must be same
  
-
 ### Description
 Returns the division of the two arguments.
 
@@ -265,14 +253,11 @@ Returns a mock log table.
 
 
 ### Arguments
+must satisfy one of 
 
-
-* must satisfy one of 
-
-	* index 1 family must be same
-	* index 2 family must be same
+* index 1 family must be same
+* index 2 family must be same
  
-
 ### Description
 Takes the maximum element in the group. Works with Ints, Floats, Strings, Booleans, Times, Durations.
 
@@ -284,14 +269,11 @@ Takes the maximum element in the group. Works with Ints, Floats, Strings, Boolea
 
 
 ### Arguments
+must satisfy one of 
 
-
-* must satisfy one of 
-
-	* index 1 family must be same
-	* index 2 family must be same
+* index 1 family must be same
+* index 2 family must be same
  
-
 ### Description
 Takes the minimum element in the group. Works with Ints, Floats, Strings, Booleans, Times, Durations.
 
@@ -367,14 +349,11 @@ Returns a list of tuples.
 
 
 ### Arguments
+must satisfy one of 
 
-
-* must satisfy one of 
-
-	* index 1 family must be same
-	* index 2 family must be same
+* index 1 family must be same
+* index 2 family must be same
  
-
 ### Description
 Sums Floats, Ints or Durations in the group. You may not mix types.
 

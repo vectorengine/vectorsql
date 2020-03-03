@@ -14,11 +14,9 @@ func SUM(arg interface{}) IExpression {
 		name:          "SUM",
 		argumentNames: [][]string{},
 		description:   docs.Text("Sums Floats, Ints or Durations in the group. You may not mix types."),
-		validate: All(
-			OneOf(
-				SameFamily(datavalues.FamilyInt),
-				SameFamily(datavalues.FamilyFloat),
-			),
+		validate: OneOf(
+			SameFamily(datavalues.FamilyInt),
+			SameFamily(datavalues.FamilyFloat),
 		),
 		expr: expressionsFor(arg)[0],
 		updateFn: func(current datavalues.IDataValue, next datavalues.IDataValue) (datavalues.IDataValue, error) {
@@ -39,11 +37,9 @@ func MIN(arg interface{}) IExpression {
 		name:          "MIN",
 		argumentNames: [][]string{},
 		description:   docs.Text("Takes the minimum element in the group. Works with Ints, Floats, Strings, Booleans, Times, Durations."),
-		validate: All(
-			OneOf(
-				SameFamily(datavalues.FamilyInt),
-				SameFamily(datavalues.FamilyFloat),
-			),
+		validate: OneOf(
+			SameFamily(datavalues.FamilyInt),
+			SameFamily(datavalues.FamilyFloat),
 		),
 		expr: expressionsFor(arg)[0],
 		updateFn: func(current datavalues.IDataValue, next datavalues.IDataValue) (datavalues.IDataValue, error) {
@@ -74,12 +70,11 @@ func MAX(arg interface{}) IExpression {
 		name:          "MAX",
 		argumentNames: [][]string{},
 		description:   docs.Text("Takes the maximum element in the group. Works with Ints, Floats, Strings, Booleans, Times, Durations."),
-		validate: All(
-			OneOf(
-				SameFamily(datavalues.FamilyInt),
-				SameFamily(datavalues.FamilyFloat),
-			),
+		validate: OneOf(
+			SameFamily(datavalues.FamilyInt),
+			SameFamily(datavalues.FamilyFloat),
 		),
+
 		expr: expressionsFor(arg)[0],
 		updateFn: func(current datavalues.IDataValue, next datavalues.IDataValue) (datavalues.IDataValue, error) {
 			if current == nil {

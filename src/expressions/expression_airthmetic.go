@@ -17,11 +17,9 @@ func ADD(left interface{}, right interface{}) IExpression {
 			{"left", "right"},
 		},
 		description: docs.Text("Returns the sum of the two arguments."),
-		validate: All(
-			OneOf(
-				SameFamily(datavalues.FamilyInt),
-				SameFamily(datavalues.FamilyFloat),
-			),
+		validate: OneOf(
+			SameFamily(datavalues.FamilyInt),
+			SameFamily(datavalues.FamilyFloat),
 		),
 		left:  exprs[0],
 		right: exprs[1],
@@ -39,11 +37,9 @@ func SUB(left interface{}, right interface{}) IExpression {
 			{"left", "right"},
 		},
 		description: docs.Text("Returns the difference between the two arguments."),
-		validate: All(
-			OneOf(
-				SameFamily(datavalues.FamilyInt),
-				SameFamily(datavalues.FamilyFloat),
-			),
+		validate: OneOf(
+			SameFamily(datavalues.FamilyInt),
+			SameFamily(datavalues.FamilyFloat),
 		),
 		left:  exprs[0],
 		right: exprs[1],
@@ -61,11 +57,9 @@ func MUL(left interface{}, right interface{}) IExpression {
 			{"left", "right"},
 		},
 		description: docs.Text("Returns the dot product of the two arguments."),
-		validate: All(
-			OneOf(
-				SameFamily(datavalues.FamilyInt),
-				SameFamily(datavalues.FamilyFloat),
-			),
+		validate: OneOf(
+			SameFamily(datavalues.FamilyInt),
+			SameFamily(datavalues.FamilyFloat),
 		),
 		left:  exprs[0],
 		right: exprs[1],
@@ -83,11 +77,9 @@ func DIV(left interface{}, right interface{}) IExpression {
 			{"left", "right"},
 		},
 		description: docs.Text("Returns the division of the two arguments."),
-		validate: All(
-			OneOf(
-				SameFamily(datavalues.FamilyInt),
-				SameFamily(datavalues.FamilyFloat),
-			),
+		validate: OneOf(
+			SameFamily(datavalues.FamilyInt),
+			SameFamily(datavalues.FamilyFloat),
 		),
 		left:  exprs[0],
 		right: exprs[1],
