@@ -46,12 +46,12 @@ func TestCreateDatabaseExecutor(t *testing.T) {
 			executor, err := ExecutorFactory(ctx, plan)
 			assert.Nil(t, err)
 
-			transform, err := executor.Execute()
+			result, err := executor.Execute()
 			if test.err != "" {
 				assert.Equal(t, test.err, err.Error())
 			} else {
 				assert.Nil(t, err)
-				assert.Nil(t, transform)
+				assert.NotNil(t, result)
 			}
 		})
 	}

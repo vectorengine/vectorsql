@@ -49,17 +49,15 @@ func TestShowTablessExecutor(t *testing.T) {
 			executor, err := ExecutorFactory(ctx, plan)
 			assert.Nil(t, err)
 
-			transform, err := executor.Execute()
+			result, err := executor.Execute()
 			if test.err != "" {
 				assert.Equal(t, test.err, err.Error())
 			} else {
 				assert.Nil(t, err)
-				if transform != nil {
-					for x := range transform.In().Recv() {
-						expect := test.expect
-						actual := x.(*datablocks.DataBlock)
-						assert.True(t, mocks.DataBlockEqual(expect, actual))
-					}
+				for x := range result.In.In().Recv() {
+					expect := test.expect
+					actual := x.(*datablocks.DataBlock)
+					assert.True(t, mocks.DataBlockEqual(expect, actual))
 				}
 			}
 		})

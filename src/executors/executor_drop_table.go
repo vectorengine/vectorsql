@@ -7,7 +7,6 @@ package executors
 import (
 	"databases"
 	"planners"
-	"processors"
 )
 
 type DropTableExecutor struct {
@@ -22,7 +21,7 @@ func NewDropTableExecutor(ctx *ExecutorContext, plan planners.IPlan) IExecutor {
 	}
 }
 
-func (executor *DropTableExecutor) Execute() (processors.IProcessor, error) {
+func (executor *DropTableExecutor) Execute() (*Result, error) {
 	ectx := executor.ctx
 	log := executor.ctx.log
 	ast := executor.plan.Ast
@@ -41,8 +40,9 @@ func (executor *DropTableExecutor) Execute() (processors.IProcessor, error) {
 	if err := database.Executor().DropTable(table); err != nil {
 		return nil, err
 	}
-	log.Debug("Executor->Return->Pipeline:%v", nil)
-	return nil, nil
+	blockIO := NewResult(nil, nil)
+	log.Debug("Executor->Return->Result:%+v", blockIO)
+	return blockIO, nil
 }
 
 func (executor *DropTableExecutor) String() string {

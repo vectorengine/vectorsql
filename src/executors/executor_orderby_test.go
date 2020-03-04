@@ -74,13 +74,13 @@ func TestOrderByExecutor(t *testing.T) {
 			datasource := transforms.NewDataSourceTransform(tctx, stream)
 
 			orderby := NewOrderByExecutor(ctx, test.plan.(*planners.OrderByPlan))
-			transform, err := orderby.Execute()
+			result, err := orderby.Execute()
 			assert.Nil(t, err)
 
 			sink := processors.NewSink("sink")
 			pipeline := processors.NewPipeline(context.Background())
 			pipeline.Add(datasource)
-			pipeline.Add(transform)
+			pipeline.Add(result.In)
 			pipeline.Add(sink)
 			pipeline.Run()
 

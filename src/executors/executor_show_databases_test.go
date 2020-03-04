@@ -59,13 +59,13 @@ func TestShowDatabasesExecutor(t *testing.T) {
 			executor, err := ExecutorFactory(ctx, plan)
 			assert.Nil(t, err)
 
-			transform, err := executor.Execute()
+			result, err := executor.Execute()
 			if test.err != "" {
 				assert.Equal(t, test.err, err.Error())
 			} else {
 				assert.Nil(t, err)
-				if transform != nil {
-					for x := range transform.In().Recv() {
+				if result.In != nil {
+					for x := range result.Read() {
 						expect := test.expect
 						actual := x.(*datablocks.DataBlock)
 						assert.True(t, mocks.DataBlockEqual(expect, actual))

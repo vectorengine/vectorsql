@@ -4,7 +4,9 @@
 
 package datastreams
 
-import "datablocks"
+import (
+	"datablocks"
+)
 
 type IDataBlockInputStream interface {
 	Name() string

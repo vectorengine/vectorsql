@@ -66,13 +66,13 @@ func TestFilterExecutor(t *testing.T) {
 			datasource := transforms.NewDataSourceTransform(tctx, stream)
 
 			filter := NewFilterExecutor(ctx, test.plan.(*planners.FilterPlan))
-			transform, err := filter.Execute()
+			result, err := filter.Execute()
 			assert.Nil(t, err)
 
 			sink := processors.NewSink("sink")
 			pipeline := processors.NewPipeline(context.Background())
 			pipeline.Add(datasource)
-			pipeline.Add(transform)
+			pipeline.Add(result.In)
 			pipeline.Add(sink)
 			pipeline.Run()
 

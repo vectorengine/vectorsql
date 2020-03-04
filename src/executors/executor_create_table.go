@@ -7,7 +7,6 @@ package executors
 import (
 	"databases"
 	"planners"
-	"processors"
 )
 
 type CreateTableExecutor struct {
@@ -22,7 +21,7 @@ func NewCreateTableExecutor(ctx *ExecutorContext, plan planners.IPlan) IExecutor
 	}
 }
 
-func (executor *CreateTableExecutor) Execute() (processors.IProcessor, error) {
+func (executor *CreateTableExecutor) Execute() (*Result, error) {
 	ectx := executor.ctx
 	log := executor.ctx.log
 	ast := executor.plan.Ast
@@ -40,8 +39,9 @@ func (executor *CreateTableExecutor) Execute() (processors.IProcessor, error) {
 	if err := database.Executor().CreateTable(ast); err != nil {
 		return nil, err
 	}
-	log.Debug("Executor->Return->Pipeline:%v", nil)
-	return nil, nil
+	blockIO := NewResult(nil, nil)
+	log.Debug("Executor->Return->Result:%+v", blockIO)
+	return blockIO, nil
 }
 
 func (executor *CreateTableExecutor) String() string {

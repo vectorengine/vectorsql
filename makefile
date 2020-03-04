@@ -83,7 +83,7 @@ coverage:
 
 check:
 	go get -v github.com/golangci/golangci-lint/cmd/golangci-lint
-	bin/golangci-lint --skip-dirs github run src/...
+	bin/golangci-lint --skip-dirs github run src/... --skip-files sql.go
 
 fmt:
 	go fmt $(pkgs)

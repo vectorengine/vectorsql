@@ -45,13 +45,13 @@ func (s *HTTPHandler) processQuery(query string, rw io.Writer) (err error) {
 		return err
 	}
 
-	sink, err := executor.Execute()
+	result, err := executor.Execute()
 	if err != nil {
 		log.Error("%+v", err)
 		return err
 	}
 
-	if err = s.processOrdinaryQuery(rw, session, sink); err != nil {
+	if err = s.processOrdinaryQuery(rw, session, result.In); err != nil {
 		return
 	}
 	log.Debug("%v", executor.String())

@@ -18,23 +18,23 @@ type ProjectionExecutor struct {
 	transformer processors.IProcessor
 }
 
-func NewProjectionExecutor(ctx *ExecutorContext, plan *planners.ProjectionPlan) *ProjectionExecutor {
+func NewProjectionExecutor(ctx *ExecutorContext, plan *planners.ProjectionPlan) IExecutor {
 	return &ProjectionExecutor{
 		ctx:  ctx,
 		plan: plan,
 	}
 }
 
-func (executor *ProjectionExecutor) Execute() (processors.IProcessor, error) {
+func (executor *ProjectionExecutor) Execute() (*Result, error) {
 	log := executor.ctx.log
 	conf := executor.ctx.conf
 
 	log.Debug("Executor->Enter->LogicalPlan:%s", executor.plan)
 	transformCtx := transforms.NewTransformContext(executor.ctx.ctx, log, conf)
 	transform := transforms.NewProjectionTransform(transformCtx, executor.plan)
-	executor.transformer = transform
-	log.Debug("Executor->Return->Pipeline:%v", transform)
-	return transform, nil
+	blockIO := NewResult(transform, nil)
+	log.Debug("Executor->Return->Result:%+v", blockIO)
+	return blockIO, nil
 }
 
 func (executor *ProjectionExecutor) String() string {

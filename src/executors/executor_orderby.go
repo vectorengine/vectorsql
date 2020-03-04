@@ -18,14 +18,14 @@ type OrderByExecutor struct {
 	transformer processors.IProcessor
 }
 
-func NewOrderByExecutor(ctx *ExecutorContext, plan *planners.OrderByPlan) *OrderByExecutor {
+func NewOrderByExecutor(ctx *ExecutorContext, plan *planners.OrderByPlan) IExecutor {
 	return &OrderByExecutor{
 		ctx:  ctx,
 		plan: plan,
 	}
 }
 
-func (executor *OrderByExecutor) Execute() (processors.IProcessor, error) {
+func (executor *OrderByExecutor) Execute() (*Result, error) {
 	log := executor.ctx.log
 	conf := executor.ctx.conf
 
@@ -33,8 +33,9 @@ func (executor *OrderByExecutor) Execute() (processors.IProcessor, error) {
 	transformCtx := transforms.NewTransformContext(executor.ctx.ctx, log, conf)
 	transform := transforms.NewOrderByTransform(transformCtx, executor.plan)
 	executor.transformer = transform
-	log.Debug("Executor->Return->Pipeline:%v", transform)
-	return transform, nil
+	blockIO := NewResult(transform, nil)
+	log.Debug("Executor->Return->Result:%+v", blockIO)
+	return blockIO, nil
 }
 
 func (executor *OrderByExecutor) String() string {

@@ -49,13 +49,13 @@ func (s *TCPHandler) processQuery(session *TCPSession) error {
 		return session.sendException(err, conf.Server.CalculateTextStackTrace)
 	}
 
-	sink, err := executor.Execute()
+	result, err := executor.Execute()
 	if err != nil {
 		log.Error("%+v", err)
 		return session.sendException(err, conf.Server.CalculateTextStackTrace)
 	}
 
-	if err := s.processOrdinaryQuery(session, sink); err != nil {
+	if err := s.processOrdinaryQuery(session, result.In); err != nil {
 		return err
 	}
 	log.Debug("%v", executor.String())

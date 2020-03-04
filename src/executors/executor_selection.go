@@ -19,14 +19,14 @@ type SelectionExecutor struct {
 	transformer processors.IProcessor
 }
 
-func NewSelectionExecutor(ctx *ExecutorContext, plan *planners.SelectionPlan) *SelectionExecutor {
+func NewSelectionExecutor(ctx *ExecutorContext, plan *planners.SelectionPlan) IExecutor {
 	return &SelectionExecutor{
 		ctx:  ctx,
 		plan: plan,
 	}
 }
 
-func (executor *SelectionExecutor) Execute() (processors.IProcessor, error) {
+func (executor *SelectionExecutor) Execute() (*Result, error) {
 	log := executor.ctx.log
 	conf := executor.ctx.conf
 	plan := executor.plan
@@ -46,8 +46,9 @@ func (executor *SelectionExecutor) Execute() (processors.IProcessor, error) {
 		return nil, errors.Errorf("Unsupported filler mode:%v", plan.SelectionMode)
 	}
 	executor.transformer = transform
-	log.Debug("Executor->Return->Pipeline:%v", transform)
-	return transform, nil
+	blockIO := NewResult(transform, nil)
+	log.Debug("Executor->Return->Result:%+v", blockIO)
+	return blockIO, nil
 }
 
 func (executor *SelectionExecutor) String() string {

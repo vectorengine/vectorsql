@@ -18,14 +18,14 @@ type FilterExecutor struct {
 	transformer processors.IProcessor
 }
 
-func NewFilterExecutor(ctx *ExecutorContext, filter *planners.FilterPlan) *FilterExecutor {
+func NewFilterExecutor(ctx *ExecutorContext, filter *planners.FilterPlan) IExecutor {
 	return &FilterExecutor{
 		ctx:    ctx,
 		filter: filter,
 	}
 }
 
-func (executor *FilterExecutor) Execute() (processors.IProcessor, error) {
+func (executor *FilterExecutor) Execute() (*Result, error) {
 	log := executor.ctx.log
 	conf := executor.ctx.conf
 
@@ -33,8 +33,9 @@ func (executor *FilterExecutor) Execute() (processors.IProcessor, error) {
 	transformCtx := transforms.NewTransformContext(executor.ctx.ctx, log, conf)
 	transform := transforms.NewFilterTransform(transformCtx, executor.filter)
 	executor.transformer = transform
-	log.Debug("Executor->Return->Pipeline:%v", executor.transformer)
-	return transform, nil
+	blockIO := NewResult(transform, nil)
+	log.Debug("Executor->Return->Result:%+v", blockIO)
+	return blockIO, nil
 }
 
 func (executor *FilterExecutor) String() string {

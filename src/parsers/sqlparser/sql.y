@@ -1164,17 +1164,17 @@ union_rhs:
 	}
 
 insert_statement:
-	insert_or_replace comment_opt ignore_opt into_table_name opt_partition_clause insert_data on_dup_opt formats_opt
+	insert_or_replace comment_opt ignore_opt into_table_name opt_partition_clause formats_opt insert_data on_dup_opt
 	{
 		// insert_data returns a *Insert pre-filled with Columns & Values
-		ins := $6
+		ins := $7
 		ins.Action = $1
 		ins.Comments = $2
 		ins.Ignore = $3
 		ins.Table = $4
 		ins.Partitions = $5
-		ins.OnDup = OnDup($7)
-		ins.Formats = $8
+		ins.Formats = $6
+		ins.OnDup = OnDup($8)
 		$$ = ins
 	}
 |	insert_or_replace comment_opt ignore_opt into_table_name opt_partition_clause SET update_list on_dup_opt

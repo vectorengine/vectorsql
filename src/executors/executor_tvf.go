@@ -29,14 +29,14 @@ type TableValuedFunctionExecutor struct {
 	transformer processors.IProcessor
 }
 
-func NewTableValuedFunctionExecutor(ctx *ExecutorContext, plan *planners.TableValuedFunctionPlan) *TableValuedFunctionExecutor {
+func NewTableValuedFunctionExecutor(ctx *ExecutorContext, plan *planners.TableValuedFunctionPlan) IExecutor {
 	return &TableValuedFunctionExecutor{
 		ctx:  ctx,
 		plan: plan,
 	}
 }
 
-func (executor *TableValuedFunctionExecutor) Execute() (processors.IProcessor, error) {
+func (executor *TableValuedFunctionExecutor) Execute() (*Result, error) {
 	var constants []interface{}
 	var variables []datavalues.IDataValue
 
@@ -135,8 +135,9 @@ func (executor *TableValuedFunctionExecutor) Execute() (processors.IProcessor, e
 	transformCtx := transforms.NewTransformContext(executor.ctx.ctx, executor.ctx.log, executor.ctx.conf)
 	transform := transforms.NewDataSourceTransform(transformCtx, stream)
 	executor.transformer = transform
-	log.Debug("Executor->Return->Pipeline:%s", transform.Name())
-	return transform, nil
+	blockIO := NewResult(transform, nil)
+	log.Debug("Executor->Return->Result:%+v", blockIO)
+	return blockIO, nil
 }
 
 func (executor *TableValuedFunctionExecutor) String() string {

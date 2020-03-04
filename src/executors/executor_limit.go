@@ -18,14 +18,14 @@ type LimitExecutor struct {
 	transformer processors.IProcessor
 }
 
-func NewLimitExecutor(ctx *ExecutorContext, plan *planners.LimitPlan) *LimitExecutor {
+func NewLimitExecutor(ctx *ExecutorContext, plan *planners.LimitPlan) IExecutor {
 	return &LimitExecutor{
 		ctx:  ctx,
 		plan: plan,
 	}
 }
 
-func (executor *LimitExecutor) Execute() (processors.IProcessor, error) {
+func (executor *LimitExecutor) Execute() (*Result, error) {
 	log := executor.ctx.log
 	conf := executor.ctx.conf
 
@@ -33,8 +33,9 @@ func (executor *LimitExecutor) Execute() (processors.IProcessor, error) {
 	transformCtx := transforms.NewTransformContext(executor.ctx.ctx, log, conf)
 	transform := transforms.NewLimitransform(transformCtx, executor.plan)
 	executor.transformer = transform
-	log.Debug("Executor->Return->Pipeline:%v", transform)
-	return transform, nil
+	blockIO := NewResult(transform, nil)
+	log.Debug("Executor->Return->Result:%+v", blockIO)
+	return blockIO, nil
 }
 
 func (executor *LimitExecutor) String() string {

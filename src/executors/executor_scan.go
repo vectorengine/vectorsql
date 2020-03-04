@@ -19,14 +19,14 @@ type ScanExecutor struct {
 	transformer processors.IProcessor
 }
 
-func NewScanExecutor(ctx *ExecutorContext, plan *planners.ScanPlan) *ScanExecutor {
+func NewScanExecutor(ctx *ExecutorContext, plan *planners.ScanPlan) IExecutor {
 	return &ScanExecutor{
 		ctx:  ctx,
 		plan: plan,
 	}
 }
 
-func (executor *ScanExecutor) Execute() (processors.IProcessor, error) {
+func (executor *ScanExecutor) Execute() (*Result, error) {
 	log := executor.ctx.log
 	conf := executor.ctx.conf
 	plan := executor.plan
@@ -50,8 +50,9 @@ func (executor *ScanExecutor) Execute() (processors.IProcessor, error) {
 	transformCtx := transforms.NewTransformContext(executor.ctx.ctx, log, conf)
 	transform := transforms.NewDataSourceTransform(transformCtx, input)
 	executor.transformer = transform
-	log.Debug("Executor->Return->Pipeline:%v", transform)
-	return transform, nil
+	blockIO := NewResult(transform, nil)
+	log.Debug("Executor->Return->Result:%+v", blockIO)
+	return blockIO, nil
 }
 
 func (executor *ScanExecutor) String() string {

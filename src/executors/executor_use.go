@@ -7,7 +7,6 @@ package executors
 import (
 	"databases"
 	"planners"
-	"processors"
 )
 
 type UseExecutor struct {
@@ -22,7 +21,7 @@ func NewUseExecutor(ctx *ExecutorContext, plan planners.IPlan) IExecutor {
 	}
 }
 
-func (executor *UseExecutor) Execute() (processors.IProcessor, error) {
+func (executor *UseExecutor) Execute() (*Result, error) {
 	ectx := executor.ctx
 	log := executor.ctx.log
 	plan := executor.plan
@@ -33,8 +32,9 @@ func (executor *UseExecutor) Execute() (processors.IProcessor, error) {
 		return nil, err
 	}
 	ectx.session.SetDatabase(dbname)
-	log.Debug("Executor->Return->Pipeline:%v", nil)
-	return nil, nil
+	blockIO := NewResult(nil, nil)
+	log.Debug("Executor->Return->Result:%+v", blockIO)
+	return blockIO, nil
 }
 
 func (executor *UseExecutor) String() string {

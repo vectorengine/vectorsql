@@ -150,10 +150,10 @@ ORDER BY
 
 			ctx := NewExecutorContext(mock.Ctx, mock.Log, mock.Conf, mock.Session)
 			executor := NewSelectExecutor(ctx, plan)
-			transform, err := executor.Execute()
+			result, err := executor.Execute()
 			assert.Nil(t, err)
 
-			for x := range transform.In().Recv() {
+			for x := range result.Read() {
 				expect := test.expect
 				actual := x.(*datablocks.DataBlock)
 				assert.True(t, mocks.DataBlockEqual(expect, actual))

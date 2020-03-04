@@ -7,7 +7,6 @@ package executors
 import (
 	"base/errors"
 	"planners"
-	"processors"
 )
 
 type SelectExecutor struct {
@@ -24,7 +23,7 @@ func NewSelectExecutor(ctx *ExecutorContext, plan planners.IPlan) IExecutor {
 	}
 }
 
-func (executor *SelectExecutor) Execute() (processors.IProcessor, error) {
+func (executor *SelectExecutor) Execute() (*Result, error) {
 	ectx := executor.ctx
 	log := executor.ctx.log
 	tree := executor.tree
@@ -68,8 +67,9 @@ func (executor *SelectExecutor) Execute() (processors.IProcessor, error) {
 	}
 	pipeline.Run()
 
-	log.Debug("Executor->Return->Pipeline:%s", pipeline)
-	return pipeline.Last(), nil
+	blockIO := NewResult(pipeline.Last(), nil)
+	log.Debug("Executor->Return->Result:%+v", blockIO)
+	return blockIO, nil
 }
 
 func (executor *SelectExecutor) String() string {

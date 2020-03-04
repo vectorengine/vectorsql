@@ -32,7 +32,7 @@ func (tree *ExecutorTree) BuildPipeline() (*processors.Pipeline, error) {
 		if err != nil {
 			return nil, err
 		}
-		pipeline.Add(transform)
+		pipeline.Add(transform.In)
 	}
 	return pipeline, nil
 }

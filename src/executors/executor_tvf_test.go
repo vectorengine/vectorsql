@@ -78,11 +78,13 @@ func TestTVFExecutor(t *testing.T) {
 			assert.Nil(t, err)
 			pipeline.Run()
 
-			for x := range pipeline.Last().In().Recv() {
+			err = pipeline.Wait(func(x interface{}) error {
 				expect := test.expect
 				actual := x.(*datablocks.DataBlock)
 				assert.Equal(t, expect, actual)
-			}
+				return nil
+			})
+			assert.Nil(t, err)
 		})
 	}
 }
