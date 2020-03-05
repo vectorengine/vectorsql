@@ -13,6 +13,7 @@ import (
 	"planners"
 	"processors"
 	"servers/protocol"
+	"sessions"
 )
 
 func (s *TCPHandler) processQuery(session *TCPSession) error {
@@ -43,6 +44,9 @@ func (s *TCPHandler) processQuery(session *TCPSession) error {
 
 	// Executors.
 	ectx := executors.NewExecutorContext(ctx, log, conf, xsession)
+	ectx.SetProgressCallback(func(pv *sessions.ProgressValues) {
+		xsession.UpdateProgress(pv)
+	})
 	executor, err := executors.ExecutorFactory(ectx, plan)
 	if err != nil {
 		log.Error("%+v", err)
@@ -69,6 +73,11 @@ func (s *TCPHandler) processOrdinaryQuery(session *TCPSession, sink processors.I
 	log.Debug("TCPHandler->OrdinaryQuery->Enter")
 	if sink != nil {
 		for x := range sink.In().Recv() {
+			// Send progress.
+			if err := session.sendProgress(); err != nil {
+				return err
+			}
+
 			switch x := x.(type) {
 			case error:
 				log.Error("%+v", x)
@@ -78,6 +87,7 @@ func (s *TCPHandler) processOrdinaryQuery(session *TCPSession, sink processors.I
 				if err != nil {
 					return err
 				}
+
 				for _, block := range chunks {
 					if err := session.sendData(block); err != nil {
 						return err

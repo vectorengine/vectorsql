@@ -7,17 +7,17 @@ package executors
 import (
 	"context"
 
+	"base/xlog"
 	"config"
 	"sessions"
-
-	"base/xlog"
 )
 
 type ExecutorContext struct {
-	log     *xlog.Log
-	ctx     context.Context
-	conf    *config.Config
-	session *sessions.Session
+	log              *xlog.Log
+	ctx              context.Context
+	conf             *config.Config
+	session          *sessions.Session
+	progressCallback func(values *sessions.ProgressValues)
 }
 
 func NewExecutorContext(ctx context.Context, log *xlog.Log, conf *config.Config, session *sessions.Session) *ExecutorContext {
@@ -27,4 +27,8 @@ func NewExecutorContext(ctx context.Context, log *xlog.Log, conf *config.Config,
 		conf:    conf,
 		session: session,
 	}
+}
+
+func (ctx *ExecutorContext) SetProgressCallback(fn func(pv *sessions.ProgressValues)) {
+	ctx.progressCallback = fn
 }

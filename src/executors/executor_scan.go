@@ -48,6 +48,7 @@ func (executor *ScanExecutor) Execute() (*Result, error) {
 		return nil, err
 	}
 	transformCtx := transforms.NewTransformContext(executor.ctx.ctx, log, conf)
+	transformCtx.SetProgressCallback(executor.ctx.progressCallback)
 	transform := transforms.NewDataSourceTransform(transformCtx, input)
 	executor.transformer = transform
 	blockIO := NewResult(transform, nil)

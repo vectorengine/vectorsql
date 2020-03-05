@@ -36,6 +36,10 @@ func NewTCPSession(conn net.Conn) *TCPSession {
 	}
 }
 
+func (session *TCPSession) Close() {
+	session.session.Close()
+}
+
 func (session *TCPSession) sendException(x error, withStack bool) error {
 	writer := session.writer
 
@@ -43,6 +47,15 @@ func (session *TCPSession) sendException(x error, withStack bool) error {
 		return err
 	}
 	return session.flush()
+}
+
+func (session *TCPSession) sendProgress() error {
+	writer := session.writer
+
+	if err := protocol.WriteProgressResponse(writer, session.session.GetProgress(), session.hello.ClientRevision); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (session *TCPSession) sendData(block *datablocks.DataBlock) error {

@@ -133,6 +133,7 @@ func (executor *TableValuedFunctionExecutor) Execute() (*Result, error) {
 	// Stream.
 	stream := datastreams.NewChannelBlockInputStream(queue)
 	transformCtx := transforms.NewTransformContext(executor.ctx.ctx, executor.ctx.log, executor.ctx.conf)
+	transformCtx.SetProgressCallback(executor.ctx.progressCallback)
 	transform := transforms.NewDataSourceTransform(transformCtx, stream)
 	executor.transformer = transform
 	blockIO := NewResult(transform, nil)

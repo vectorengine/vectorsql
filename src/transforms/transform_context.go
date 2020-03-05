@@ -5,16 +5,18 @@
 package transforms
 
 import (
-	"config"
 	"context"
 
 	"base/xlog"
+	"config"
+	"sessions"
 )
 
 type TransformContext struct {
-	ctx  context.Context
-	log  *xlog.Log
-	conf *config.Config
+	ctx              context.Context
+	log              *xlog.Log
+	conf             *config.Config
+	progressCallback func(values *sessions.ProgressValues)
 }
 
 func NewTransformContext(ctx context.Context, log *xlog.Log, conf *config.Config) *TransformContext {
@@ -23,4 +25,8 @@ func NewTransformContext(ctx context.Context, log *xlog.Log, conf *config.Config
 		log:  log,
 		conf: conf,
 	}
+}
+
+func (ctx *TransformContext) SetProgressCallback(fn func(pv *sessions.ProgressValues)) {
+	ctx.progressCallback = fn
 }

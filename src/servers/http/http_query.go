@@ -18,11 +18,10 @@ import (
 )
 
 func (s *HTTPHandler) processQuery(query string, rw io.Writer) (err error) {
-	var (
-		log     = s.log
-		conf    = s.conf
-		session = sessions.NewSession()
-	)
+	log := s.log
+	conf := s.conf
+	session := sessions.NewSession()
+	defer session.Close()
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()

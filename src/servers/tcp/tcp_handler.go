@@ -66,6 +66,8 @@ func (s *TCPHandler) handle(conn net.Conn) {
 	}()
 
 	session := NewTCPSession(conn)
+	defer session.Close()
+
 	log.Debug("Connection coming:%s", conn.RemoteAddr().String())
 	if err := s.handlePacket(session); err != nil {
 		log.Error("%+v, %T", err, err)

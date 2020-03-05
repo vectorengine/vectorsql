@@ -5,9 +5,12 @@
 package transforms
 
 import (
+	"sync/atomic"
+	"time"
+
 	"datastreams"
 	"processors"
-	"sync/atomic"
+	"sessions"
 )
 
 type DataSourceTransform struct {
@@ -40,6 +43,7 @@ func (t *DataSourceTransform) Execute() {
 			if out.IsClose() {
 				return
 			}
+			start := time.Now()
 			data, err := input.Read()
 			if err != nil {
 				log.Error("Transform->Input error:%+v", err)
@@ -47,6 +51,14 @@ func (t *DataSourceTransform) Execute() {
 				return
 			} else if data == nil {
 				return
+			}
+			cost := time.Since(start)
+			if ctx.progressCallback != nil {
+				progressValues := &sessions.ProgressValues{
+					Cost:     cost,
+					ReadRows: uint64(data.NumRows()),
+				}
+				ctx.progressCallback(progressValues)
 			}
 			out.Send(data)
 			atomic.AddInt64(&t.processRows, int64(data.NumRows()))

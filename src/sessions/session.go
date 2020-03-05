@@ -4,15 +4,51 @@
 
 package sessions
 
-import ()
+import "sync"
 
 type Session struct {
+	mu       sync.Mutex
+	id       uint64
 	database string
+	progress *ProgressValues
 }
 
 func NewSession() *Session {
-	return &Session{
+	mgrMu.Lock()
+	defer mgrMu.Unlock()
+	session := &Session{
+		id:       sessionID,
 		database: "system",
+		progress: &ProgressValues{},
+	}
+	sessionMgr[sessionID] = session
+	sessionID++
+	return session
+}
+
+func (s *Session) UpdateProgress(pv *ProgressValues) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	s.progress.Cost += pv.Cost
+	s.progress.ReadRows += pv.ReadRows
+	s.progress.ReadBytes += pv.ReadBytes
+	s.progress.TotalRowsToRead += pv.TotalRowsToRead
+	s.progress.WrittenRows += pv.WrittenRows
+	s.progress.WrittenBytes += pv.WrittenBytes
+}
+
+func (s *Session) GetProgress() *ProgressValues {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	return &ProgressValues{
+		Cost:            s.progress.Cost,
+		ReadRows:        s.progress.ReadRows,
+		ReadBytes:       s.progress.ReadBytes,
+		TotalRowsToRead: s.progress.TotalRowsToRead,
+		WrittenRows:     s.progress.WrittenRows,
+		WrittenBytes:    s.progress.WrittenBytes,
 	}
 }
 
@@ -22,4 +58,10 @@ func (s *Session) SetDatabase(db string) {
 
 func (s *Session) GetDatabase() string {
 	return s.database
+}
+
+func (s *Session) Close() {
+	mgrMu.Lock()
+	defer mgrMu.Unlock()
+	delete(sessionMgr, s.id)
 }
