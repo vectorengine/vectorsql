@@ -32,6 +32,7 @@ func (executor *ProjectionExecutor) Execute() (*Result, error) {
 	log.Debug("Executor->Enter->LogicalPlan:%s", executor.plan)
 	transformCtx := transforms.NewTransformContext(executor.ctx.ctx, log, conf)
 	transform := transforms.NewProjectionTransform(transformCtx, executor.plan)
+	executor.transformer = transform
 	blockIO := NewResult(transform, nil)
 	log.Debug("Executor->Return->Result:%+v", blockIO)
 	return blockIO, nil

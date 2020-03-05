@@ -55,8 +55,10 @@ func (t *DataSourceTransform) Execute() {
 			cost := time.Since(start)
 			if ctx.progressCallback != nil {
 				progressValues := &sessions.ProgressValues{
-					Cost:     cost,
-					ReadRows: uint64(data.NumRows()),
+					Cost:            cost,
+					ReadRows:        uint64(data.NumRows()),
+					TotalRowsToRead: uint64(data.NumRows()),
+					ReadBytes:       data.TotalBytes(),
 				}
 				ctx.progressCallback(progressValues)
 			}

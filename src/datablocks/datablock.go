@@ -14,10 +14,11 @@ import (
 )
 
 type DataBlock struct {
-	mu     sync.RWMutex
-	seqs   []int
-	info   *DataBlockInfo
-	values []*DataBlockValue
+	mu         sync.RWMutex
+	seqs       []int
+	info       *DataBlockInfo
+	values     []*DataBlockValue
+	totalBytes uint64
 }
 
 func NewDataBlock(cols []*columns.Column) *DataBlock {
@@ -49,6 +50,12 @@ func (block *DataBlock) Clone() *DataBlock {
 
 func (block *DataBlock) Info() *DataBlockInfo {
 	return block.info
+}
+
+func (block *DataBlock) TotalBytes() uint64 {
+	block.mu.RLock()
+	defer block.mu.RUnlock()
+	return block.totalBytes
 }
 
 func (block *DataBlock) NumRows() int {
@@ -122,6 +129,7 @@ func (block *DataBlock) WriteRow(values []datavalues.IDataValue) error {
 
 	offset := len(block.values[0].values)
 	for i := 0; i < cols; i++ {
+		block.totalBytes += uint64(values[i].Size())
 		block.values[i].values = append(block.values[i].values, values[i])
 	}
 	block.seqs = append(block.seqs, offset)
