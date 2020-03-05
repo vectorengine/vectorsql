@@ -6,7 +6,6 @@ package tcp
 
 import (
 	"context"
-
 	"datablocks"
 	"executors"
 	"optimizers"
@@ -14,6 +13,8 @@ import (
 	"processors"
 	"servers/protocol"
 	"sessions"
+	"sync"
+	"time"
 )
 
 func (s *TCPHandler) processQuery(session *TCPSession) error {
@@ -67,17 +68,32 @@ func (s *TCPHandler) processQuery(session *TCPSession) error {
 }
 
 func (s *TCPHandler) processOrdinaryQuery(session *TCPSession, sink processors.IProcessor) error {
+	var mu sync.Mutex
 	conf := s.conf
 	log := s.log
+	done := make(chan struct{})
+	defer close(done)
 
 	log.Debug("TCPHandler->OrdinaryQuery->Enter")
 	if sink != nil {
-		for x := range sink.In().Recv() {
-			// Send progress.
-			if err := session.sendProgress(); err != nil {
-				return err
+		go func() {
+			for {
+				select {
+				case <-done:
+					return
+				default:
+					mu.Lock()
+					if err := session.sendProgress(); err != nil {
+						mu.Unlock()
+						return
+					}
+					mu.Unlock()
+					time.Sleep(time.Millisecond * 100)
+				}
 			}
+		}()
 
+		for x := range sink.In().Recv() {
 			switch x := x.(type) {
 			case error:
 				log.Error("%+v", x)
@@ -89,9 +105,12 @@ func (s *TCPHandler) processOrdinaryQuery(session *TCPSession, sink processors.I
 				}
 
 				for _, block := range chunks {
+					mu.Lock()
 					if err := session.sendData(block); err != nil {
+						mu.Unlock()
 						return err
 					}
+					mu.Unlock()
 				}
 			}
 		}
