@@ -67,9 +67,10 @@ func (executor *SelectExecutor) Execute() (*Result, error) {
 	}
 	pipeline.Run()
 
-	blockIO := NewResult(pipeline.Last(), nil)
-	log.Debug("Executor->Return->Result:%+v", blockIO)
-	return blockIO, nil
+	result := NewResult()
+	result.SetInput(pipeline.Last())
+	log.Debug("Executor->Return->Result:%+v", result)
+	return result, nil
 }
 
 func (executor *SelectExecutor) String() string {

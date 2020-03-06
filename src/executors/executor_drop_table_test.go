@@ -42,11 +42,10 @@ func TestDropTableExecutor(t *testing.T) {
 		},
 	}
 
+	mock, cleanup := mocks.NewMock()
+	defer cleanup()
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			mock, cleanup := mocks.NewMock()
-			defer cleanup()
-
 			plan, err := planners.PlanFactory(test.query)
 			assert.Nil(t, err)
 

@@ -23,6 +23,7 @@ var table = map[reflect.Type]executorCreator{
 	reflect.TypeOf(&planners.DropTablePlan{}):      NewDropTableExecutor,
 	reflect.TypeOf(&planners.ShowDatabasesPlan{}):  NewShowDatabasesExecutor,
 	reflect.TypeOf(&planners.ShowTablesPlan{}):     NewShowTablesExecutor,
+	reflect.TypeOf(&planners.InsertPlan{}):         NewInsertExecutor,
 }
 
 func ExecutorFactory(ctx *ExecutorContext, plan planners.IPlan) (IExecutor, error) {

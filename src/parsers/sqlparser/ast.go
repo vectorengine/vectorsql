@@ -581,6 +581,14 @@ const (
 	ReplaceStr = "replace"
 )
 
+const (
+	NodeNameInsert = "INSERT"
+)
+
+func (node *Insert) Name() string {
+	return NodeNameInsert
+}
+
 // Format formats the node.
 func (node *Insert) Format(buf *TrackedBuffer) {
 	buf.Myprintf("%s %v%sinto %v%v%v %v%v%v",

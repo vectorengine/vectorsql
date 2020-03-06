@@ -136,9 +136,11 @@ func (executor *TableValuedFunctionExecutor) Execute() (*Result, error) {
 	transformCtx.SetProgressCallback(executor.ctx.progressCallback)
 	transform := transforms.NewDataSourceTransform(transformCtx, stream)
 	executor.transformer = transform
-	blockIO := NewResult(transform, nil)
-	log.Debug("Executor->Return->Result:%+v", blockIO)
-	return blockIO, nil
+
+	result := NewResult()
+	result.SetInput(transform)
+	log.Debug("Executor->Return->Result:%+v", result)
+	return result, nil
 }
 
 func (executor *TableValuedFunctionExecutor) String() string {

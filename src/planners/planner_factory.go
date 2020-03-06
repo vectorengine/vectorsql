@@ -22,6 +22,7 @@ var table = map[string]planCreator{
 	sqlparser.NodeNameTableDrop:      NewDropTablePlan,
 	sqlparser.NodeNameShowDatabases:  NewShowDatabasesPlan,
 	sqlparser.NodeNameShowTables:     NewShowTablesPlan,
+	sqlparser.NodeNameInsert:         NewInsertPlan,
 }
 
 func PlanFactory(query string) (IPlan, error) {

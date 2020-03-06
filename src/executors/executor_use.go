@@ -32,9 +32,10 @@ func (executor *UseExecutor) Execute() (*Result, error) {
 		return nil, err
 	}
 	ectx.session.SetDatabase(dbname)
-	blockIO := NewResult(nil, nil)
-	log.Debug("Executor->Return->Result:%+v", blockIO)
-	return blockIO, nil
+
+	result := NewResult()
+	log.Debug("Executor->Return->Result:%+v", result)
+	return result, nil
 }
 
 func (executor *UseExecutor) String() string {

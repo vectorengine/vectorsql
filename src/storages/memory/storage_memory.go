@@ -10,7 +10,6 @@ import (
 	"columns"
 	"datablocks"
 	"datastreams"
-	"planners"
 	"sessions"
 )
 
@@ -36,18 +35,14 @@ func (storage *MemoryStorage) Columns() []*columns.Column {
 	return storage.cols
 }
 
-func (storage *MemoryStorage) GetOutputStream(session *sessions.Session, scan *planners.ScanPlan) (datastreams.IDataBlockOutputStream, error) {
+func (storage *MemoryStorage) GetOutputStream(session *sessions.Session) (datastreams.IDataBlockOutputStream, error) {
 	return storage.output, nil
 }
 
-func (storage *MemoryStorage) GetInputStream(session *sessions.Session, scan *planners.ScanPlan) (datastreams.IDataBlockInputStream, error) {
+func (storage *MemoryStorage) GetInputStream(session *sessions.Session) (datastreams.IDataBlockInputStream, error) {
 	log := storage.ctx.log
 
-	log.Debug("Storage->Memory->Enter->Database:%v, Project:%+v, Filter:%+v",
-		session.GetDatabase(),
-		scan.Project != nil,
-		scan.Filter != nil,
-	)
+	log.Debug("Storage->Memory->Enter->Database:%v", session.GetDatabase())
 
 	// Stream.
 	stream := datastreams.NewOneBlockInputStream(storage.output.blocks[0])

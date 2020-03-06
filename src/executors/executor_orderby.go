@@ -33,9 +33,11 @@ func (executor *OrderByExecutor) Execute() (*Result, error) {
 	transformCtx := transforms.NewTransformContext(executor.ctx.ctx, log, conf)
 	transform := transforms.NewOrderByTransform(transformCtx, executor.plan)
 	executor.transformer = transform
-	blockIO := NewResult(transform, nil)
-	log.Debug("Executor->Return->Result:%+v", blockIO)
-	return blockIO, nil
+
+	result := NewResult()
+	result.SetInput(transform)
+	log.Debug("Executor->Return->Result:%+v", result)
+	return result, nil
 }
 
 func (executor *OrderByExecutor) String() string {

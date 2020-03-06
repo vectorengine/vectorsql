@@ -46,9 +46,11 @@ func (executor *SelectionExecutor) Execute() (*Result, error) {
 		return nil, errors.Errorf("Unsupported filler mode:%v", plan.SelectionMode)
 	}
 	executor.transformer = transform
-	blockIO := NewResult(transform, nil)
-	log.Debug("Executor->Return->Result:%+v", blockIO)
-	return blockIO, nil
+
+	result := NewResult()
+	result.SetInput(transform)
+	log.Debug("Executor->Return->Result:%+v", result)
+	return result, nil
 }
 
 func (executor *SelectionExecutor) String() string {

@@ -43,7 +43,7 @@ func (executor *ScanExecutor) Execute() (*Result, error) {
 		return nil, err
 	}
 
-	input, err := storage.GetInputStream(session, plan)
+	input, err := storage.GetInputStream(session)
 	if err != nil {
 		return nil, err
 	}
@@ -51,9 +51,11 @@ func (executor *ScanExecutor) Execute() (*Result, error) {
 	transformCtx.SetProgressCallback(executor.ctx.progressCallback)
 	transform := transforms.NewDataSourceTransform(transformCtx, input)
 	executor.transformer = transform
-	blockIO := NewResult(transform, nil)
-	log.Debug("Executor->Return->Result:%+v", blockIO)
-	return blockIO, nil
+
+	result := NewResult()
+	result.SetInput(transform)
+	log.Debug("Executor->Return->Result:%+v", result)
+	return result, nil
 }
 
 func (executor *ScanExecutor) String() string {

@@ -19,8 +19,16 @@ type Result struct {
 	Out datastreams.IDataBlockOutputStream
 }
 
-func NewResult(in processors.IProcessor, out datastreams.IDataBlockOutputStream) *Result {
-	return &Result{In: in, Out: out}
+func NewResult() *Result {
+	return &Result{}
+}
+
+func (r *Result) SetInput(in processors.IProcessor) {
+	r.In = in
+}
+
+func (r *Result) SetOutput(out datastreams.IDataBlockOutputStream) {
+	r.Out = out
 }
 
 func (r *Result) Read() <-chan interface{} {

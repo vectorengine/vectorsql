@@ -13,7 +13,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestCreateTableExecutor(t *testing.T) {
+func TestInsertExecutor(t *testing.T) {
 	tests := []struct {
 		name  string
 		query string
@@ -28,9 +28,8 @@ func TestCreateTableExecutor(t *testing.T) {
 			query: "create table db1.t1(a UInt32) Engine=Memory",
 		},
 		{
-			name:  "create-table-exists",
-			query: "create table db1.t1(a UInt32) Engine=Memory",
-			err:   "db1.t1 exists",
+			name:  "insert into db1.t1 values",
+			query: "insert into db1.t1 values",
 		},
 		{
 			name:  "drop",

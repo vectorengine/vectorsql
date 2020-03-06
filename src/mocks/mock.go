@@ -6,13 +6,13 @@ package mocks
 
 import (
 	"context"
+	"os"
 	"sync"
 
+	"base/xlog"
 	"config"
 	"databases"
 	"sessions"
-
-	"base/xlog"
 )
 
 var once sync.Once
@@ -46,5 +46,6 @@ func NewMock() (*Mock, func()) {
 	}
 	return mock, func() {
 		cancel()
+		os.RemoveAll(conf.Server.Path)
 	}
 }

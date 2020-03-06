@@ -39,9 +39,10 @@ func (executor *CreateTableExecutor) Execute() (*Result, error) {
 	if err := database.Executor().CreateTable(ast); err != nil {
 		return nil, err
 	}
-	blockIO := NewResult(nil, nil)
-	log.Debug("Executor->Return->Result:%+v", blockIO)
-	return blockIO, nil
+
+	result := NewResult()
+	log.Debug("Executor->Return->Result:%+v", result)
+	return result, nil
 }
 
 func (executor *CreateTableExecutor) String() string {

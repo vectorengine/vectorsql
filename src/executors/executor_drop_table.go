@@ -40,9 +40,10 @@ func (executor *DropTableExecutor) Execute() (*Result, error) {
 	if err := database.Executor().DropTable(table); err != nil {
 		return nil, err
 	}
-	blockIO := NewResult(nil, nil)
-	log.Debug("Executor->Return->Result:%+v", blockIO)
-	return blockIO, nil
+
+	result := NewResult()
+	log.Debug("Executor->Return->Result:%+v", result)
+	return result, nil
 }
 
 func (executor *DropTableExecutor) String() string {

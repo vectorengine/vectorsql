@@ -33,9 +33,11 @@ func (executor *FilterExecutor) Execute() (*Result, error) {
 	transformCtx := transforms.NewTransformContext(executor.ctx.ctx, log, conf)
 	transform := transforms.NewFilterTransform(transformCtx, executor.filter)
 	executor.transformer = transform
-	blockIO := NewResult(transform, nil)
-	log.Debug("Executor->Return->Result:%+v", blockIO)
-	return blockIO, nil
+
+	result := NewResult()
+	result.SetInput(transform)
+	log.Debug("Executor->Return->Result:%+v", result)
+	return result, nil
 }
 
 func (executor *FilterExecutor) String() string {
