@@ -23,7 +23,7 @@ func NewMemoryStorage(ctx *MemoryStorageContext, cols []*columns.Column) *Memory
 	return &MemoryStorage{
 		ctx:    ctx,
 		cols:   cols,
-		output: NewNativeBlockOutputStream(),
+		output: NewNativeBlockOutputStream(datablocks.NewDataBlock(cols)),
 	}
 }
 
@@ -52,11 +52,12 @@ func (storage *MemoryStorage) GetInputStream(session *sessions.Session) (datastr
 
 type NativeBlockOutputStream struct {
 	mu     sync.RWMutex
+	header *datablocks.DataBlock
 	blocks []*datablocks.DataBlock
 }
 
-func NewNativeBlockOutputStream() *NativeBlockOutputStream {
-	return &NativeBlockOutputStream{}
+func NewNativeBlockOutputStream(header *datablocks.DataBlock) *NativeBlockOutputStream {
+	return &NativeBlockOutputStream{header: header}
 }
 
 func (stream *NativeBlockOutputStream) Name() string {
@@ -69,6 +70,11 @@ func (stream *NativeBlockOutputStream) Write(block *datablocks.DataBlock) error 
 	stream.blocks = append(stream.blocks, block)
 	return nil
 }
+
 func (stream *NativeBlockOutputStream) Finalize() error {
 	return nil
+}
+
+func (stream *NativeBlockOutputStream) SampleBlock() *datablocks.DataBlock {
+	return stream.header.Clone()
 }

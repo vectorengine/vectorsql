@@ -20,4 +20,5 @@ type IDataBlockOutputStream interface {
 	Name() string
 	Write(*datablocks.DataBlock) error
 	Finalize() error
+	SampleBlock() *datablocks.DataBlock
 }

@@ -8,19 +8,20 @@ import (
 	"io"
 	"sync"
 
-	"datablocks"
-
 	"base/binary"
 	"base/errors"
+	"datablocks"
 )
 
 type NativeBlockOutputStream struct {
 	mu     sync.RWMutex
 	writer io.Writer
+	header *datablocks.DataBlock
 }
 
-func NewNativeBlockOutputStream(writer io.Writer) IDataBlockOutputStream {
+func NewNativeBlockOutputStream(header *datablocks.DataBlock, writer io.Writer) IDataBlockOutputStream {
 	return &NativeBlockOutputStream{
+		header: header,
 		writer: writer,
 	}
 }
@@ -76,4 +77,8 @@ func (stream *NativeBlockOutputStream) Write(block *datablocks.DataBlock) error 
 
 func (stream *NativeBlockOutputStream) Finalize() error {
 	return nil
+}
+
+func (stream *NativeBlockOutputStream) SampleBlock() *datablocks.DataBlock {
+	return stream.header.Clone()
 }

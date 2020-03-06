@@ -7,6 +7,7 @@ package tcp
 import (
 	"context"
 	"datablocks"
+	"datastreams"
 	"executors"
 	"optimizers"
 	"planners"
@@ -59,11 +60,17 @@ func (s *TCPHandler) processQuery(session *TCPSession) error {
 		log.Error("%+v", err)
 		return session.sendException(err, conf.Server.CalculateTextStackTrace)
 	}
-
-	if err := s.processOrdinaryQuery(session, result.In); err != nil {
-		return err
-	}
 	log.Debug("%v", executor.String())
+
+	if result.In != nil {
+		if err := s.processOrdinaryQuery(session, result.In); err != nil {
+			return err
+		}
+	} else if result.Out != nil {
+		if err := s.processInsertQuery(session, result.Out); err != nil {
+			return err
+		}
+	}
 	return session.sendEndOfStream()
 }
 
@@ -116,5 +123,12 @@ func (s *TCPHandler) processOrdinaryQuery(session *TCPSession, sink processors.I
 		}
 	}
 	log.Debug("TCPHandler->OrdinaryQuery->Return")
+	return nil
+}
+
+func (s *TCPHandler) processInsertQuery(session *TCPSession, output datastreams.IDataBlockOutputStream) error {
+	if err := session.sendData(output.SampleBlock()); err != nil {
+		return err
+	}
 	return nil
 }

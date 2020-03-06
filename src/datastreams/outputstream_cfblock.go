@@ -19,17 +19,19 @@ type CustomFormatBlockOutputStream struct {
 	formatName  string
 	writePrefix bool
 	writeSuffix bool
+	header      *datablocks.DataBlock
 
 	format dataformats.IDataBlockOutputFormat
 }
 
 func NewCustomFormatBlockOutputStream(header *datablocks.DataBlock, writer io.Writer, formatName string) IDataBlockOutputStream {
 	if formatName == "Native" {
-		return NewNativeBlockOutputStream(writer)
+		return NewNativeBlockOutputStream(header, writer)
 	}
 	return &CustomFormatBlockOutputStream{
 		writer:     writer,
 		formatName: formatName,
+		header:     header,
 		format:     dataformats.FactoryGetOutput(formatName)(header, writer),
 	}
 }
@@ -63,4 +65,8 @@ func (stream *CustomFormatBlockOutputStream) Finalize() error {
 		stream.writeSuffix = true
 	}
 	return nil
+}
+
+func (stream *CustomFormatBlockOutputStream) SampleBlock() *datablocks.DataBlock {
+	return stream.header.Clone()
 }
