@@ -4,15 +4,16 @@
 
 package dataformats
 
-import "datablocks"
+import (
+	"datablocks"
+)
 
 type IDataBlockInputFormat interface {
-	Name() string
+	Read() (*datablocks.DataBlock, error)
 }
 
 type IDataBlockOutputFormat interface {
-	Name() string
-	FormatPrefix() ([]byte, error)
+	WritePrefix() error
 	Write(*datablocks.DataBlock) error
-	FormatSuffix() ([]byte, error)
+	WriteSuffix() error
 }

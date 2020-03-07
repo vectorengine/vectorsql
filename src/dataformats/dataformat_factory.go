@@ -17,11 +17,11 @@ type (
 var (
 	inputTable  = map[string]InputCreator{}
 	outputTable = map[string]OutputCreator{
-		"TSV":         NewTSVOutputFormat,
-		"TabSeparted": NewTSVOutputFormat,
-
-		"TSVWithNames":         NewTSVWithNamesOutputFormat,
-		"TabSepartedWithNames": NewTSVWithNamesOutputFormat,
+		"TSV":                   NewTSVOutputFormat,
+		"TabSeparated":          NewTSVOutputFormat,
+		"TSVWithNames":          NewTSVWithNamesOutputFormat,
+		"TabSeparatedWithNames": NewTSVWithNamesOutputFormat,
+		"NativeBlock":           NewNativeBlockOutputFormat,
 	}
 )
 

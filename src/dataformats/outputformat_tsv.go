@@ -32,31 +32,31 @@ func NewTSVWithNamesOutputFormat(sampleBlock *datablocks.DataBlock, writer io.Wr
 	}
 }
 
-func (f *TSVOutputFormat) FormatPrefix() ([]byte, error) {
-	if f.withNames {
-		cols := f.sampleBlock.Columns()
+func (format *TSVOutputFormat) WritePrefix() error {
+	if format.withNames {
+		cols := format.sampleBlock.Columns()
 		for i, col := range cols {
 			if i != 0 {
-				if _, err := f.writer.Write([]byte("\t")); err != nil {
-					return nil, err
+				if _, err := format.writer.Write([]byte("\t")); err != nil {
+					return err
 				}
 			}
-			if _, err := f.writer.Write([]byte(col.Name)); err != nil {
-				return nil, err
+			if _, err := format.writer.Write([]byte(col.Name)); err != nil {
+				return err
 			}
 		}
-		if _, err := f.writer.Write([]byte("\n")); err != nil {
-			return nil, err
+		if _, err := format.writer.Write([]byte("\n")); err != nil {
+			return err
 		}
 	}
-	return nil, nil
+	return nil
 }
 
-func (stream *TSVOutputFormat) Write(block *datablocks.DataBlock) error {
-	stream.mu.Lock()
-	defer stream.mu.Unlock()
+func (format *TSVOutputFormat) Write(block *datablocks.DataBlock) error {
+	format.mu.Lock()
+	defer format.mu.Unlock()
 
-	writer := stream.writer
+	writer := format.writer
 	iters := block.ColumnIterators()
 	for i := 0; i < block.NumRows(); i++ {
 		for i, it := range iters {
@@ -82,13 +82,6 @@ func (stream *TSVOutputFormat) Write(block *datablocks.DataBlock) error {
 	return nil
 }
 
-func (f *TSVOutputFormat) FormatSuffix() (b []byte, err error) {
-	return
-}
-
-func (stream *TSVOutputFormat) Name() string {
-	if stream.withNames {
-		return "TSVWithNames"
-	}
-	return "TSV"
+func (format *TSVOutputFormat) WriteSuffix() error {
+	return nil
 }

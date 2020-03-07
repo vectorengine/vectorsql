@@ -20,8 +20,7 @@ type CustomFormatBlockOutputStream struct {
 	writePrefix bool
 	writeSuffix bool
 	header      *datablocks.DataBlock
-
-	format dataformats.IDataBlockOutputFormat
+	format      dataformats.IDataBlockOutputFormat
 }
 
 func NewCustomFormatBlockOutputStream(header *datablocks.DataBlock, writer io.Writer, formatName string) IDataBlockOutputStream {
@@ -45,7 +44,7 @@ func (stream *CustomFormatBlockOutputStream) Write(block *datablocks.DataBlock) 
 	defer stream.mu.Unlock()
 
 	if !stream.writePrefix {
-		if _, err := stream.format.FormatPrefix(); err != nil {
+		if err := stream.format.WritePrefix(); err != nil {
 			return err
 		}
 		stream.writePrefix = true
@@ -59,7 +58,7 @@ func (stream *CustomFormatBlockOutputStream) Write(block *datablocks.DataBlock) 
 
 func (stream *CustomFormatBlockOutputStream) Finalize() error {
 	if !stream.writeSuffix {
-		if _, err := stream.format.FormatSuffix(); err != nil {
+		if err := stream.format.WriteSuffix(); err != nil {
 			return err
 		}
 		stream.writeSuffix = true
