@@ -12,20 +12,19 @@ import (
 )
 
 type TSVOutputFormat struct {
-	mu          sync.RWMutex
-	writer      io.Writer
-	withNames   bool
-	sampleBlock *datablocks.DataBlock
+	mu        sync.RWMutex
+	writer    io.Writer
+	withNames bool
 }
 
-func NewTSVOutputFormat(sampleBlock *datablocks.DataBlock, writer io.Writer) IDataBlockOutputFormat {
+func NewTSVOutputFormat(writer io.Writer) IDataBlockOutputFormat {
 	return &TSVOutputFormat{
 		writer:    writer,
 		withNames: false,
 	}
 }
 
-func NewTSVWithNamesOutputFormat(sampleBlock *datablocks.DataBlock, writer io.Writer) IDataBlockOutputFormat {
+func NewTSVWithNamesOutputFormat(writer io.Writer) IDataBlockOutputFormat {
 	return &TSVOutputFormat{
 		writer:    writer,
 		withNames: true,
@@ -33,22 +32,6 @@ func NewTSVWithNamesOutputFormat(sampleBlock *datablocks.DataBlock, writer io.Wr
 }
 
 func (format *TSVOutputFormat) WritePrefix() error {
-	if format.withNames {
-		cols := format.sampleBlock.Columns()
-		for i, col := range cols {
-			if i != 0 {
-				if _, err := format.writer.Write([]byte("\t")); err != nil {
-					return err
-				}
-			}
-			if _, err := format.writer.Write([]byte(col.Name)); err != nil {
-				return err
-			}
-		}
-		if _, err := format.writer.Write([]byte("\n")); err != nil {
-			return err
-		}
-	}
 	return nil
 }
 

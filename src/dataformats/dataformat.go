@@ -9,7 +9,9 @@ import (
 )
 
 type IDataBlockInputFormat interface {
+	ReadPrefix() error
 	Read() (*datablocks.DataBlock, error)
+	ReadSuffix() error
 }
 
 type IDataBlockOutputFormat interface {

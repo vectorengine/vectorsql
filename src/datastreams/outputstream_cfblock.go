@@ -31,7 +31,7 @@ func NewCustomFormatBlockOutputStream(header *datablocks.DataBlock, writer io.Wr
 		writer:     writer,
 		formatName: formatName,
 		header:     header,
-		format:     dataformats.FactoryGetOutput(formatName)(header, writer),
+		format:     dataformats.FactoryGetOutput(formatName)(writer),
 	}
 }
 

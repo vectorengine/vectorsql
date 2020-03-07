@@ -5,13 +5,12 @@
 package dataformats
 
 import (
-	"datablocks"
 	"io"
 )
 
 type (
-	InputCreator  func(sampleBlock *datablocks.DataBlock, reader io.Reader) IDataBlockInputFormat
-	OutputCreator func(sampleBlock *datablocks.DataBlock, writer io.Writer) IDataBlockOutputFormat
+	InputCreator  func(reader io.Reader) IDataBlockInputFormat
+	OutputCreator func(writer io.Writer) IDataBlockOutputFormat
 )
 
 var (
@@ -21,7 +20,6 @@ var (
 		"TabSeparated":          NewTSVOutputFormat,
 		"TSVWithNames":          NewTSVWithNamesOutputFormat,
 		"TabSeparatedWithNames": NewTSVWithNamesOutputFormat,
-		"NativeBlock":           NewNativeBlockOutputFormat,
 	}
 )
 
