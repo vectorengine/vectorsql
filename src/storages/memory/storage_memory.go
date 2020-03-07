@@ -44,8 +44,14 @@ func (storage *MemoryStorage) GetInputStream(session *sessions.Session) (datastr
 
 	log.Debug("Storage->Memory->Enter->Database:%v", session.GetDatabase())
 
-	// Stream.
-	stream := datastreams.NewOneBlockInputStream(storage.output.blocks[0])
+	queue := make(chan interface{}, 64)
+	stream := datastreams.NewChannelBlockInputStream(queue)
+	go func() {
+		defer close(queue)
+		for _, block := range storage.output.blocks {
+			queue <- block
+		}
+	}()
 	log.Debug("Storage->Memory->Return->Stream:%+v", stream)
 	return stream, nil
 }
