@@ -49,3 +49,11 @@ func (datatype *Float64DataType) SerializeText(writer io.Writer, v datavalues.ID
 	}
 	return nil
 }
+
+func (datatype *Float64DataType) Deserialize(reader *binary.Reader) (datavalues.IDataValue, error) {
+	if res, err := reader.Float64(); err != nil {
+		return nil, errors.Wrap(err)
+	} else {
+		return datavalues.MakeFloat(res), nil
+	}
+}

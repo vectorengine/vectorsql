@@ -47,3 +47,11 @@ func (datatype *Int32DataType) SerializeText(writer io.Writer, v datavalues.IDat
 	}
 	return nil
 }
+
+func (datatype *Int32DataType) Deserialize(reader *binary.Reader) (datavalues.IDataValue, error) {
+	if res, err := reader.Int32(); err != nil {
+		return nil, errors.Wrap(err)
+	} else {
+		return datavalues.MakeInt32(res), nil
+	}
+}

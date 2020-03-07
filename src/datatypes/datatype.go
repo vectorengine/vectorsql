@@ -8,10 +8,9 @@ import (
 	"io"
 	"reflect"
 
-	"datavalues"
-
 	"base/binary"
 	"base/errors"
+	"datavalues"
 )
 
 type IDataType interface {
@@ -19,6 +18,7 @@ type IDataType interface {
 	Type() reflect.Type
 	Serialize(*binary.Writer, datavalues.IDataValue) error
 	SerializeText(io.Writer, datavalues.IDataValue) error
+	Deserialize(*binary.Reader) (datavalues.IDataValue, error)
 }
 
 func GetDataTypeByValue(val datavalues.IDataValue) (IDataType, error) {

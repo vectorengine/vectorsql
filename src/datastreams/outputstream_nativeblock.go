@@ -5,10 +5,10 @@
 package datastreams
 
 import (
-	"base/binary"
-	"base/errors"
 	"io"
 
+	"base/binary"
+	"base/errors"
 	"datablocks"
 )
 

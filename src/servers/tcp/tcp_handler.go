@@ -8,16 +8,16 @@ import (
 	"fmt"
 	"net"
 
-	"config"
-
 	"base/errors"
 	"base/xlog"
+	"config"
 	"servers/protocol"
 )
 
 type TCPHandler struct {
 	log      *xlog.Log
 	conf     *config.Config
+	state    QueryState
 	listener net.Listener
 }
 

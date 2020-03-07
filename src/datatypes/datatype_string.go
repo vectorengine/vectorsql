@@ -8,10 +8,9 @@ import (
 	"io"
 	"reflect"
 
-	"datavalues"
-
 	"base/binary"
 	"base/errors"
+	"datavalues"
 )
 
 const (
@@ -46,4 +45,12 @@ func (datatype *StringDataType) SerializeText(writer io.Writer, v datavalues.IDa
 		return errors.Wrap(err)
 	}
 	return nil
+}
+
+func (datatype *StringDataType) Deserialize(reader *binary.Reader) (datavalues.IDataValue, error) {
+	if res, err := reader.String(); err != nil {
+		return nil, errors.Wrap(err)
+	} else {
+		return datavalues.MakeString(res), nil
+	}
 }

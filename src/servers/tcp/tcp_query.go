@@ -6,6 +6,9 @@ package tcp
 
 import (
 	"context"
+	"sync"
+	"time"
+
 	"datablocks"
 	"datastreams"
 	"executors"
@@ -14,8 +17,6 @@ import (
 	"processors"
 	"servers/protocol"
 	"sessions"
-	"sync"
-	"time"
 )
 
 func (s *TCPHandler) processQuery(session *TCPSession) error {
@@ -70,6 +71,7 @@ func (s *TCPHandler) processQuery(session *TCPSession) error {
 		if err := s.processInsertQuery(session, result.Out); err != nil {
 			return err
 		}
+		s.state.SetExecutorResult(result)
 	}
 	return session.sendEndOfStream()
 }

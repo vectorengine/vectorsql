@@ -48,3 +48,11 @@ func (datatype *UInt64DataType) SerializeText(writer io.Writer, v datavalues.IDa
 	}
 	return nil
 }
+
+func (datatype *UInt64DataType) Deserialize(reader *binary.Reader) (datavalues.IDataValue, error) {
+	if res, err := reader.UInt64(); err != nil {
+		return nil, errors.Wrap(err)
+	} else {
+		return datavalues.ToValue(res), nil
+	}
+}
