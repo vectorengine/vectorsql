@@ -23,10 +23,8 @@ func NewUseExecutor(ctx *ExecutorContext, plan planners.IPlan) IExecutor {
 
 func (executor *UseExecutor) Execute() (*Result, error) {
 	ectx := executor.ctx
-	log := executor.ctx.log
 	plan := executor.plan
 
-	log.Debug("Executor->Enter->LogicalPlan:%s", executor.plan)
 	dbname := plan.Ast.DBName.String()
 	if _, err := databases.GetDatabase(dbname); err != nil {
 		return nil, err
@@ -34,7 +32,6 @@ func (executor *UseExecutor) Execute() (*Result, error) {
 	ectx.session.SetDatabase(dbname)
 
 	result := NewResult()
-	log.Debug("Executor->Return->Result:%+v", result)
 	return result, nil
 }
 

@@ -36,3 +36,12 @@ func newDataBlockValueWithValues(col *columns.Column, values []datavalues.IDataV
 func (v *DataBlockValue) ColumnName() string {
 	return v.column.Name
 }
+
+func (v *DataBlockValue) DeepClone() *DataBlockValue {
+	clone := &DataBlockValue{
+		column: v.column,
+		values: make([]datavalues.IDataValue, len(v.values)),
+	}
+	copy(clone.values, v.values)
+	return clone
+}

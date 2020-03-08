@@ -6,6 +6,7 @@ package tcp
 
 import (
 	"fmt"
+	"io"
 	"net"
 
 	"base/errors"
@@ -70,7 +71,11 @@ func (s *TCPHandler) handle(conn net.Conn) {
 
 	log.Debug("Connection coming:%s", conn.RemoteAddr().String())
 	if err := s.handlePacket(session); err != nil {
-		log.Error("%+v, %T", err, err)
+		if err == io.EOF {
+			log.Info("Connection closed:%v", conn.RemoteAddr().String())
+		} else {
+			log.Error("%+v, %T", err, err)
+		}
 		conn.Close()
 	}
 }

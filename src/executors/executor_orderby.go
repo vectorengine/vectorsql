@@ -29,14 +29,12 @@ func (executor *OrderByExecutor) Execute() (*Result, error) {
 	log := executor.ctx.log
 	conf := executor.ctx.conf
 
-	log.Debug("Executor->Enter->LogicalPlan:%s", executor.plan)
 	transformCtx := transforms.NewTransformContext(executor.ctx.ctx, log, conf)
 	transform := transforms.NewOrderByTransform(transformCtx, executor.plan)
 	executor.transformer = transform
 
 	result := NewResult()
 	result.SetInput(transform)
-	log.Debug("Executor->Return->Result:%+v", result)
 	return result, nil
 }
 

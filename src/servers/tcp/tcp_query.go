@@ -61,7 +61,6 @@ func (s *TCPHandler) processQuery(session *TCPSession) error {
 		log.Error("%+v", err)
 		return session.sendException(err, conf.Server.CalculateTextStackTrace)
 	}
-	log.Debug("%v", executor.String())
 
 	if result.In != nil {
 		if err := s.processOrdinaryQuery(session, result.In); err != nil {
@@ -129,8 +128,5 @@ func (s *TCPHandler) processOrdinaryQuery(session *TCPSession, sink processors.I
 }
 
 func (s *TCPHandler) processInsertQuery(session *TCPSession, output datastreams.IDataBlockOutputStream) error {
-	if err := session.sendData(output.SampleBlock()); err != nil {
-		return err
-	}
-	return nil
+	return session.sendData(output.SampleBlock())
 }

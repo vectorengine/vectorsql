@@ -43,9 +43,20 @@ func newDataBlock(seqs []int, values []*DataBlockValue) *DataBlock {
 	}
 }
 
-// Clone a sample block
 func (block *DataBlock) Clone() *DataBlock {
 	return NewDataBlock(block.Columns())
+}
+
+func (block *DataBlock) DeepClone() *DataBlock {
+	clone := NewDataBlock(block.Columns())
+	clone.totalBytes = block.totalBytes
+	clone.seqs = make([]int, len(block.seqs))
+	copy(clone.seqs, block.seqs)
+
+	for i, value := range block.values {
+		clone.values[i] = value.DeepClone()
+	}
+	return clone
 }
 
 func (block *DataBlock) Info() *DataBlockInfo {

@@ -45,7 +45,6 @@ func (executor *TableValuedFunctionExecutor) Execute() (*Result, error) {
 	conf := executor.ctx.conf
 	queue := make(chan interface{}, 64)
 
-	log.Debug("Executor->Enter->LogicalPlan:%s", executor.plan)
 	err := plan.Walk(func(plan planners.IPlan) (bool, error) {
 		switch plan := plan.(type) {
 		case *planners.ConstantPlan:
@@ -139,7 +138,6 @@ func (executor *TableValuedFunctionExecutor) Execute() (*Result, error) {
 
 	result := NewResult()
 	result.SetInput(transform)
-	log.Debug("Executor->Return->Result:%+v", result)
 	return result, nil
 }
 

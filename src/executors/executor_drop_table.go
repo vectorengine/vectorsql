@@ -23,10 +23,8 @@ func NewDropTableExecutor(ctx *ExecutorContext, plan planners.IPlan) IExecutor {
 
 func (executor *DropTableExecutor) Execute() (*Result, error) {
 	ectx := executor.ctx
-	log := executor.ctx.log
 	ast := executor.plan.Ast
 
-	log.Debug("Executor->Enter->LogicalPlan:%s", executor.plan)
 	schema := ectx.session.GetDatabase()
 	if !ast.FromTables[0].Qualifier.IsEmpty() {
 		schema = ast.FromTables[0].Qualifier.String()
@@ -42,7 +40,6 @@ func (executor *DropTableExecutor) Execute() (*Result, error) {
 	}
 
 	result := NewResult()
-	log.Debug("Executor->Return->Result:%+v", result)
 	return result, nil
 }
 

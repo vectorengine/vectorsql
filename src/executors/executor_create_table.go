@@ -23,10 +23,8 @@ func NewCreateTableExecutor(ctx *ExecutorContext, plan planners.IPlan) IExecutor
 
 func (executor *CreateTableExecutor) Execute() (*Result, error) {
 	ectx := executor.ctx
-	log := executor.ctx.log
 	ast := executor.plan.Ast
 
-	log.Debug("Executor->Enter->LogicalPlan:%s", executor.plan)
 	schema := ectx.session.GetDatabase()
 	if !ast.Table.Qualifier.IsEmpty() {
 		schema = ast.Table.Qualifier.String()
@@ -41,7 +39,6 @@ func (executor *CreateTableExecutor) Execute() (*Result, error) {
 	}
 
 	result := NewResult()
-	log.Debug("Executor->Return->Result:%+v", result)
 	return result, nil
 }
 

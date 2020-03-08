@@ -25,11 +25,9 @@ func NewSelectExecutor(ctx *ExecutorContext, plan planners.IPlan) IExecutor {
 
 func (executor *SelectExecutor) Execute() (*Result, error) {
 	ectx := executor.ctx
-	log := executor.ctx.log
 	tree := executor.tree
 
 	children := executor.plan.SubPlan.SubPlans
-	log.Debug("Executor->Enter->LogicalPlan:%s", children)
 
 	for _, plan := range children {
 		switch plan := plan.(type) {
@@ -69,7 +67,6 @@ func (executor *SelectExecutor) Execute() (*Result, error) {
 
 	result := NewResult()
 	result.SetInput(pipeline.Last())
-	log.Debug("Executor->Return->Result:%+v", result)
 	return result, nil
 }
 

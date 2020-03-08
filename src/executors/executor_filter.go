@@ -29,14 +29,12 @@ func (executor *FilterExecutor) Execute() (*Result, error) {
 	log := executor.ctx.log
 	conf := executor.ctx.conf
 
-	log.Debug("Executor->Enter->LogicalPlan:%s", executor.filter)
 	transformCtx := transforms.NewTransformContext(executor.ctx.ctx, log, conf)
 	transform := transforms.NewFilterTransform(transformCtx, executor.filter)
 	executor.transformer = transform
 
 	result := NewResult()
 	result.SetInput(transform)
-	log.Debug("Executor->Return->Result:%+v", result)
 	return result, nil
 }
 
