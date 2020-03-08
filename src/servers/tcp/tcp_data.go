@@ -21,5 +21,5 @@ func (s *TCPHandler) processData(session *TCPSession) error {
 			s.state.Reset()
 		}
 	}
-	return session.sendEndOfStream()
+	return nil
 }

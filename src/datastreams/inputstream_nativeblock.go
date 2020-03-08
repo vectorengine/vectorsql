@@ -53,8 +53,8 @@ func (stream *NativeBlockInputStream) Read() (*datablocks.DataBlock, error) {
 		return nil, errors.Wrap(err)
 	}
 
-	var columnSlice []*columns.Column
-	var valueSlice [][]datavalues.IDataValue
+	columnSlice := make([]*columns.Column, numColumns)
+	valueSlice := make([][]datavalues.IDataValue, numColumns)
 	for i := 0; i < int(numColumns); i++ {
 		colName, err := reader.String()
 		if err != nil {
@@ -68,9 +68,7 @@ func (stream *NativeBlockInputStream) Read() (*datablocks.DataBlock, error) {
 		if err != nil {
 			return nil, err
 		}
-		column := columns.NewColumn(colName, dt)
-		columnSlice = append(columnSlice, column)
-
+		columnSlice[i] = columns.NewColumn(colName, dt)
 		values := make([]datavalues.IDataValue, numRows)
 		for j := 0; j < int(numRows); j++ {
 			val, err := dt.Deserialize(reader)
@@ -79,7 +77,7 @@ func (stream *NativeBlockInputStream) Read() (*datablocks.DataBlock, error) {
 			}
 			values[j] = val
 		}
-		valueSlice = append(valueSlice, values)
+		valueSlice[i] = values
 	}
 
 	if numColumns > 0 {
