@@ -99,6 +99,7 @@ curl -XPOST http://127.0.0.1:8123 -d "SELECT SUM(IF(status!=200, 1, 0)) AS error
 
 * Dataset: 10,000,000 (10 Million)
 * Hardware: 16vCPUx16G KVM Cloud Instance
+* [Benchmark](benchmark)
 
 
 |Query |Cost(second)|
