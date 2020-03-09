@@ -5,6 +5,7 @@
 package datastreams
 
 import (
+	"fmt"
 	"sync"
 
 	"datablocks"
@@ -35,5 +36,6 @@ func (stream *OneBlockInputStream) Read() (*datablocks.DataBlock, error) {
 	}
 	block := stream.blocks[stream.current]
 	stream.current++
+	fmt.Printf("OneBlockInputStream->Block:%v\n", block.NumRows())
 	return block, nil
 }

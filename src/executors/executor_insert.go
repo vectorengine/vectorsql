@@ -27,8 +27,6 @@ func (executor *InsertExecutor) Execute() (*Result, error) {
 	conf := executor.ctx.conf
 	session := executor.ctx.session
 
-	log.Debug("Executor->Enter->LogicalPlan:%s", executor.plan)
-
 	schema := session.GetDatabase()
 	if plan.Schema != "" {
 		schema = plan.Schema
@@ -48,7 +46,6 @@ func (executor *InsertExecutor) Execute() (*Result, error) {
 
 	result := NewResult()
 	result.SetOutput(output)
-	log.Debug("Executor->Return->Result:%+v", result)
 	return result, nil
 }
 

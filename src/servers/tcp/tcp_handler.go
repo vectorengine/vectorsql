@@ -72,7 +72,7 @@ func (s *TCPHandler) handle(conn net.Conn) {
 	log.Debug("Connection coming:%s", conn.RemoteAddr().String())
 	if err := s.handlePacket(session); err != nil {
 		if err == io.EOF {
-			log.Info("Client:%v closed", conn.RemoteAddr().String())
+			log.Info("Connection closed:%v", conn.RemoteAddr().String())
 		} else {
 			log.Error("%+v, %T", err, err)
 		}

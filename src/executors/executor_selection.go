@@ -31,7 +31,6 @@ func (executor *SelectionExecutor) Execute() (*Result, error) {
 	conf := executor.ctx.conf
 	plan := executor.plan
 
-	log.Debug("Executor->Enter->LogicalPlan:%s", executor.plan)
 	transformCtx := transforms.NewTransformContext(executor.ctx.ctx, log, conf)
 
 	var transform processors.IProcessor
@@ -49,7 +48,6 @@ func (executor *SelectionExecutor) Execute() (*Result, error) {
 
 	result := NewResult()
 	result.SetInput(transform)
-	log.Debug("Executor->Return->Result:%+v", result)
 	return result, nil
 }
 

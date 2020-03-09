@@ -5,21 +5,23 @@
 package tcp
 
 import (
+	"base/humanize"
 	"servers/protocol"
 )
 
 func (s *TCPHandler) processData(session *TCPSession) error {
+	log := s.log
 	block, err := protocol.ReadDataRequest(session.reader)
 	if err != nil {
 		return err
 	}
 	if block != nil {
+		log.Debug("Receive client data block: rows:%v, columns:%v, size:%v", block.NumRows(), block.NumColumns(), humanize.Bytes(block.TotalBytes()))
 		if !s.state.Empty() {
-			if err := s.state.result.Out.Write(block); err != nil {
-				return err
-			}
-			s.state.Reset()
+			return s.state.result.Out.Write(block)
 		}
+	} else {
+		log.Debug("Receive nil client data block")
 	}
 	return nil
 }

@@ -32,7 +32,6 @@ func (executor *ScanExecutor) Execute() (*Result, error) {
 	plan := executor.plan
 	session := executor.ctx.session
 
-	log.Debug("Executor->Enter->LogicalPlan:%s", executor.plan)
 	if plan.Schema == "" {
 		plan.Schema = session.GetDatabase()
 	}
@@ -54,7 +53,6 @@ func (executor *ScanExecutor) Execute() (*Result, error) {
 
 	result := NewResult()
 	result.SetInput(transform)
-	log.Debug("Executor->Return->Result:%+v", result)
 	return result, nil
 }
 

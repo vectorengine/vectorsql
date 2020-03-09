@@ -23,10 +23,8 @@ func NewCreateDatabaseExecutor(ctx *ExecutorContext, plan planners.IPlan) IExecu
 
 func (executor *CreateDatabaseExecutor) Execute() (*Result, error) {
 	ectx := executor.ctx
-	log := executor.ctx.log
 	ast := executor.plan.Ast
 
-	log.Debug("Executor->Enter->LogicalPlan:%s", executor.plan)
 	databaseCtx := databases.NewDatabaseContext(ectx.log, ectx.conf)
 	database, err := databases.DatabaseFactory(databaseCtx, ast)
 	if err != nil {
@@ -37,7 +35,6 @@ func (executor *CreateDatabaseExecutor) Execute() (*Result, error) {
 	}
 
 	result := NewResult()
-	log.Debug("Executor->Return->Result:%+v", result)
 	return result, nil
 }
 

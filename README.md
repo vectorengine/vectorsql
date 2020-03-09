@@ -97,23 +97,21 @@ curl -XPOST http://127.0.0.1:8123 -d "SELECT SUM(IF(status!=200, 1, 0)) AS error
 
 ## Performance
 
-* Dataset: 10,000,000 (10 Million) and ~ 10,000 groups
-* Hardware: 16Cx16G KVM Cloud Instance
+* Dataset: 10,000,000 (10 Million)
+* Hardware: 16vCPUx16G KVM Cloud Instance
 
-|Query |Cost(second)| Parallelism|
-|-------------------------------|---------------|---|
-|SELECT COUNT(c1) FROM randtable(rows->10000000, c1->'Int32')|0.198 s| Yes |
-|SELECT COUNT(c1) FROM randtable(rows->10000000, c1->'Int32') WHERE c1!=0|0.463 s| Yes |
-|SELECT SUM(c1) FROM randtable(rows->10000000, c1->'Int32')| 0.138 s| Yes|
-|SELECT SUM(c1) AS sc1, COUNT(c1) AS cc1, sc1/cc1 AS avgc1 FROM randtable(rows->10000000, c1->'Int32')|1.446 s| Yes |
-|SELECT MIN(c1), MAX(c1) FROM randtable(rows->10000000, c1->'Int32')|0.458 s| Yes |
-|SELECT COUNT(c1) as cc1, c1 FROM randtable(rows->10000000, c1->'Int32') GROUP BY c1 ORDER BY cc1 DESC LIMIT 10|2.148 s| Yes |
-|SELECT c2 FROM randtable(rows->10000000, c2->'String') WHERE c2 LIKE '%xx%'|0.799 s| Yes |
-|SELECT COUNT(c2) FROM randtable(rows->10000000, c2->'String') WHERE c2 LIKE '%xx%'|0.860 s| Yes |
 
-* Note
-  - randtable random N numbers to (N/1000) groups
-  - Cost not include the Test Data Generation time
+|Query |Cost(second)|
+|-------------------------------|---------------|
+| SELECT COUNT(id) FROM testdata | 0.378s |
+| SELECT COUNT(id) FROM testdata WHERE id!=0 | 0.796s |
+| SELECT SUM(data5) FROM testdata | 0.371s |
+| SELECT SUM(data5) AS sum, COUNT(data5) AS count, sum/count AS avg FROM testdata | 1.878s |
+| SELECT MAX(id), MIN(id) FROM testdata | 0.514s |
+| SELECT COUNT(data1) AS count, data1 FROM testdata GROUP BY data1 ORDER BY count DESC LIMIT 10 | 0.926s |
+| SELECT email FROM testdata WHERE email like '%20@example.com%' LIMIT 1 | 0.041s |
+| SELECT COUNT(email) FROM testdata WHERE email like '%20@example.com%' | 1.643s |
+| SELECT data1 AS x, x - 1, x - 2, x - 3, count(data1) AS c FROM testdata GROUP BY x, x - 1, x - 2, x - 3 ORDER BY c DESC LIMIT 10 | 2.142s |
 
 ## Metrics
 
