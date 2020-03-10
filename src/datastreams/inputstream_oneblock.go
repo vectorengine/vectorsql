@@ -39,3 +39,5 @@ func (stream *OneBlockInputStream) Read() (*datablocks.DataBlock, error) {
 	fmt.Printf("OneBlockInputStream->Block:%v\n", block.NumRows())
 	return block, nil
 }
+
+func (stream *OneBlockInputStream) Close() {}

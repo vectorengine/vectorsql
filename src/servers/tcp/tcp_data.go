@@ -6,12 +6,16 @@ package tcp
 
 import (
 	"base/humanize"
-	"servers/protocol"
+	"datastreams"
 )
 
 func (s *TCPHandler) processData(session *TCPSession) error {
 	log := s.log
-	block, err := protocol.ReadDataRequest(session.reader)
+
+	stream := datastreams.NewNativeBlockInputStream(session.reader)
+	defer stream.Close()
+
+	block, err := stream.Read()
 	if err != nil {
 		return err
 	}

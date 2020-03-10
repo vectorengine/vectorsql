@@ -66,6 +66,8 @@ func (stream *CustomFormatBlockOutputStream) Finalize() error {
 	return nil
 }
 
+func (stream *CustomFormatBlockOutputStream) Close() {}
+
 func (stream *CustomFormatBlockOutputStream) SampleBlock() *datablocks.DataBlock {
 	return stream.header.Clone()
 }

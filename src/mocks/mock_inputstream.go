@@ -49,3 +49,5 @@ func (stream *MockBlockInputStream) Read() (*datablocks.DataBlock, error) {
 func (stream *MockBlockInputStream) Insert(v *datablocks.DataBlock) error {
 	panic("You can't use the Insert here")
 }
+
+func (stream *MockBlockInputStream) Close() {}

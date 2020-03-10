@@ -27,3 +27,5 @@ func (stream *IteratorBlockInputStream) Name() string {
 func (stream *IteratorBlockInputStream) Read() (*datablocks.DataBlock, error) {
 	return stream.iteratorFunc()
 }
+
+func (stream *IteratorBlockInputStream) Close() {}

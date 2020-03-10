@@ -37,6 +37,7 @@ func NewTCPSession(conn net.Conn) *TCPSession {
 }
 
 func (session *TCPSession) Close() {
+	session.conn.Close()
 	session.session.Close()
 }
 

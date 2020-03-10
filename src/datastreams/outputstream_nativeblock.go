@@ -75,6 +75,8 @@ func (stream *NativeBlockOutputStream) Finalize() error {
 	return nil
 }
 
+func (stream *NativeBlockOutputStream) Close() {}
+
 func (stream *NativeBlockOutputStream) SampleBlock() *datablocks.DataBlock {
 	return stream.header.Clone()
 }

@@ -14,11 +14,13 @@ type IDataBlockInputStream interface {
 	// Read next block.
 	// If there are no more blocks, return nil.
 	Read() (*datablocks.DataBlock, error)
+	Close()
 }
 
 type IDataBlockOutputStream interface {
 	Name() string
 	Write(*datablocks.DataBlock) error
 	Finalize() error
+	Close()
 	SampleBlock() *datablocks.DataBlock
 }

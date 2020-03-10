@@ -42,6 +42,9 @@ func (storage *SystemNumbersStorage) GetInputStream(session *sessions.Session) (
 	return NewSystemNumbersBlockInputStream(storage), nil
 }
 
+func (storage *SystemNumbersStorage) Close() {
+}
+
 type SystemNumbersBlockIntputStream struct {
 	storage      *SystemNumbersStorage
 	block        *datablocks.DataBlock
@@ -78,3 +81,5 @@ func (stream *SystemNumbersBlockIntputStream) Read() (*datablocks.DataBlock, err
 	}
 	return block, nil
 }
+
+func (stream *SystemNumbersBlockIntputStream) Close() {}

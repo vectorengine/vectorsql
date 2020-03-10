@@ -104,15 +104,15 @@ curl -XPOST http://127.0.0.1:8123 -d "SELECT SUM(IF(status!=200, 1, 0)) AS error
 
 |Query |Cost(second)|
 |-------------------------------|---------------|
-| SELECT COUNT(id) FROM testdata | 0.378s |
-| SELECT COUNT(id) FROM testdata WHERE id!=0 | 0.796s |
-| SELECT SUM(data5) FROM testdata | 0.371s |
-| SELECT SUM(data5) AS sum, COUNT(data5) AS count, sum/count AS avg FROM testdata | 1.878s |
-| SELECT MAX(id), MIN(id) FROM testdata | 0.514s |
-| SELECT COUNT(data1) AS count, data1 FROM testdata GROUP BY data1 ORDER BY count DESC LIMIT 10 | 0.926s |
-| SELECT email FROM testdata WHERE email like '%20@example.com%' LIMIT 1 | 0.041s |
-| SELECT COUNT(email) FROM testdata WHERE email like '%20@example.com%' | 1.643s |
-| SELECT data1 AS x, x - 1, x - 2, x - 3, count(data1) AS c FROM testdata GROUP BY x, x - 1, x - 2, x - 3 ORDER BY c DESC LIMIT 10 | 2.142s |
+| SELECT COUNT(id) FROM testdata | 0.269s |
+| SELECT COUNT(id) FROM testdata WHERE id!=0 | 0.438s |
+| SELECT SUM(data1) FROM testdata | 0.287s |
+| SELECT SUM(data1) AS sum, COUNT(data1) AS count, sum/count AS avg FROM testdata | 1.814s |
+| SELECT MAX(id), MIN(id) FROM testdata | 0.473s |
+| SELECT COUNT(data1) AS count, data1 FROM testdata GROUP BY data1 ORDER BY count DESC LIMIT 10 | 0.728s |
+| SELECT email FROM testdata WHERE email like '%20@example.com%' LIMIT 1 | 0.076s |
+| SELECT COUNT(email) FROM testdata WHERE email like '%20@example.com%' | 1.470s |
+| SELECT data1 AS x, x - 1, x - 2, x - 3, count(data1) AS c FROM testdata GROUP BY x, x - 1, x - 2, x - 3 ORDER BY c DESC LIMIT 10 | 2.396s |
 
 ## Metrics
 

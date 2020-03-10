@@ -5,13 +5,12 @@
 package system
 
 import (
+	"base/errors"
 	"columns"
 	"datablocks"
 	"datastreams"
 	"datatypes"
 	"sessions"
-
-	"base/errors"
 )
 
 type SystemTablesStorage struct {
@@ -51,4 +50,7 @@ func (storage *SystemTablesStorage) GetInputStream(session *sessions.Session) (d
 
 	// Stream.
 	return datastreams.NewOneBlockInputStream(block), nil
+}
+
+func (storage *SystemTablesStorage) Close() {
 }

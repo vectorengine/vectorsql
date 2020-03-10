@@ -34,3 +34,5 @@ func (stream *ChannelBlockInputStream) Read() (*datablocks.DataBlock, error) {
 	}
 	return nil, nil
 }
+
+func (stream *ChannelBlockInputStream) Close() {}

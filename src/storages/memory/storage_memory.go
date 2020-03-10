@@ -43,7 +43,7 @@ func (storage *MemoryStorage) GetInputStream(session *sessions.Session) (datastr
 	log := storage.ctx.log
 
 	i := 0
-	stream := datastreams.NewIteratorBlockInputStream(func() (*datablocks.DataBlock, error) {
+	iteratorFn := func() (*datablocks.DataBlock, error) {
 		if i >= len(storage.output.blocks) {
 			return nil, nil
 		}
@@ -51,8 +51,14 @@ func (storage *MemoryStorage) GetInputStream(session *sessions.Session) (datastr
 		log.Debug("Storage->Memory->InputStream->Block: index:%v, rows:%v", i, res.NumRows())
 		i++
 		return res, nil
-	})
+	}
+	stream := datastreams.NewIteratorBlockInputStream(iteratorFn)
 	return stream, nil
+}
+
+func (storage *MemoryStorage) Close() {
+	storage.cols = nil
+	storage.output.Close()
 }
 
 type NativeBlockOutputStream struct {
@@ -80,14 +86,14 @@ func (stream *NativeBlockOutputStream) Finalize() error {
 	return nil
 }
 
-func (stream *NativeBlockOutputStream) SampleBlock() *datablocks.DataBlock {
-	return stream.header.Clone()
+func (stream *NativeBlockOutputStream) Close() {
+	for _, block := range stream.blocks {
+		block.Close()
+	}
+	stream.blocks = nil
+	stream.header = nil
 }
 
-func (stream *NativeBlockOutputStream) Copy() []*datablocks.DataBlock {
-	blocks := make([]*datablocks.DataBlock, len(stream.blocks))
-	for i, block := range stream.blocks {
-		blocks[i] = block.DeepClone()
-	}
-	return blocks
+func (stream *NativeBlockOutputStream) SampleBlock() *datablocks.DataBlock {
+	return stream.header.Clone()
 }

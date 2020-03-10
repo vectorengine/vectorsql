@@ -147,6 +147,12 @@ func (block *DataBlock) WriteRow(values []datavalues.IDataValue) error {
 	return nil
 }
 
+func (block *DataBlock) Close() {
+	block.seqs = nil
+	block.values = nil
+	block.totalBytes = 0
+}
+
 func (block *DataBlock) Dump() {
 	header := "\n| "
 	for _, cv := range block.values {

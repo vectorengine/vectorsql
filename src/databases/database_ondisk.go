@@ -160,10 +160,11 @@ func (database *OnDiskDatabase) detachTable(tableName string) error {
 
 	log := database.ctx.log
 	dbName := database.getDBName()
-	if _, ok := database.tableCaches[tableName]; !ok {
+	tbl, ok := database.tableCaches[tableName]
+	if !ok {
 		return errors.Errorf("%s.%s doesn't exists", dbName, tableName)
 	}
-
+	tbl.storage.Close()
 	delete(database.tableCaches, tableName)
 	log.Info("Detach table:%s.%s", dbName, tableName)
 	return nil

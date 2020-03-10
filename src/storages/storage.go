@@ -15,4 +15,5 @@ type IStorage interface {
 	Columns() []*columns.Column
 	GetInputStream(*sessions.Session) (datastreams.IDataBlockInputStream, error)
 	GetOutputStream(*sessions.Session) (datastreams.IDataBlockOutputStream, error)
+	Close()
 }

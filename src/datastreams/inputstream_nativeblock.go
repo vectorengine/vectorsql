@@ -95,3 +95,5 @@ func (stream *NativeBlockInputStream) Read() (*datablocks.DataBlock, error) {
 	}
 	return nil, nil
 }
+
+func (stream *NativeBlockInputStream) Close() {}
