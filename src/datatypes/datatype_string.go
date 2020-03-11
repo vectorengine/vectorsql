@@ -5,12 +5,10 @@
 package datatypes
 
 import (
-	"io"
-	"reflect"
-
 	"base/binary"
 	"base/errors"
 	"datavalues"
+	"io"
 )
 
 const (
@@ -23,10 +21,6 @@ type StringDataType struct {
 
 func NewStringDataType() IDataType {
 	return &StringDataType{}
-}
-
-func (datatype *StringDataType) Type() reflect.Type {
-	return reflect.ValueOf(string("")).Type()
 }
 
 func (datatype *StringDataType) Name() string {

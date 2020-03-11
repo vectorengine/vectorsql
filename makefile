@@ -21,6 +21,7 @@ test:
 	@$(MAKE) testsessions
 	@$(MAKE) testexpressions
 	@$(MAKE) testprocessors
+	@$(MAKE) testdatatypes
 	@$(MAKE) testdatastreams
 	@$(MAKE) testparsers
 	@$(MAKE) testplanners
@@ -41,6 +42,9 @@ testsessions:
 
 testprocessors:
 	go test -v -race processors
+
+testdatatypes:
+	go test -v -race datatypes
 
 testdatastreams:
 	go test -v -race datastreams
@@ -66,8 +70,8 @@ testtransforms:
 
 pkgs =	config		\
 		sessions	\
-		parsers/...	\
 		processors	\
+		datatypes	\
 		datastreams	\
 		expressions	\
 		planners	\

@@ -14,13 +14,13 @@ type dataTypeCreator func() IDataType
 
 var (
 	table = map[string]dataTypeCreator{
-		DataTypeStringName:  NewStringDataType,
-		DataTypeInt32Name:   NewInt32DataType,
-		DataTypeUInt32Name:  NewUInt32DataType,
-		DataTypeInt64Name:   NewInt64DataType,
-		DataTypeUInt64Name:  NewUInt64DataType,
-		DataTypeFloat32Name: NewFloat32DataType,
-		DataTypeFloat64Name: NewFloat64DataType,
+		NewStringDataType().Name():  NewStringDataType,
+		NewInt32DataType().Name():   NewInt32DataType,
+		NewUInt32DataType().Name():  NewUInt32DataType,
+		NewInt64DataType().Name():   NewInt64DataType,
+		NewUInt64DataType().Name():  NewUInt64DataType,
+		NewFloat32DataType().Name(): NewFloat32DataType,
+		NewFloat64DataType().Name(): NewFloat64DataType,
 	}
 )
 

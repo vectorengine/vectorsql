@@ -5,13 +5,11 @@
 package datatypes
 
 import (
-	"fmt"
-	"io"
-	"reflect"
-
 	"base/binary"
 	"base/errors"
 	"datavalues"
+	"fmt"
+	"io"
 )
 
 const (
@@ -24,10 +22,6 @@ type Float32DataType struct {
 
 func NewFloat32DataType() IDataType {
 	return &Float32DataType{}
-}
-
-func (datatype *Float32DataType) Type() reflect.Type {
-	return reflect.ValueOf(int64(0)).Type()
 }
 
 func (datatype *Float32DataType) Name() string {

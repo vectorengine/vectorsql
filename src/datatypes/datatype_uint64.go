@@ -5,11 +5,9 @@
 package datatypes
 
 import (
+	"datavalues"
 	"fmt"
 	"io"
-	"reflect"
-
-	"datavalues"
 
 	"base/binary"
 	"base/errors"
@@ -25,10 +23,6 @@ type UInt64DataType struct {
 
 func NewUInt64DataType() IDataType {
 	return &UInt64DataType{}
-}
-
-func (datatype *UInt64DataType) Type() reflect.Type {
-	return reflect.ValueOf(uint64(0)).Type()
 }
 
 func (datatype *UInt64DataType) Name() string {
