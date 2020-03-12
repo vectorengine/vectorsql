@@ -77,6 +77,12 @@ func logMemStats(log *xlog.Log) {
 	for range t.C {
 		memstats := &runtime.MemStats{}
 		runtime.ReadMemStats(memstats)
-		log.Info("Memory InUse: %v    Alloc: %v    Sys: %v", humanize.Bytes(memstats.HeapInuse), humanize.Bytes(memstats.Alloc), humanize.Bytes(memstats.Sys))
+		log.Info("Memory InUse: %v    Alloc: %v    Sys: %v    NumGC: %v    NextGC: %v",
+			humanize.Bytes(memstats.HeapInuse),
+			humanize.Bytes(memstats.Alloc),
+			humanize.Bytes(memstats.Sys),
+			memstats.NumGC,
+			humanize.Bytes(memstats.NextGC),
+		)
 	}
 }
