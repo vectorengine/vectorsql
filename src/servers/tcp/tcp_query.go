@@ -72,6 +72,7 @@ func (s *TCPHandler) processQuery(session *TCPSession) error {
 		}
 		s.state.SetExecutorResult(result)
 	}
+	log.Debug("%s", executor.String())
 	return session.sendEndOfStream()
 }
 

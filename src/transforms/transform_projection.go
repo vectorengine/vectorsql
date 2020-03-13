@@ -5,16 +5,18 @@
 package transforms
 
 import (
+	"time"
+
 	"datablocks"
 	"planners"
 	"processors"
-	"sync/atomic"
+	"sessions"
 )
 
 type ProjectionTransform struct {
-	ctx         *TransformContext
-	plan        *planners.ProjectionPlan
-	processRows int64
+	ctx            *TransformContext
+	plan           *planners.ProjectionPlan
+	progressValues sessions.ProgressValues
 	processors.BaseProcessor
 }
 
@@ -33,11 +35,16 @@ func (t *ProjectionTransform) Execute() {
 	onNext := func(x interface{}) {
 		switch y := x.(type) {
 		case *datablocks.DataBlock:
+			start := time.Now()
 			if block, err := y.ProjectionByPlan(t.plan.Projections); err != nil {
 				out.Send(err)
 			} else {
+				cost := time.Since(start)
+				t.progressValues.Cost.Add(cost)
+				t.progressValues.ReadBytes.Add(int64(block.TotalBytes()))
+				t.progressValues.ReadRows.Add(int64(block.NumRows()))
+				t.progressValues.TotalRowsToRead.Add(int64(block.NumRows()))
 				out.Send(block)
-				atomic.AddInt64(&t.processRows, int64(block.NumRows()))
 			}
 		default:
 			out.Send(x)
@@ -46,6 +53,6 @@ func (t *ProjectionTransform) Execute() {
 	t.Subscribe(onNext)
 }
 
-func (t *ProjectionTransform) Rows() int64 {
-	return atomic.LoadInt64(&t.processRows)
+func (t *ProjectionTransform) Stats() sessions.ProgressValues {
+	return t.progressValues
 }

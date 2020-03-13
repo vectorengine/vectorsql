@@ -143,5 +143,5 @@ func (executor *TableValuedFunctionExecutor) Execute() (*Result, error) {
 
 func (executor *TableValuedFunctionExecutor) String() string {
 	transformer := executor.transformer.(*transforms.DataSourceTransform)
-	return fmt.Sprintf("(%v, rows:%v, cost:%v)", transformer.Name(), transformer.Rows(), executor.duration)
+	return fmt.Sprintf("(%v, stats:%+v, cost:%v)", transformer.Name(), transformer.Stats(), executor.duration)
 }

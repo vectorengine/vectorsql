@@ -5,11 +5,12 @@
 package datatypes
 
 import (
+	"fmt"
+	"io"
+
 	"base/binary"
 	"base/errors"
 	"datavalues"
-	"fmt"
-	"io"
 )
 
 const (
@@ -17,7 +18,6 @@ const (
 )
 
 type Int64DataType struct {
-	DataTypeBase
 }
 
 func NewInt64DataType() IDataType {

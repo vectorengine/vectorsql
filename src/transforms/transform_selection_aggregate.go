@@ -5,20 +5,22 @@
 package transforms
 
 import (
+	"sync"
+	"time"
+
 	"datablocks"
 	"expressions"
 	"planners"
 	"processors"
-	"sync"
-	"sync/atomic"
+	"sessions"
 
 	"github.com/gammazero/workerpool"
 )
 
 type AggregateSelectionTransform struct {
-	ctx         *TransformContext
-	plan        *planners.SelectionPlan
-	processRows int64
+	ctx            *TransformContext
+	plan           *planners.SelectionPlan
+	progressValues sessions.ProgressValues
 	processors.BaseProcessor
 }
 
@@ -51,6 +53,7 @@ func (t *AggregateSelectionTransform) Execute() {
 		switch y := x.(type) {
 		case *datablocks.DataBlock:
 			workerPool.Submit(func() {
+				start := time.Now()
 				expr, err := y.AggregateSelectionByPlan(fields, plan)
 				if err != nil {
 					out.Send(err)
@@ -59,7 +62,12 @@ func (t *AggregateSelectionTransform) Execute() {
 				mu.Lock()
 				exprs = append(exprs, expr)
 				mu.Unlock()
-				atomic.AddInt64(&t.processRows, int64(y.NumRows()))
+
+				cost := time.Since(start)
+				t.progressValues.Cost.Add(cost)
+				t.progressValues.ReadBytes.Add(int64(y.TotalBytes()))
+				t.progressValues.ReadRows.Add(int64(y.NumRows()))
+				t.progressValues.TotalRowsToRead.Add(int64(y.NumRows()))
 			})
 		case error:
 			out.Send(y)
@@ -92,6 +100,6 @@ func (t *AggregateSelectionTransform) Execute() {
 	t.Subscribe(onNext, onDone)
 }
 
-func (t *AggregateSelectionTransform) Rows() int64 {
-	return atomic.LoadInt64(&t.processRows)
+func (t *AggregateSelectionTransform) Stats() sessions.ProgressValues {
+	return t.progressValues
 }

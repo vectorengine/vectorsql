@@ -40,5 +40,5 @@ func (executor *OrderByExecutor) Execute() (*Result, error) {
 
 func (executor *OrderByExecutor) String() string {
 	transformer := executor.transformer.(*transforms.OrderByTransform)
-	return fmt.Sprintf("(%v, rows:%v, cost:%v)", transformer.Name(), transformer.Rows(), transformer.Duration())
+	return fmt.Sprintf("(%v, stats:%+v)", transformer.Name(), transformer.Stats())
 }

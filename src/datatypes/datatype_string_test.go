@@ -6,7 +6,6 @@ package datatypes
 
 import (
 	"bytes"
-	"math"
 	"testing"
 
 	"base/binary"
@@ -15,25 +14,21 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestDataTypeFloat32(t *testing.T) {
+func TestDataTypeString(t *testing.T) {
 	tests := []struct {
 		name   string
 		expect datavalues.IDataValue
 		errStr string
 	}{
 		{
-			name:   "DataTypeFloat32-passed",
-			expect: datavalues.ToValue(float32(32)),
-		},
-		{
-			name:   "DataTypeFloat32-overflow-passed",
-			expect: datavalues.ToValue(math.MaxFloat32 + 1),
+			name:   "DataTypeString-passed",
+			expect: datavalues.ToValue("string"),
 		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			dt, err := DataTypeFactory(DataTypeFloat32Name)
+			dt, err := DataTypeFactory(DataTypeStringName)
 			assert.Nil(t, err)
 
 			buf := &bytes.Buffer{}

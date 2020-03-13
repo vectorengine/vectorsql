@@ -5,17 +5,18 @@
 package transforms
 
 import (
-	"sync/atomic"
+	"time"
 
 	"datablocks"
 	"planners"
 	"processors"
+	"sessions"
 )
 
 type OrderByTransform struct {
-	ctx         *TransformContext
-	plan        *planners.OrderByPlan
-	processRows int64
+	ctx            *TransformContext
+	plan           *planners.OrderByPlan
+	progressValues sessions.ProgressValues
 	processors.BaseProcessor
 }
 
@@ -57,17 +58,22 @@ func (t *OrderByTransform) Execute() {
 	}
 	onDone := func() {
 		if block != nil {
+			start := time.Now()
 			if err := block.OrderByPlan(fields, t.plan); err != nil {
 				out.Send(err)
 			} else {
+				cost := time.Since(start)
+				t.progressValues.Cost.Add(cost)
+				t.progressValues.ReadBytes.Add(int64(block.TotalBytes()))
+				t.progressValues.ReadRows.Add(int64(block.NumRows()))
+				t.progressValues.TotalRowsToRead.Add(int64(block.NumRows()))
 				out.Send(block)
-				atomic.AddInt64(&t.processRows, int64(block.NumRows()))
 			}
 		}
 	}
 	t.Subscribe(onNext, onDone)
 }
 
-func (t *OrderByTransform) Rows() int64 {
-	return atomic.LoadInt64(&t.processRows)
+func (t *OrderByTransform) Stats() sessions.ProgressValues {
+	return t.progressValues
 }

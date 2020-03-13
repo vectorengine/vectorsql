@@ -71,6 +71,7 @@ testtransforms:
 pkgs =	config		\
 		sessions	\
 		processors	\
+		parsers/...	\
 		datatypes	\
 		datastreams	\
 		expressions	\

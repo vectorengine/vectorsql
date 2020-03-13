@@ -58,5 +58,5 @@ func (executor *ScanExecutor) Execute() (*Result, error) {
 
 func (executor *ScanExecutor) String() string {
 	transformer := executor.transformer.(*transforms.DataSourceTransform)
-	return fmt.Sprintf("(%v, rows:%v, cost:%v)", transformer.Name(), transformer.Rows(), transformer.Duration())
+	return fmt.Sprintf("(%v, stats:%+v, cost:%v)", transformer.Name(), transformer.Stats(), transformer.Duration())
 }

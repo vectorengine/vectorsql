@@ -5,8 +5,6 @@
 package datatypes
 
 import (
-	"strings"
-
 	"base/errors"
 )
 
@@ -19,7 +17,6 @@ var (
 		NewUInt32DataType().Name():  NewUInt32DataType,
 		NewInt64DataType().Name():   NewInt64DataType,
 		NewUInt64DataType().Name():  NewUInt64DataType,
-		NewFloat32DataType().Name(): NewFloat32DataType,
 		NewFloat64DataType().Name(): NewFloat64DataType,
 	}
 )
@@ -27,11 +24,7 @@ var (
 func DataTypeFactory(name string) (IDataType, error) {
 	dt, ok := table[name]
 	if !ok {
-		if dt2, ok := table[strings.ToUpper(name)]; !ok {
-			return nil, errors.Errorf("Unsupported data type:%s", name)
-		} else {
-			return dt2(), nil
-		}
+		return nil, errors.Errorf("Unsupported data type:%s", name)
 	}
 	return dt(), nil
 }

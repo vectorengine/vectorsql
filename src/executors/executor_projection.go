@@ -40,5 +40,5 @@ func (executor *ProjectionExecutor) Execute() (*Result, error) {
 
 func (executor *ProjectionExecutor) String() string {
 	transformer := executor.transformer.(*transforms.ProjectionTransform)
-	return fmt.Sprintf("(%v, rows:%v, cost:%v)", transformer.Name(), transformer.Rows(), transformer.Duration())
+	return fmt.Sprintf("(%v, stats:%+v)", transformer.Name(), transformer.Stats())
 }

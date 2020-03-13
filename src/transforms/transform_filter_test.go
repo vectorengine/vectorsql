@@ -180,6 +180,8 @@ func TestFilterTransform(t *testing.T) {
 				return nil
 			})
 			assert.Nil(t, err)
+			stats := filter.(*FilterTransform).Stats()
+			assert.True(t, stats.TotalRowsToRead.Get() > 0)
 		})
 	}
 }

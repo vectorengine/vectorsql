@@ -18,7 +18,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestLimitTransfrom(t *testing.T) {
+func TestSelectionAggregateTransfrom(t *testing.T) {
 	tests := []struct {
 		name   string
 		plan   planners.IPlan
@@ -27,9 +27,12 @@ func TestLimitTransfrom(t *testing.T) {
 	}{
 		{
 			name: "simple",
-			plan: planners.NewLimitPlan(
-				planners.NewConstantPlan(1),
-				planners.NewConstantPlan(2),
+			plan: planners.NewSelectionPlan(
+				planners.NewMapPlan(
+					planners.NewVariablePlan("name"),
+					planners.NewUnaryExpressionPlan("sum", planners.NewVariablePlan("age")),
+				),
+				planners.NewMapPlan(),
 			),
 			source: mocks.NewSourceFromSlice(
 				mocks.NewBlockFromSlice(
@@ -41,14 +44,22 @@ func TestLimitTransfrom(t *testing.T) {
 					[]interface{}{"z", 13},
 					[]interface{}{"y", 12},
 					[]interface{}{"y", 13},
-				)),
+				),
+				mocks.NewBlockFromSlice(
+					[]*columns.Column{
+						{Name: "name", DataType: datatypes.NewStringDataType()},
+						{Name: "age", DataType: datatypes.NewInt32DataType()},
+					},
+					[]interface{}{"x", 11},
+					[]interface{}{"y", 13},
+				),
+			),
 			expect: mocks.NewBlockFromSlice(
 				[]*columns.Column{
 					{Name: "name", DataType: datatypes.NewStringDataType()},
-					{Name: "age", DataType: datatypes.NewInt32DataType()},
+					{Name: "SUM(age)", DataType: datatypes.NewInt32DataType()},
 				},
-				[]interface{}{"z", 13},
-				[]interface{}{"y", 12},
+				[]interface{}{"y", 73},
 			),
 		},
 	}
@@ -57,17 +68,17 @@ func TestLimitTransfrom(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			mock, cleanup := mocks.NewMock()
 			defer cleanup()
-			ctx := NewTransformContext(mock.Ctx, mock.Log, mock.Conf)
 
+			ctx := NewTransformContext(mock.Ctx, mock.Log, mock.Conf)
 			stream := mocks.NewMockBlockInputStream(test.source)
 			datasource := NewDataSourceTransform(ctx, stream)
 
-			limit := NewLimitransform(ctx, test.plan.(*planners.LimitPlan))
+			selection := NewAggregateSelectionTransform(ctx, test.plan.(*planners.SelectionPlan))
 
 			sink := processors.NewSink("sink")
 			pipeline := processors.NewPipeline(context.Background())
 			pipeline.Add(datasource)
-			pipeline.Add(limit)
+			pipeline.Add(selection)
 			pipeline.Add(sink)
 			pipeline.Run()
 
@@ -78,8 +89,9 @@ func TestLimitTransfrom(t *testing.T) {
 				return nil
 			})
 			assert.Nil(t, err)
-			stats := limit.(*Limitransform).Stats()
-			assert.True(t, stats.TotalRowsToRead.Get() > 0)
+			stats := selection.(*AggregateSelectionTransform).Stats()
+			assert.Equal(t, stats.TotalRowsToRead.Get(), int64(6))
 		})
+
 	}
 }

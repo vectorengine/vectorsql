@@ -5,16 +5,18 @@
 package transforms
 
 import (
+	"time"
+
 	"datablocks"
 	"planners"
 	"processors"
-	"sync/atomic"
+	"sessions"
 )
 
 type Limitransform struct {
-	ctx         *TransformContext
-	plan        *planners.LimitPlan
-	processRows int64
+	ctx            *TransformContext
+	plan           *planners.LimitPlan
+	progressValues sessions.ProgressValues
 	processors.BaseProcessor
 }
 
@@ -43,11 +45,17 @@ func (t *Limitransform) Execute() {
 		switch y := x.(type) {
 		case *datablocks.DataBlock:
 			if x != nil {
+				start := time.Now()
 				cutOffset, cutLimit := y.Limit(offset, limit)
 				offset -= cutOffset
 				limit -= cutLimit
 				x = y
-				atomic.AddInt64(&t.processRows, int64(y.NumRows()))
+
+				cost := time.Since(start)
+				t.progressValues.Cost.Add(cost)
+				t.progressValues.ReadBytes.Add(int64(y.TotalBytes()))
+				t.progressValues.ReadRows.Add(int64(y.NumRows()))
+				t.progressValues.TotalRowsToRead.Add(int64(y.NumRows()))
 			}
 		}
 		out.Send(x)
@@ -60,6 +68,6 @@ func (t *Limitransform) Execute() {
 	t.Subscribe(onNext)
 }
 
-func (t *Limitransform) Rows() int64 {
-	return atomic.LoadInt64(&t.processRows)
+func (t *Limitransform) Stats() sessions.ProgressValues {
+	return t.progressValues
 }

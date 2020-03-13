@@ -17,25 +17,25 @@ func WriteProgressResponse(writer *binary.Writer, pv *sessions.ProgressValues, c
 	}
 
 	// Read rows.
-	if err := writer.Uvarint(pv.ReadRows); err != nil {
+	if err := writer.Uvarint(uint64(pv.ReadRows.Get())); err != nil {
 		return errors.Wrapf(err, "couldn't write ReadRows")
 	}
 
 	// Read Bytes.
-	if err := writer.Uvarint(pv.ReadBytes); err != nil {
+	if err := writer.Uvarint(uint64(pv.ReadBytes.Get())); err != nil {
 		return errors.Wrapf(err, "couldn't write ReadBytes")
 	}
 
 	// Total Read Rows.
-	if err := writer.Uvarint(pv.TotalRowsToRead); err != nil {
+	if err := writer.Uvarint(uint64(pv.TotalRowsToRead.Get())); err != nil {
 		return errors.Wrapf(err, "couldn't write TotalRowsToRead")
 	}
 
 	if clientRevision >= DBMS_MIN_REVISION_WITH_CLIENT_WRITE_INFO {
-		if err := writer.Uvarint(pv.WrittenRows); err != nil {
+		if err := writer.Uvarint(uint64(pv.WrittenRows.Get())); err != nil {
 			return errors.Wrapf(err, "couldn't write WrittenRows")
 		}
-		if err := writer.Uvarint(pv.WrittenBytes); err != nil {
+		if err := writer.Uvarint(uint64(pv.WrittenBytes.Get())); err != nil {
 			return errors.Wrapf(err, "couldn't write WrittenBytes")
 		}
 	}

@@ -136,6 +136,8 @@ func TestOrderByTransfrom(t *testing.T) {
 			} else {
 				assert.Nil(t, err)
 				assert.True(t, mocks.DataBlockEqual(expect, actual))
+				stats := orderby.(*OrderByTransform).Stats()
+				assert.Equal(t, stats.TotalRowsToRead.Get(), int64(6))
 			}
 		})
 	}

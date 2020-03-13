@@ -40,5 +40,5 @@ func (executor *FilterExecutor) Execute() (*Result, error) {
 
 func (executor *FilterExecutor) String() string {
 	transformer := executor.transformer.(*transforms.FilterTransform)
-	return fmt.Sprintf("(%v, rows:%v, cost:%v)", transformer.Name(), transformer.Rows(), transformer.Duration())
+	return fmt.Sprintf("(%v, stats:%+v)", transformer.Name(), transformer.Stats())
 }

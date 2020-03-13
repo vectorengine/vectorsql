@@ -22,12 +22,12 @@ func GetDataTypeByValue(val datavalues.IDataValue) (IDataType, error) {
 	switch val.Type() {
 	case datavalues.TypeString:
 		return NewStringDataType(), nil
-	case datavalues.TypeFloat:
-		return NewFloat64DataType(), nil
 	case datavalues.TypeInt:
 		return NewInt64DataType(), nil
 	case datavalues.TypeInt32:
 		return NewInt32DataType(), nil
+	case datavalues.TypeFloat:
+		return NewFloat64DataType(), nil
 	default:
 		return nil, errors.Errorf("Unsupported value type:%v", val.Type())
 	}

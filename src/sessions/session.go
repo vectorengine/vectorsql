@@ -30,12 +30,7 @@ func (s *Session) UpdateProgress(pv *ProgressValues) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	s.progress.Cost += pv.Cost
-	s.progress.ReadRows += pv.ReadRows
-	s.progress.ReadBytes += pv.ReadBytes
-	s.progress.TotalRowsToRead += pv.TotalRowsToRead
-	s.progress.WrittenRows += pv.WrittenRows
-	s.progress.WrittenBytes += pv.WrittenBytes
+	s.progress = pv
 }
 
 func (s *Session) GetProgress() *ProgressValues {

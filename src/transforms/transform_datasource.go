@@ -5,7 +5,6 @@
 package transforms
 
 import (
-	"sync/atomic"
 	"time"
 
 	"datastreams"
@@ -14,9 +13,9 @@ import (
 )
 
 type DataSourceTransform struct {
-	ctx         *TransformContext
-	input       datastreams.IDataBlockInputStream
-	processRows int64
+	ctx            *TransformContext
+	input          datastreams.IDataBlockInputStream
+	progressValues sessions.ProgressValues
 	processors.BaseProcessor
 }
 
@@ -53,22 +52,20 @@ func (t *DataSourceTransform) Execute() {
 				return
 			}
 			cost := time.Since(start)
+			t.progressValues.Cost.Add(cost)
+			t.progressValues.ReadBytes.Add(int64(data.TotalBytes()))
+			t.progressValues.ReadRows.Add(int64(data.NumRows()))
+			t.progressValues.TotalRowsToRead.Add(int64(data.NumRows()))
 			if ctx.progressCallback != nil {
-				progressValues := &sessions.ProgressValues{
-					Cost:            cost,
-					ReadRows:        uint64(data.NumRows()),
-					TotalRowsToRead: uint64(data.NumRows()),
-					ReadBytes:       data.TotalBytes(),
-				}
-				ctx.progressCallback(progressValues)
+				ctx.progressCallback(&t.progressValues)
 			}
+
 			out.Send(data)
-			atomic.AddInt64(&t.processRows, int64(data.NumRows()))
 		}
 
 	}
 }
 
-func (t *DataSourceTransform) Rows() int64 {
-	return atomic.LoadInt64(&t.processRows)
+func (t *DataSourceTransform) Stats() sessions.ProgressValues {
+	return t.progressValues
 }

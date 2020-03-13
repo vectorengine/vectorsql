@@ -6,16 +6,18 @@ package transforms
 
 import (
 	"datablocks"
-	"github.com/gammazero/workerpool"
 	"planners"
 	"processors"
-	"sync/atomic"
+	"sessions"
+	"time"
+
+	"github.com/gammazero/workerpool"
 )
 
 type FilterTransform struct {
-	ctx         *TransformContext
-	filter      *planners.FilterPlan
-	processRows int64
+	ctx            *TransformContext
+	filter         *planners.FilterPlan
+	progressValues sessions.ProgressValues
 	processors.BaseProcessor
 }
 
@@ -44,12 +46,17 @@ func (t *FilterTransform) Execute() {
 	onNext := func(x interface{}) {
 		switch y := x.(type) {
 		case *datablocks.DataBlock:
-			atomic.AddInt64(&t.processRows, int64(y.NumRows()))
 			workerPool.Submit(func() {
+				start := time.Now()
 				if err := y.FilterByPlan(fields, plan); err != nil {
 					out.Send(err)
 				} else {
 					if y.NumRows() > 0 {
+						cost := time.Since(start)
+						t.progressValues.Cost.Add(cost)
+						t.progressValues.ReadBytes.Add(int64(y.TotalBytes()))
+						t.progressValues.ReadRows.Add(int64(y.NumRows()))
+						t.progressValues.TotalRowsToRead.Add(int64(y.NumRows()))
 						out.Send(y)
 					}
 				}
@@ -64,6 +71,6 @@ func (t *FilterTransform) Execute() {
 	t.Subscribe(onNext, onDone)
 }
 
-func (t *FilterTransform) Rows() int64 {
-	return atomic.LoadInt64(&t.processRows)
+func (t *FilterTransform) Stats() sessions.ProgressValues {
+	return t.progressValues
 }

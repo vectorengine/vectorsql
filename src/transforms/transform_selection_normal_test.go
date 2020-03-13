@@ -18,7 +18,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestLimitTransfrom(t *testing.T) {
+func TestSelectionNormalTransfrom(t *testing.T) {
 	tests := []struct {
 		name   string
 		plan   planners.IPlan
@@ -27,9 +27,11 @@ func TestLimitTransfrom(t *testing.T) {
 	}{
 		{
 			name: "simple",
-			plan: planners.NewLimitPlan(
-				planners.NewConstantPlan(1),
-				planners.NewConstantPlan(2),
+			plan: planners.NewSelectionPlan(
+				planners.NewMapPlan(
+					planners.NewVariablePlan("name"),
+				),
+				planners.NewMapPlan(),
 			),
 			source: mocks.NewSourceFromSlice(
 				mocks.NewBlockFromSlice(
@@ -47,8 +49,10 @@ func TestLimitTransfrom(t *testing.T) {
 					{Name: "name", DataType: datatypes.NewStringDataType()},
 					{Name: "age", DataType: datatypes.NewInt32DataType()},
 				},
-				[]interface{}{"z", 13},
+				[]interface{}{"x", 11},
 				[]interface{}{"y", 12},
+				[]interface{}{"y", 13},
+				[]interface{}{"z", 13},
 			),
 		},
 	}
@@ -57,29 +61,46 @@ func TestLimitTransfrom(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			mock, cleanup := mocks.NewMock()
 			defer cleanup()
+
+			mock.Conf.Server.DefaultBlockSize = 3
 			ctx := NewTransformContext(mock.Ctx, mock.Log, mock.Conf)
 
 			stream := mocks.NewMockBlockInputStream(test.source)
 			datasource := NewDataSourceTransform(ctx, stream)
+			orderby := NewOrderByTransform(ctx,
+				planners.NewOrderByPlan(
+					planners.Order{
+						Expression: planners.NewVariablePlan("name"),
+						Direction:  "asc",
+					},
+				))
 
-			limit := NewLimitransform(ctx, test.plan.(*planners.LimitPlan))
+			selection := NewNormalSelectionTransform(ctx, test.plan.(*planners.SelectionPlan))
 
 			sink := processors.NewSink("sink")
 			pipeline := processors.NewPipeline(context.Background())
 			pipeline.Add(datasource)
-			pipeline.Add(limit)
+			pipeline.Add(selection)
+			pipeline.Add(orderby)
 			pipeline.Add(sink)
 			pipeline.Run()
 
+			var actual *datablocks.DataBlock
 			err := pipeline.Wait(func(x interface{}) error {
-				actual := x.(*datablocks.DataBlock)
-				expect := test.expect
-				assert.True(t, mocks.DataBlockEqual(actual, expect))
+				y := x.(*datablocks.DataBlock)
+				if actual == nil {
+					actual = y
+				} else {
+					actual.Append(y)
+				}
 				return nil
 			})
 			assert.Nil(t, err)
-			stats := limit.(*Limitransform).Stats()
-			assert.True(t, stats.TotalRowsToRead.Get() > 0)
+			expect := test.expect
+			assert.True(t, mocks.DataBlockEqual(actual, expect))
+
+			stats := selection.(*NormalSelectionTransform).Stats()
+			assert.Equal(t, stats.TotalRowsToRead.Get(), int64(4))
 		})
 	}
 }

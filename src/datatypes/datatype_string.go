@@ -5,10 +5,11 @@
 package datatypes
 
 import (
+	"io"
+
 	"base/binary"
 	"base/errors"
 	"datavalues"
-	"io"
 )
 
 const (
@@ -16,7 +17,6 @@ const (
 )
 
 type StringDataType struct {
-	DataTypeBase
 }
 
 func NewStringDataType() IDataType {

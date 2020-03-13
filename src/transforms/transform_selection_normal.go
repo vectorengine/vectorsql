@@ -8,15 +8,16 @@ import (
 	"datablocks"
 	"planners"
 	"processors"
-	"sync/atomic"
+	"sessions"
+	"time"
 
 	"github.com/gammazero/workerpool"
 )
 
 type NormalSelectionTransform struct {
-	ctx         *TransformContext
-	plan        *planners.SelectionPlan
-	processRows int64
+	ctx            *TransformContext
+	plan           *planners.SelectionPlan
+	progressValues sessions.ProgressValues
 	processors.BaseProcessor
 }
 
@@ -46,11 +47,16 @@ func (t *NormalSelectionTransform) Execute() {
 		switch y := x.(type) {
 		case *datablocks.DataBlock:
 			workerPool.Submit(func() {
+				start := time.Now()
 				if block, err := y.NormalSelectionByPlan(fields, plan); err != nil {
 					out.Send(err)
 				} else {
+					cost := time.Since(start)
+					t.progressValues.Cost.Add(cost)
+					t.progressValues.ReadBytes.Add(int64(y.TotalBytes()))
+					t.progressValues.ReadRows.Add(int64(y.NumRows()))
+					t.progressValues.TotalRowsToRead.Add(int64(y.NumRows()))
 					out.Send(block)
-					atomic.AddInt64(&t.processRows, int64(y.NumRows()))
 				}
 			})
 		case error:
@@ -63,6 +69,6 @@ func (t *NormalSelectionTransform) Execute() {
 	t.Subscribe(onNext, onDone)
 }
 
-func (t *NormalSelectionTransform) Rows() int64 {
-	return atomic.LoadInt64(&t.processRows)
+func (t *NormalSelectionTransform) Stats() sessions.ProgressValues {
+	return t.progressValues
 }

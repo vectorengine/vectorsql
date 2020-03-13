@@ -5,8 +5,9 @@
 package transforms
 
 import (
+	"sessions"
 	"sync"
-	"sync/atomic"
+	"time"
 
 	"base/collections"
 	"datablocks"
@@ -18,9 +19,9 @@ import (
 )
 
 type GroupBySelectionTransform struct {
-	ctx         *TransformContext
-	plan        *planners.SelectionPlan
-	processRows int64
+	ctx            *TransformContext
+	plan           *planners.SelectionPlan
+	progressValues sessions.ProgressValues
 	processors.BaseProcessor
 }
 
@@ -46,6 +47,7 @@ func (t *GroupBySelectionTransform) Execute() {
 		switch y := x.(type) {
 		case *datablocks.DataBlock:
 			workerPool.Submit(func() {
+				start := time.Now()
 				grouper, err := y.GroupBySelectionByPlan(plan)
 				if err != nil {
 					out.Send(err)
@@ -54,7 +56,12 @@ func (t *GroupBySelectionTransform) Execute() {
 				mu.Lock()
 				groupers = append(groupers, grouper)
 				mu.Unlock()
-				atomic.AddInt64(&t.processRows, int64(y.NumRows()))
+
+				cost := time.Since(start)
+				t.progressValues.Cost.Add(cost)
+				t.progressValues.ReadBytes.Add(int64(y.TotalBytes()))
+				t.progressValues.ReadRows.Add(int64(y.NumRows()))
+				t.progressValues.TotalRowsToRead.Add(int64(y.NumRows()))
 			})
 		case error:
 			out.Send(y)
@@ -116,6 +123,6 @@ func (t *GroupBySelectionTransform) Execute() {
 	t.Subscribe(onNext, onDone)
 }
 
-func (t *GroupBySelectionTransform) Rows() int64 {
-	return atomic.LoadInt64(&t.processRows)
+func (t *GroupBySelectionTransform) Stats() sessions.ProgressValues {
+	return t.progressValues
 }

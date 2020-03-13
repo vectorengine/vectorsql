@@ -5,14 +5,14 @@
 package sessions
 
 import (
-	"time"
+	"base/sync2"
 )
 
 type ProgressValues struct {
-	Cost            time.Duration
-	ReadRows        uint64
-	ReadBytes       uint64
-	TotalRowsToRead uint64
-	WrittenRows     uint64
-	WrittenBytes    uint64
+	Cost            sync2.AtomicDuration
+	ReadRows        sync2.AtomicInt64
+	ReadBytes       sync2.AtomicInt64
+	TotalRowsToRead sync2.AtomicInt64
+	WrittenRows     sync2.AtomicInt64
+	WrittenBytes    sync2.AtomicInt64
 }

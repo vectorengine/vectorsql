@@ -55,11 +55,11 @@ func (executor *SelectionExecutor) String() string {
 	transformer := executor.transformer
 	switch transformer := transformer.(type) {
 	case *transforms.NormalSelectionTransform:
-		return fmt.Sprintf("(%v, rows:%v, cost:%v)", transformer.Name(), transformer.Rows(), transformer.Duration())
+		return fmt.Sprintf("(%v, stats:%+v)", transformer.Name(), transformer.Stats())
 	case *transforms.AggregateSelectionTransform:
-		return fmt.Sprintf("(%v, rows:%v, cost:%v)", transformer.Name(), transformer.Rows(), transformer.Duration())
+		return fmt.Sprintf("(%v, stats:%+v)", transformer.Name(), transformer.Stats())
 	case *transforms.GroupBySelectionTransform:
-		return fmt.Sprintf("(%v, rows:%v, cost:%v)", transformer.Name(), transformer.Rows(), transformer.Duration())
+		return fmt.Sprintf("(%v, stats:%+v)", transformer.Name(), transformer.Stats())
 	}
 	return ""
 }
