@@ -12,8 +12,17 @@ import (
 
 func TestSession(t *testing.T) {
 	session := NewSession()
+	defer session.Close()
+
 	assert.Equal(t, "system", session.GetDatabase())
 
 	session.SetDatabase("xx")
 	assert.Equal(t, "xx", session.GetDatabase())
+
+	// progress
+	pv := &ProgressValues{}
+	pv.ReadRows.Add(11)
+	session.UpdateProgress(pv)
+	got := session.GetProgress()
+	assert.Equal(t, pv, got)
 }

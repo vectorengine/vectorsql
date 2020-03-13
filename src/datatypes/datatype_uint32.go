@@ -29,17 +29,12 @@ func (datatype *UInt32DataType) Name() string {
 }
 
 func (datatype *UInt32DataType) Serialize(writer *binary.Writer, v datavalues.IDataValue) error {
-	if err := writer.UInt32(uint32(datavalues.AsInt(v))); err != nil {
-		return errors.Wrap(err)
-	}
-	return nil
+	return writer.UInt32(uint32(datavalues.AsInt(v)))
 }
 
 func (datatype *UInt32DataType) SerializeText(writer io.Writer, v datavalues.IDataValue) error {
-	if _, err := writer.Write([]byte(fmt.Sprintf("%d", uint32(datavalues.AsInt(v))))); err != nil {
-		return errors.Wrap(err)
-	}
-	return nil
+	_, err := writer.Write([]byte(fmt.Sprintf("%d", uint32(datavalues.AsInt(v)))))
+	return err
 }
 
 func (datatype *UInt32DataType) Deserialize(reader *binary.Reader) (datavalues.IDataValue, error) {

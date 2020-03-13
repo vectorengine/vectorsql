@@ -31,17 +31,12 @@ func (datatype *Float64DataType) Name() string {
 
 func (datatype *Float64DataType) Serialize(writer *binary.Writer, v datavalues.IDataValue) error {
 	round := math.Round(datavalues.AsFloat(v)*10000) / 10000
-	if err := writer.Float64(round); err != nil {
-		return errors.Wrap(err)
-	}
-	return nil
+	return writer.Float64(round)
 }
 
 func (datatype *Float64DataType) SerializeText(writer io.Writer, v datavalues.IDataValue) error {
-	if _, err := writer.Write([]byte(fmt.Sprintf("%.4f", datavalues.AsFloat(v)))); err != nil {
-		return errors.Wrap(err)
-	}
-	return nil
+	_, err := writer.Write([]byte(fmt.Sprintf("%.4f", datavalues.AsFloat(v))))
+	return err
 }
 
 func (datatype *Float64DataType) Deserialize(reader *binary.Reader) (datavalues.IDataValue, error) {
