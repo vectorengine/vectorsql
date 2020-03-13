@@ -14,7 +14,7 @@ import (
 )
 
 func TestShowTablesPlan(t *testing.T) {
-	query := "show tables"
+	query := "show tables where names like 'xx' limit 2"
 	statement, err := parsers.Parse(query)
 	assert.Nil(t, err)
 

@@ -72,5 +72,8 @@ func TestPlanner(t *testing.T) {
 		expect := test.expect
 		actual := exprs.String()
 		assert.Equal(t, expect, actual)
+
+		_, err = BuildVariableValues(plan)
+		assert.Nil(t, err)
 	}
 }
