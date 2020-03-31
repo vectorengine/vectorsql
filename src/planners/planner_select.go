@@ -47,6 +47,8 @@ func (plan *SelectPlan) Build() error {
 		return err
 	}
 
+	i := 0
+	i++
 	// Fields with aliased.
 	fields, _ = parseFields(aliases, ast.SelectExprs)
 
