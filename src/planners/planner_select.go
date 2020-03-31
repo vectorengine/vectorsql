@@ -36,10 +36,7 @@ func (plan *SelectPlan) Build() error {
 	tree.Add(source)
 
 	// Fields.
-	fields, err := parseFields(nil, ast.SelectExprs)
-	if err != nil {
-		return err
-	}
+	fields, _ := parseFields(nil, ast.SelectExprs)
 
 	// Aliases.
 	aliases, err := parseAliases(fields)
