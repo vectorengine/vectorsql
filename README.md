@@ -39,7 +39,7 @@ $./bin/vectorsql-server -c conf/vectorsql-default.toml
 $clickhouse-client --compression=0
 VectorSQL :) SELECT SUM(IF(status!=200, 1, 0)) AS errors, SUM(IF(status=200, 1, 0)) as success, (errors/COUNT(server)) AS error_rate,(success/COUNT(server)) as success_rate, (SUM(response_time)/COUNT(server)) AS load_avg, MIN(response_time), MAX(response_time), path, server FROM logmock(rows->15) GROUP BY server, path HAVING errors>0 ORDER BY server ASC, load_avg DESC;
 
-SELECT 
+SELECT
     SUM(IF(status != 200, 1, 0)) AS errors, 
     SUM(IF(status = 200, 1, 0)) AS success, 
     errors / COUNT(server) AS error_rate, 
