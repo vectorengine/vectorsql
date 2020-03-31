@@ -48,10 +48,7 @@ func (plan *SelectPlan) Build() error {
 	}
 
 	// Fields with aliased.
-	fields, err = parseFields(aliases, ast.SelectExprs)
-	if err != nil {
-		return err
-	}
+	fields, _ = parseFields(aliases, ast.SelectExprs)
 
 	// Filter.
 	if ast.Where != nil {
