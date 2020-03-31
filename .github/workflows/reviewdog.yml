@@ -1,0 +1,11 @@
+name: reviewdog
+on: [pull_request]
+jobs:
+  golangci-lint:
+    name: runner / golangci-lint
+    runs-on: ubuntu-latest
+    steps:
+    - name: Lint
+        run: |
+          curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | sh -s -- -b $(go env GOPATH)/bin v1.23.6
+          $(go env GOPATH)/bin/golangci-lint run ./...
