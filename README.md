@@ -1,4 +1,4 @@
-NOTICE: This project have moved to [fuse-query](https://github.com/datafusedev/fuse-query)
+NOTICE: This project have moved to [Databend](https://github.com/datafuselabs/databend)
 
 <img src="logo/vectorsql.svg" alt="VectorSQL Logo" width="40%">
 
